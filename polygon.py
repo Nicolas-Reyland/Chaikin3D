@@ -216,7 +216,7 @@ class Polygon:
 		return Polygon(nodes, vertex_list, vertex_index_list)
 
 	@staticmethod
-	def Chaikin3D(polygon : Polygon, n : int = 4) -> Polygon:
+	def Chaikin3D(polygon : Polygon, n : int = 4, verbose : bool = False, file_mode : bool = False) -> Polygon:
 		'''ratio could also be float ?
 		'''
 		# change recursion limit
@@ -232,7 +232,10 @@ class Polygon:
 		sub_node_count = 0
 
 		#
+		total_nodes = len(polygon.nodes)
+		if verbose: print('Calculating new node positions for {} verticies'.format(total_nodes))
 		for node_index,current_node in enumerate(polygon.nodes):
+			if verbose and node_index % 100 == 0: print('[{}/{}] done ({:.2f}%)'.format(node_index, total_nodes, 100 * node_index / total_nodes))
 			#print('\ncurrent node:', current_node)
 			# create sub-nodes
 			num_new_connections = num_graphical_nodes = 0
@@ -289,16 +292,14 @@ class Polygon:
 			#print('sub-nodes:', len(sub_node_list))
 			sub_node_count += len(sub_node_list)
 
-		#print('sub_node_count', sub_node_count)
-
-		#print('\nreconnection')
 		# connect all the sub_nodes together
-		#processed_triplets : list[list[tuple[float]]] = []
 		chaikin_groups_list : list[set[N.Node]] = []
-
-		for old_node in old_nodes:
+		processed_groups = []
+		if verbose: print('Reconnect the new nodes (using the old nodes as starting point)')
+		for old_node_index,old_node in enumerate(old_nodes):
+			if verbose and old_node_index % 100 == 0: print('[{}/{}] done (old nodes) ({:.2f}%)'.format(old_node_index, total_nodes, 100 * old_node_index / total_nodes))
 			old_group_list : list[set[N.Node]] = Polygon._find_chaikin_groups_for_node(old_node)
-			for old_group in old_group_list:
+			for old_group in filter(lambda g: g not in processed_groups and (not file_mode or Polygon._nec_group_cond(g)), old_group_list): # and Polygon._nec_group_cond(g)
 				new_group : set[N.Node] = set()
 				for old_node in old_group:
 					new_nodes = node_dict[old_node]
@@ -313,15 +314,21 @@ class Polygon:
 						# don't break because there are two new nodes per old node
 				if new_group not in chaikin_groups_list:
 					chaikin_groups_list.append(new_group)
+				processed_groups.append(old_group)
 
+		total_groups = len(chaikin_groups_list)
+		if verbose: print('Ordering the groups ({})'.format(total_groups))
 		#print('num raw groups:', len(chaikin_groups_list))
 		ordered_groups : list[list[N.Node]] = list(map(Polygon._order_chaikin_group, chaikin_groups_list))
 
-		for ogroup in ordered_groups:
+		if verbose: print('Connecting the groups ({})'.format(total_groups))
+		for i,ogroup in enumerate(ordered_groups):
+			if verbose and i % 100 == 0: print('[{}/{}] done ({:.2f}%)'.format(i, total_groups, 100 * i / total_groups))
 			#print('ordered group', ogroup)
 			Polygon._connect_ordered_chaikin_group(ogroup)
 
 		# construct new node list
+		if verbose: print('Building the new nodes list...')
 		new_node_list : list[N.Node] = []
 		for _,sub_nodes in node_dict.items():
 			new_node_list.extend(sub_nodes)
@@ -329,7 +336,18 @@ class Polygon:
 		#print('num nodes:', len(new_node_list))
 
 		# return the final polygon
+		if verbose: print('Chaiking 3D done')
 		return Polygon(new_node_list)
+
+	@staticmethod
+	def _nec_group_cond(group):
+		if type(group) == set: group = list(group)
+		num_elements = len(group)
+		for i in range(num_elements):
+			for j in range(i+1, num_elements):
+				if not C.Connection.are_connected(group[i], group[j], 'main'):
+					return False
+		return True
 
 	@staticmethod
 	def _find_chaikin_groups_for_node(chaikin_node : N.Node) -> list[set[N.Node]]:
@@ -449,5 +467,8 @@ class Polygon:
 					group_list.remove(remaining_node)
 					current_node = remaining_node
 					break
+			else:
+				print('no connection found. returning empty group')
+				return []
 
 		return ordered_group

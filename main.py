@@ -9,6 +9,7 @@ parser = ArgumentParser(description='Apply the Chaikin algorithm, expanded for t
 parser.add_argument('-i', '--input', type=str, help='input file (df. None)')
 parser.add_argument('-s', '--shape', type=str, help='shape (df. cube)')
 parser.add_argument('-c', '--chaikin', type=int, help='number of chaikin generations (df. 0)')
+parser.add_argument('-v', '--verbose', type=str, help='verbose (boolean) (df. false)')
 parser.add_argument('-cc', '--chaikin-coef', type=float, help='Chaikin coefficient (df. 4)')
 parser.add_argument('-p', '--plot', type=str, help='plot type ["simple", "full", "evolution", "animation"] (df. simple)')
 parser.add_argument('-a', '--alpha', type=float, help='Alpha/Opacity value for mesh rendering (df. 0.8)')
@@ -33,6 +34,7 @@ if shape and input_file:
 	raise Exception('You must either give an input file or a shape. You cannot give both')
 
 chaikin_gens = args['chaikin'] if args['chaikin'] else 0
+verbose = parse_bool(args['verbose']) if args['verbose'] else False
 chaikin_coef = args['chaikin_coef'] if args['chaikin_coef'] else 4
 plot = args['plot'] if args['plot'] else 'simple'
 alpha = args['alpha'] if args['alpha'] else .8
@@ -47,6 +49,8 @@ elif RENDERER == 'mpl':
 	from mpl_renderer import *
 else:
 	raise Exception('Unkown renderer:', RENDERER)
+
+FILE_MODE = None
 
 # functions
 def draw_full(renderer : Renderer, poly : Polygon) -> None:
@@ -92,8 +96,9 @@ def draw_chaikin_evolution(renderer : Renderer, poly : Polygon, n : int, coef : 
 	near = math.sqrt(n + 1)
 	rows = int(near) + (0 if near == int(near) else 1)
 	cols = rows
+	print('cols', cols, 'rows', rows)
 	renderer.init_subplots(rows, cols, subplot_titles=['Chaikin Gen {}'.format(i) for i in range(n)])
-	for i in range(n):
+	for i in range(n + 1):
 		print('Generation: {}'.format(i))
 		# get values
 		alpha_poly_dd = renderer.get_polygon_draw_data(poly, alpha = alpha, color = 'lightblue')
@@ -111,7 +116,7 @@ def draw_chaikin_evolution(renderer : Renderer, poly : Polygon, n : int, coef : 
 		# go to next plot
 		renderer.next_subplot()
 		# Chaikin
-		poly = Polygon.Chaikin3D(poly, coef)
+		poly = Polygon.Chaikin3D(poly, coef, verbose, FILE_MODE)
 
 	renderer.draw_subplots()
 
@@ -129,7 +134,7 @@ def chaikin_animation(renderer : Renderer, poly : Polygon, n : int, coef : float
 			data=alpha_poly_dd + graphical_conn_dd + main_conn_dd,
 			name='Chaikin Gen {}'.format(gen)
 		))
-		if gen < n: poly = Polygon.Chaikin3D(poly, coef)
+		if gen < n: poly = Polygon.Chaikin3D(poly, coef, verbose, FILE_MODE)
 	fig = go.Figure(frames=frames)
 	# add first frame
 	alpha_poly_dd = renderer.get_polygon_draw_data(poly, alpha = alpha, color = 'lightblue')
@@ -200,17 +205,19 @@ def main():
 	renderer = Renderer()
 	if input_file:
 		poly = ObjMesh(input_file, rotate_mesh).to_polygon()
+		FILE_MODE = True
 	elif shape:
 		if shape not in vars(basic_shapes).keys():
 			raise Exception('Unrecognized shape:', shape)
 		poly = vars(basic_shapes)[shape]()
+		FILE_MODE = False
 	else:
 		raise Exception('You must give an input file or a shape. One or the other, but not none at all')
 
 	if plot != 'evolution' and plot != 'animation':
 		for _ in range(chaikin_gens):
 			print(' - 3D Chaikin -')
-			poly = Polygon.Chaikin3D(poly, chaikin_coef)
+			poly = Polygon.Chaikin3D(poly, chaikin_coef, verbose, FILE_MODE)
 			print('Chaikin done')
 
 	if plot == 'simple':
