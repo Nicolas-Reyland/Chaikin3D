@@ -49,6 +49,14 @@ class Polygon:
 		print('num hash triplets', len(triplet_hash_set))
 		return triplet_list
 
+	def get_connections(self, type_ : str = 'any') -> list[C.Connection]:
+		connection_list = []
+		for node in self.nodes:
+			for conn in node.get_connections_by_type(type_):
+				if conn not in connection_list:
+					connection_list.append(conn)
+		return connection_list
+
 	@staticmethod
 	def _triplet_in_list(triplet_list, triplet) -> bool:
 		if triplet in triplet_list: return True
@@ -269,97 +277,16 @@ class Polygon:
 
 		print('num raw groups:', len(chaikin_groups_list))
 		ordered_groups : list[list[N.Node]] = list(map(Polygon._order_chaikin_group, chaikin_groups_list))
-		ordered_groups : list[list[N.Node]] = Polygon._remove_imposter_chaikin_groups(ordered_groups)
 
 		for ogroup in ordered_groups:
-			Polygon._connect_chaikin_group(ogroup)
+			Polygon._connect_ordered_chaikin_group(ogroup)
 
 
 
 
 
 			break
-			for old_conn in old_node.connection_list:
-				old_conn_node = old_conn.get_partner_node(old_node)
-				for old_sub_conn in filter(lambda old_sub_conn: not old_sub_conn.contains_node(old_node), old_conn_node.connection_list):
-					old_sub_conn_node = old_sub_conn.get_partner_node(old_conn_node)
-					if C.Connection.are_connected(old_sub_conn_node, old_node):
-						triplet = [
-							old_node.coords,
-							old_conn_node.coords,
-							old_sub_conn_node.coords
-						]
-						# have we already processed this triplet ?
-						if Polygon._triplet_in_list(processed_triplets, triplet):
-							continue
-						processed_triplets.append(triplet)
-						'''
-						# centroid of triplet
-						centroid_node = N.Node.from_point(matrix.centroid_of_triangle(old_node.coords, old_conn_node.coords, old_sub_conn_node.coords))
-						'''
-						# select the right sub-nodes to connect
-						chaikin_nodes_2 = node_dict[old_conn_node]
-						chaikin_nodes_3 = node_dict[old_sub_conn_node]
-						selected_chaikin_nodes : set[N.Node] = set() # there should be exactly 6 nodes in it
-						# search in chaikin-nodes 1
-						for c_node_1 in chaikin_nodes_1:
-							for c_node_2 in chaikin_nodes_2:
-								if not C.Connection.are_connected(c_node_1, c_node_2): continue
-								selected_chaikin_nodes.add(c_node_1)
-								selected_chaikin_nodes.add(c_node_2)
-							for c_node_3 in chaikin_nodes_3:
-								if not C.Connection.are_connected(c_node_1, c_node_3): continue
-								selected_chaikin_nodes.add(c_node_1)
-								selected_chaikin_nodes.add(c_node_3)
-						for c_node_2 in chaikin_nodes_2:
-							for c_node_3 in chaikin_nodes_3:
-								if not C.Connection.are_connected(c_node_2, c_node_3): continue
-								selected_chaikin_nodes.add(c_node_2)
-								selected_chaikin_nodes.add(c_node_3)
-						print(selected_chaikin_nodes)
-						assert len(selected_chaikin_nodes) == 6
-						# select an 'intern' triangle from these nodes
-						r'''
-						The 'intern' triangle ABC for the chaikin sub-groups 1, 2 & 3
-						-------A-------------------------
-						 \ 1  /                   \  2 /
-						  \  /                     \  /
-						   \/                       \/
-						    \                       B
-						     \                     /
-						      \                   /
-						       \                 /
-						        \               /
-						         \             /
-						          \           /
-						           \         /
-						            \       /
-						             C-----/
-						              \ 3 /
-						               \ /
-						                v
 
-						(note: there are two intern triangles for each set of 3 chaikin sub-groups)
-						'''
-						for A_node in chaikin_nodes_1:
-							# get the chaikin node from sub-group 1 that is connected to the sub-group 2
-							if A_node in selected_chaikin_nodes and any([C.Connection.are_connected(A_node, c_n_2) for c_n_2 in chaikin_nodes_2]):
-								# get the other chaikin node from sub-group 2 (not connected to sub-group 1, but sub-group 3)
-								B_node_possibilities = list(filter(lambda c_n_2: c_n_2 in selected_chaikin_nodes and not C.Connection.are_connected(A_node, c_n_2), chaikin_nodes_2))
-								assert len(B_node_possibilities) == 1
-								B_node = B_node_possibilities[0]
-								# get the node from sub-group 3
-								C_node_possibilities = list(filter(lambda c_n_3: c_n_3 in selected_chaikin_nodes and not C.Connection.are_connected(B_node, c_n_3), chaikin_nodes_3))
-								assert len(C_node_possibilities) == 1
-								C_node = C_node_possibilities[0]
-								break
-						else:
-							raise Exception('No intern triangle found for {} & {} & {}'.format(chaikin_nodes_1, chaikin_nodes_2, chaikin_nodes_3))
-
-						# connect the nodes
-						A_node.connect(B_node, 'graphical')
-						A_node.connect(C_node, 'graphical')
-						B_node.connect(C_node, 'graphical')
 
 		# construct new node list
 		new_node_list : list[N.Node] = []
@@ -373,19 +300,69 @@ class Polygon:
 
 	@staticmethod
 	def _find_chaikin_groups_for_node(chaikin_node : N.Node) -> list[set[N.Node]]:
-		chaikin_groups_list : list[set[N.Node]] = []
-		for conn in chaikin_node.get_connections_by_type('main'):
-			partner_node = conn.get_partner_node(chaikin_node)
-			for sub_conn in partner_node.get_connections_by_type('main'):
-				if sub_conn == conn: continue
-				partner_sub_node = sub_conn.get_partner_node(partner_node)
-				# iterate
-				partner_chaikin_groups : list[set[N.Node]] = Polygon._rec_find_chaikin_group(chaikin_node, partner_sub_node, {chaikin_node, partner_node})
-				for partner_chaikin_group in partner_chaikin_groups:
-					if partner_chaikin_group not in chaikin_groups_list:
-						chaikin_groups_list.append(partner_chaikin_group)
+		chaikin_group_set_list : list[set[N.Node]] = []
+		main_connections = chaikin_node.get_connections_by_type('main')
+		num_main_connections = len(main_connections)
 
-		return chaikin_groups_list
+		for i in range(num_main_connections):
+			#
+			second_node = main_connections[i].get_partner_node(chaikin_node)
+			for j in range(num_main_connections):
+				if i == j: continue
+				#
+				end_node = main_connections[j].get_partner_node(chaikin_node)
+				plane = matrix.Plane.from_points(chaikin_node.coords, second_node.coords, end_node.coords)
+				#
+				for sub_conn in second_node.get_connections_by_type('main'):
+					partner_node = sub_conn.get_partner_node(second_node)
+					local_group_set_list : list[set[N.Node]] = Polygon._rec_find_chaikin_group_with_plane(
+						chaikin_node,
+						end_node,
+						second_node,
+						partner_node,
+						{end_node, chaikin_node, second_node},
+						plane
+					)
+					for local_group in local_group_set_list:
+						if local_group not in chaikin_group_set_list:
+							chaikin_group_set_list.append(local_group)
+
+		return chaikin_group_set_list
+
+	@staticmethod
+	def _rec_find_chaikin_group_with_plane(start_node : N.Node, end_node : N.Node, second_node : N.Node, current_node : N.Node, current_group : set[N.Node], plane : matrix.Plane) -> list[set[N.Node]]:
+		'''Same as the '_rec_find_chaikin_group' function, but uses plane geometry properties to check if the group is valid
+		'''
+
+		# end of group ?
+		if current_node == end_node:
+			return [current_group]
+		# invalid node ?
+		if current_node in current_group or not plane.point_on_plane(current_node.coords):
+			return []
+
+		# add to group
+		current_group.add(current_node)
+
+		# continue search
+		local_group_set_list : list[set[N.Node]] = []
+		for conn in current_node.get_connections_by_type('main'):
+			partner_node = conn.get_partner_node(current_node)
+			# sub_local_group_set_list are the chaikin groups that go through the partner_node (long & complicated name for something very simple)
+			sub_local_group_set_list = Polygon._rec_find_chaikin_group_with_plane(
+				start_node,
+				end_node,
+				second_node,
+				partner_node,
+				current_group.copy(),
+				plane
+			)
+			# add unique groups
+			for group in sub_local_group_set_list:
+				if group not in local_group_set_list:
+					local_group_set_list.append(group)
+
+		return local_group_set_list
 
 	@staticmethod
 	def _rec_find_chaikin_group(start_node : N.Node, current_node : N.Node, current_group : set[N.Node]) -> list[set[N.Node]]:
@@ -398,6 +375,7 @@ class Polygon:
 		# add to group
 		current_group.add(current_node)
 
+		# continue search
 		groups_list : list[set[N.Node]] = []
 		for conn in current_node.get_connections_by_type('main'):
 			partner_node = conn.get_partner_node(current_node)
@@ -438,11 +416,3 @@ class Polygon:
 					break
 
 		return ordered_group
-
-	@staticmethod
-	def _remove_imposter_chaikin_groups(ogroups_set : set[list[N.Node]]) -> list[list[N.Node]]:
-		# initialize
-		valid_ogroups : list[list[N.Node]] = []
-		exit('hm')
-
-

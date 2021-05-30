@@ -1,4 +1,5 @@
 #
+import basic_shapes
 
 RENDERER = 'plotly' # 'mpl'
 
@@ -12,92 +13,25 @@ else:
 def main():
 	global DO_CHAIKIN
 	renderer = Renderer()
-
-	'''
-	poly = Polygon.from_triangular_points((
-		(0,0,0), # A   0
-		(1,0,0), # B   1
-		(1,0,1), # C   2
-		(1,1,0), # D   3
-		(1,1,1), # E   4
-		(0,1,0), # F   5
-		(0,0,0), # A'  6
-		(1,0,0), # B'  7
-		(0,1,1), # G   9
-		(0,0,1), # H   9
-		(0,0,0), # A' 10
-		(1,0,1), # C' 11
-		(1,1,1), # E' 12
-	),
-	(
-		7, # F -> B
-		12,# H -> E
-	),
-	True,
-	False)
-	'''
-
-	poly = Polygon.from_raw_points((
-		(0,0,0), #  0 A
-		(1,0,0), #  1 B
-		(1,0,1), #  2 C
-		(0,0,0), #  3 A'
-		(0,0,1), #  4 D
-		(0,0,0), #  5 A'
-		(0,1,1), #  6 E
-		(0,0,0), #  7 A'
-		(0,1,0), #  8 F
-		(0,0,0), #  9 A'
-		(1,0,0), # 10 B'
-		(1,1,0), # 11 G
-		(0,1,1), # 12 E'
-		(1,0,0), # 13 B'
-		(1,0,1), # 14 C'
-		(1,1,1), # 15 H
-		(0,1,1), # 16 E'
-		(1,0,1), # 17 C'
-		(0,0,1), # 18 D'
-	),
-	(
-		3,  # C -> A
-		7,  # E -> A
-		10, # F -> B
-		12, # G -> E
-		14, # G -> C
-		18, # H -> D
-	),
-	True,
-	False)
-
-	'''
-	A = (0,0,0)
-	B = (1,0,0)
-	C = (.5,1,0)
-	D = (.5,.2,1)
-
-	poly = Polygon.from_raw_points((
-		A,#
-		B,#
-		C,#
-		A,
-
-		D,#
-		B,
-		A,
-	),
-	(),
-	True,
-	False)
-	'''
+	#poly = basic_shapes.cube()
+	poly = basic_shapes.triangle()
 
 	DO_CHAIKIN = 1
 
 	if DO_CHAIKIN:
-		print(' - 3D Chaikin -')
-		poly = Polygon.Chaikin3D(poly)
+		for _ in range(1):
+			print(' - 3D Chaikin -')
+			poly = Polygon.Chaikin3D(poly, 4)
 
 	print(' - drawing -')
-	renderer.draw_polygon(poly, alpha = 1, draw_text = False)
+	#renderer.draw_polygon(poly, alpha = 1, draw_text = False)
+
+	figure_data = []
+	figure_data.extend(renderer.get_connections_draw_data(poly, type_ = 'graphical', color = 'black'))
+	figure_data.extend(renderer.get_connections_draw_data(poly, type_ = 'main', color = 'darkred'))
+	figure_data.extend(renderer.get_polygon_draw_data(poly, alpha = .6, color = 'lightblue'))
+	renderer.draw(figure_data)
+
 	return poly
 
 if __name__ == '__main__':
