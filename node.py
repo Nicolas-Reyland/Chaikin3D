@@ -4,8 +4,7 @@ import connection as C
 
 _hash_exp_1 = 12
 _hash_exp_2 = 34
-_hash_exp_3 = 56
-_hash_exp_4 = 7
+_hash_exp_3 = 5
 
 class Node:
 	def __init__(self, x : float, y : float, z : float):
@@ -15,11 +14,11 @@ class Node:
 		self.coords = [self.x, self.y, self.z]
 
 	def __hash__(self) -> int:
-		return int('123{x}00{y}00{z}00{num}'.format(
+		return int('{num}123{x}00{y}00{z}'.format(
 			x = int(self.x ** _hash_exp_1),
 			y = int(self.y ** _hash_exp_2),
 			z = int(self.z ** _hash_exp_3),
-			num = self.num_connections ** _hash_exp_4
+			num = self.num_connections
 		))
 
 	def __eq__(self, other : Node) -> bool:
@@ -43,6 +42,9 @@ class Node:
 		# add to other
 		other.connection_list.append(conn)
 		other.num_connections += 1
+
+	def get_connections_by_type(self, type_ : str):
+		return list(filter(lambda conn: conn.type_ == type_, self.connection_list))
 
 	def get_triplets(self):
 		triplets = []
