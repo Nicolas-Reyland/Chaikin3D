@@ -44,15 +44,16 @@ class Node:
 		other.num_connections += 1
 
 	def get_connections_by_type(self, type_ : str):
+		if type_ == 'any': return self.connection_list
 		return list(filter(lambda conn: conn.type_ == type_, self.connection_list))
 
-	def get_triplets(self):
+	def get_triplets(self, type_ : str = 'any'):
 		triplets = []
-		for conn in self.connection_list:
+		for conn in self.get_connections_by_type(type_):
 			# find the other, "partner", node in the connection
 			conn_node = conn.get_partner_node(self)
 			# find triangular connection_list
-			for sub_conn in filter(lambda sub_conn: not sub_conn.contains_node(self), conn_node.connection_list):
+			for sub_conn in filter(lambda sub_conn: not sub_conn.contains_node(self), conn_node.get_connections_by_type(type_)):
 				sub_conn_node = sub_conn.get_partner_node(conn_node)
 				if C.Connection.are_connected(sub_conn_node, self, 'any'):
 					triplets.append([

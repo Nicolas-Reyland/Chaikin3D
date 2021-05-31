@@ -1,5 +1,6 @@
 # Polygon rendering
 import plotly.graph_objects as go
+from plotly.subplots import make_subplots
 from polygon import Polygon
 
 DO_CHAIKIN = True
@@ -17,16 +18,86 @@ class Renderer:
 		self.args = args
 		self.kwargs = kwargs
 
+		self.active_subplot = False
+		self.subplot_fig = None
+		self.subplot_row_index = 0
+		self.subplot_row_limit = 0
+		self.subplot_col_index = 0
+		self.subplot_col_limit = 0
+
 	def draw(self, data : list):
 		fig = go.Figure(data, *self.args, **self.kwargs)
 		fig.show()
 
-	def get_polygon_draw_data(self, polygon : Polygon, alpha : float = 0.8, draw_text : bool = True, color : str = 'lightblue') -> list[go.Mesh3d]:
+	def init_subplots(self, rows : int, cols : int, *args, **kwargs) -> None:
+		assert not self.active_subplot # cannot have two subplots at a time
+		assert rows > 0 # >= 1
+		assert cols > 0 # >= 1
+		self.active_subplot = True
+		specs = [[{'type': 'scene'}] * cols] * rows
+		self.subplot_fig = make_subplots(rows = rows, cols = cols, specs = specs, *args, **kwargs)
+		self.subplot_row_index = 1
+		self.subplot_row_limit = rows
+		self.subplot_col_index = 1
+		self.subplot_col_limit = cols
+
+	def fill_subplot(self, data : list, *args, **kwargs):
+		assert self.active_subplot # make sure we are actually drawing subplots
+		self.subplot_fig.add_trace(
+			data,
+			row = self.subplot_row_index,
+			col = self.subplot_col_index,
+			*args,
+			**kwargs
+		)
+		# go to the next row ol column
+		self.next_subplot()
+
+	def add_to_subplot(self, data : list, function = None, custom_row : int = -1, custom_col : int = -1, *args, **kwargs):
+		assert self.active_subplot # make sure we are actually drawing subplots
+		# default function if None
+		if function == None:
+			function = self.subplot_fig.add_trace
+
+		# if you customize one, please customize the other too
+		if custom_row != -1: assert custom_col != -1
+		elif custom_col != -1: assert custom_row != -1
+
+		function(
+			data,
+			row = self.subplot_row_index if custom_row == -1 else custom_row,
+			col = self.subplot_col_index if custom_col == -1 else custom_col,
+			*args,
+			**kwargs
+		)
+
+	def next_subplot(self) -> None:
+		assert self.active_subplot
+		if self.subplot_col_index == self.subplot_col_limit:
+			self.subplot_col_index = 1
+			self.subplot_row_index += 1
+			if self.subplot_row_index > self.subplot_row_limit:
+				self.active_subplot = False
+				print('subplot filled')
+			return
+		# no limit reached
+		self.subplot_col_index += 1
+
+	def draw_subplots(self):
+		self.subplot_fig.show()
+		# don't reset figure on purpose (why do it ? could be used later by user)
+		self.active_subplot = False
+		self.subplot_row_index = 0
+		self.subplot_row_limit = 0
+		self.subplot_col_index = 0
+		self.subplot_col_limit = 0
+
+	def get_polygon_draw_data(self, polygon : Polygon, type_ : str = 'any', alpha : float = 0.8, draw_text : bool = True, color : str = 'lightblue') -> list[go.Mesh3d]:
 		X, Y, Z = [], [], []
 		I, J, K = [], [], []
 		vertex_list = []
 		vertex_index_list = []
-		for triplet in polygon:
+		for triplet in polygon._hash_iter_triplets(type_):
 			index_list = []
 			for vertex in triplet:
 				if vertex not in vertex_list:
