@@ -9,23 +9,37 @@ parser = ArgumentParser(description='Apply the Chaikin algorithm, expanded for t
 parser.add_argument('-i', '--input', type=str, help='input file (df. None)')
 parser.add_argument('-s', '--shape', type=str, help='shape (df. cube)')
 parser.add_argument('-c', '--chaikin', type=int, help='number of chaikin generations (df. 0)')
+parser.add_argument('-cc', '--chaikin-coef', type=float, help='Chaikin coefficient (df. 4)')
 parser.add_argument('-p', '--plot', type=str, help='plot type ["simple", "full", "evolution", "animation"] (df. simple)')
-parser.add_argument('-a', '--alpha', type=float, help='Alpha/Opacity value for mesh rendering (df. 0.6)')
+parser.add_argument('-a', '--alpha', type=float, help='Alpha/Opacity value for mesh rendering (df. 0.8)')
 parser.add_argument('-r', '--renderer', type=str, help='renderer ["plotly", "mpl"] (df. plotly)')
+parser.add_argument('-smc', '--show-main-connections', type=str, help='Show the main connections (for plots: "simple", "full" and "evolution") (df. true)')
+parser.add_argument('-sgc', '--show-graphical-connections', type=str, help='Show the graphical connections (for plots: "simple", "full" and "evolution") (df. false)')
+parser.add_argument('-rm', '--rotate-mesh', type=str, help='Rotate the mesh when loading a file (df. false)')
 
 args = vars(parser.parse_args())
 
+def parse_bool(s):
+	if s.lower() in ['1', 't', 'true']: return True
+	if s.lower() in ['0', 'f', 'false']: return False
+	raise Exception('Unrecognized value for supposed boolean:', s)
+
 # Arguments
 input_file = args['input']
+print(args)
 shape = args['shape'] if args['shape'] or input_file else 'cube'
 
 if shape and input_file:
 	raise Exception('You must either give an input file or a shape. You cannot give both')
 
 chaikin_gens = args['chaikin'] if args['chaikin'] else 0
+chaikin_coef = args['chaikin_coef'] if args['chaikin_coef'] else 4
 plot = args['plot'] if args['plot'] else 'simple'
-alpha = args['alpha'] if args['alpha'] else .6
+alpha = args['alpha'] if args['alpha'] else .8
 RENDERER = args['renderer'] if args['renderer'] else 'plotly'
+smc = parse_bool(args['show_main_connections']) if args['show_main_connections'] else True
+sgc = parse_bool(args['show_graphical_connections']) if args['show_graphical_connections'] else False
+rotate_mesh = parse_bool(args['rotate_mesh']) if args['rotate_mesh'] else False
 
 if RENDERER == 'plotly':
 	from plotly_renderer import *
@@ -72,7 +86,7 @@ def draw_full(renderer : Renderer, poly : Polygon) -> None:
 
 	renderer.draw_subplots()
 
-def draw_chaikin_evolution(renderer : Renderer, poly : Polygon, n : int) -> None:
+def draw_chaikin_evolution(renderer : Renderer, poly : Polygon, n : int, coef : float, alpha : float = .8) -> None:
 	# find best row-col combination
 	assert n > 0
 	near = math.sqrt(n)
@@ -81,35 +95,49 @@ def draw_chaikin_evolution(renderer : Renderer, poly : Polygon, n : int) -> None
 	renderer.init_subplots(rows, cols, subplot_titles=['Chaikin Gen {}'.format(i) for i in range(n)])
 	for i in range(n):
 		print('Generation: {}'.format(i))
-		alpha_poly_dd = renderer.get_polygon_draw_data(poly, alpha = .6, color = 'lightblue')
-		main_conn_dd = main_conn_dd = renderer.get_connections_draw_data(poly, type_ = 'main', color = 'darkred')
+		# get values
+		alpha_poly_dd = renderer.get_polygon_draw_data(poly, alpha = alpha, color = 'lightblue')
+		if smc: main_conn_dd = renderer.get_connections_draw_data(poly, type_ = 'main', color = 'darkred')
+		if sgc: graphical_conn_dd = renderer.get_connections_draw_data(poly, type_ = 'graphical', color = 'black')
+		# add to subplot
 		for sub_apoly_dd in alpha_poly_dd:
 			renderer.add_to_subplot(sub_apoly_dd)
-		for mconn_dd in main_conn_dd:
-			renderer.add_to_subplot(mconn_dd)
+		if smc:
+			for mconn_dd in main_conn_dd:
+				renderer.add_to_subplot(mconn_dd)
+		if sgc:
+			for gconn_dd in graphical_conn_dd:
+				renderer.add_to_subplot(gconn_dd)
+		# go to next plot
 		renderer.next_subplot()
 		# Chaikin
-		poly = Polygon.Chaikin3D(poly, 4)
+		poly = Polygon.Chaikin3D(poly, coef)
 
 	renderer.draw_subplots()
 
-def chaikin_animation(renderer : Renderer, poly : Polygon, n : int) -> None:
+def chaikin_animation(renderer : Renderer, poly : Polygon, n : int, coef : float, alpha : float = .6) -> None:
 	frames : list[go.Frame] = []
 	old_poly = Polygon(poly.nodes.copy())
 	for gen in range(n):
 		print('Generation: {}'.format(gen))
-		alpha_poly_dd = renderer.get_polygon_draw_data(poly, alpha = .6, color = 'lightblue')
-		main_conn_dd = renderer.get_connections_draw_data(poly, type_ = 'main', color = 'darkred')
+		alpha_poly_dd = renderer.get_polygon_draw_data(poly, alpha = alpha, color = 'lightblue')
+		if smc: main_conn_dd = renderer.get_connections_draw_data(poly, type_ = 'main', color = 'darkred')
+		else: main_conn_dd = []
+		if sgc: graphical_conn_dd = renderer.get_connections_draw_data(poly, type_ = 'graphical', color = 'black')
+		else: graphical_conn_dd = []
 		frames.append(go.Frame(
-			data=alpha_poly_dd + main_conn_dd,
+			data=alpha_poly_dd + graphical_conn_dd + main_conn_dd,
 			name='Chaikin Gen {}'.format(gen)
 		))
-		if gen < n: poly = Polygon.Chaikin3D(poly)
+		if gen < n: poly = Polygon.Chaikin3D(poly, coef)
 	fig = go.Figure(frames=frames)
 	# add first frame
-	alpha_poly_dd = renderer.get_polygon_draw_data(poly, alpha = .6, color = 'lightblue')
-	main_conn_dd = renderer.get_connections_draw_data(poly, type_ = 'main', color = 'darkred')
-	#fig.add_trace(alpha_poly_dd + main_conn_dd)
+	alpha_poly_dd = renderer.get_polygon_draw_data(poly, alpha = alpha, color = 'lightblue')
+	if smc: main_conn_dd = renderer.get_connections_draw_data(poly, type_ = 'main', color = 'darkred')
+	else: main_conn_dd = []
+	if sgc: graphical_conn_dd = renderer.get_connections_draw_data(poly, type_ = 'graphical', color = 'black')
+	else: graphical_conn_dd = []
+	#fig.add_trace(alpha_poly_dd + graphical_conn_dd + main_conn_dd)
 	#
 	frame_args = lambda duration: 	{
 										"frame": {"duration": duration},
@@ -171,7 +199,7 @@ def main():
 	global DO_CHAIKIN
 	renderer = Renderer()
 	if input_file:
-		poly = ObjMesh(input_file).to_polygon()
+		poly = ObjMesh(input_file, rotate_mesh).to_polygon()
 	elif shape:
 		if shape not in vars(basic_shapes).keys():
 			raise Exception('Unrecognized shape:', shape)
@@ -182,17 +210,22 @@ def main():
 	if plot != 'evolution' and plot != 'animation':
 		for _ in range(chaikin_gens):
 			print(' - 3D Chaikin -')
-			poly = Polygon.Chaikin3D(poly, 4)
+			poly = Polygon.Chaikin3D(poly, chaikin_coef)
 			print('Chaikin done')
 
 	if plot == 'simple':
-		renderer.draw_polygon(poly, 'any', alpha)
+		poly_dd = renderer.get_polygon_draw_data(poly, 'any', alpha)
+		if smc: main_conn_dd = renderer.get_connections_draw_data(poly, type_ = 'main', color = 'darkred')
+		else: main_conn_dd = []
+		if sgc: graphical_conn_dd = renderer.get_connections_draw_data(poly, type_ = 'graphical', color = 'black')
+		else: graphical_conn_dd = []
+		renderer.draw(poly_dd + graphical_conn_dd + main_conn_dd)
 	elif plot == 'full':
 		draw_full(renderer, poly)
 	elif plot == 'evolution':
-		draw_chaikin_evolution(renderer, poly, chaikin_gens)
+		draw_chaikin_evolution(renderer, poly, chaikin_gens + 1, chaikin_coef, alpha)
 	elif plot == 'animation':
-	   chaikin_animation(renderer, poly, chaikin_gens)
+	   chaikin_animation(renderer, poly, chaikin_gens, chaikin_coef, alpha)
 	else:
 		raise Exception('Unrecognized shape:', plot)
 

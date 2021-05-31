@@ -6,6 +6,9 @@ _hash_exp_1 = 12
 _hash_exp_2 = 34
 _hash_exp_3 = 5
 
+def _cantor_pairing(a : float, b : float) -> float:
+	return .5 * (a + b) * (a + b + 1) + b
+
 class Node:
 	def __init__(self, x : float, y : float, z : float):
 		self.x, self.y, self.z = x, y, z
@@ -14,12 +17,15 @@ class Node:
 		self.coords = [self.x, self.y, self.z]
 
 	def __hash__(self) -> int:
+		return int(_cantor_pairing(_cantor_pairing(self.x, self.y), self.z) * 10e6)
+		'''
 		return int('{num}123{x}00{y}00{z}'.format(
 			x = int(self.x ** _hash_exp_1),
 			y = int(self.y ** _hash_exp_2),
 			z = int(self.z ** _hash_exp_3),
 			num = self.num_connections
 		))
+		'''
 
 	def __eq__(self, other : Node) -> bool:
 		return self.x == other.x and \

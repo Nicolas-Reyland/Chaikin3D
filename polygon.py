@@ -206,9 +206,9 @@ class Polygon:
 			vertex_index[2] -= 1
 			vertex_index_list[index] = vertex_index
 			i, j, k = vertex_index
-			A = nodes[i - 1]
-			B = nodes[j - 1]
-			C = nodes[k - 1]
+			A = nodes[i]
+			B = nodes[j]
+			C = nodes[k]
 			A.connect(B, 'main')
 			B.connect(C, 'main')
 			C.connect(A, 'main')
