@@ -92,10 +92,8 @@ class Renderer:
 		self.subplot_col_index = 0
 		self.subplot_col_limit = 0
 
-	def get_polygon_draw_data(self, polygon : Polygon, type_ : str = 'any', alpha : float = 0.8, draw_text : bool = True, color : str = 'lightblue') -> list[go.Mesh3d]:
+	def get_polygon_draw_data(self, polygon : Polygon, type_ : str = 'any', alpha : float = 0.8, draw_text : bool = False, color : str = 'lightblue') -> list[go.Mesh3d]:
 		if polygon.vertex_list is None or polygon.vertex_index_list is None:
-			X, Y, Z = [], [], []
-			I, J, K = [], [], []
 			vertex_list = []
 			vertex_index_list = []
 			for triplet in polygon._hash_iter_triplets(type_):
@@ -107,10 +105,14 @@ class Renderer:
 					else:
 						index_list.append(vertex_list.index(vertex))
 				vertex_index_list.append(index_list)
-
 		else:
+			print('using pre-enterd vertex list & vertex index list')
 			vertex_list = polygon.vertex_list
 			vertex_index_list = polygon.vertex_index_list
+
+		if not vertex_list and not vertex_index_list:
+			print('No polygon data')
+			return []
 
 		X, Y, Z = list(zip(*vertex_list))
 		I, J, K = list(zip(*vertex_index_list))
@@ -134,9 +136,14 @@ class Renderer:
 				x = [A[0], B[0]],
 				y = [A[1], B[1]],
 				z = [A[2], B[2]],
+				marker={
+					'size': 2,
+					'color': gen_random_color() if color == 'random' else color
+				},
 				line={
 					'color': gen_random_color() if color == 'random' else color,
-					'width': width
+					'width': 2,
+					'dash': 'solid'
 				}
 			))
 		return figure_data

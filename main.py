@@ -3,7 +3,29 @@ import math
 import basic_shapes
 from wavefront_reader import ObjMesh
 
-RENDERER = 'plotly' # 'mpl'
+from argparse import ArgumentParser
+parser = ArgumentParser(description='Apply the Chaikin algorithm, expanded for the 3D space')
+
+parser.add_argument('-i', '--input', type=str, help='input file (df. None)')
+parser.add_argument('-s', '--shape', type=str, help='shape (df. cube)')
+parser.add_argument('-c', '--chaikin', type=int, help='number of chaikin generations (df. 0)')
+parser.add_argument('-p', '--plot', type=str, help='plot type ["simple", "full", "evolution", "animation"] (df. simple)')
+parser.add_argument('-a', '--alpha', type=float, help='Alpha/Opacity value for mesh rendering (df. 0.6)')
+parser.add_argument('-r', '--renderer', type=str, help='renderer ["plotly", "mpl"] (df. plotly)')
+
+args = vars(parser.parse_args())
+
+# Arguments
+input_file = args['input']
+shape = args['shape'] if args['shape'] or input_file else 'cube'
+
+if shape and input_file:
+	raise Exception('You must either give an input file or a shape. You cannot give both')
+
+chaikin_gens = args['chaikin'] if args['chaikin'] else 0
+plot = args['plot'] if args['plot'] else 'simple'
+alpha = args['alpha'] if args['alpha'] else .6
+RENDERER = args['renderer'] if args['renderer'] else 'plotly'
 
 if RENDERER == 'plotly':
 	from plotly_renderer import *
@@ -12,6 +34,7 @@ elif RENDERER == 'mpl':
 else:
 	raise Exception('Unkown renderer:', RENDERER)
 
+# functions
 def draw_full(renderer : Renderer, poly : Polygon) -> None:
 	main_conn_dd = renderer.get_connections_draw_data(poly, type_ = 'main', color = 'darkred')
 	graphical_conn_dd = renderer.get_connections_draw_data(poly, type_ = 'graphical', color = 'black')
@@ -143,37 +166,37 @@ def chaikin_animation(renderer : Renderer, poly : Polygon, n : int) -> None:
 	fig.show()
 
 
-
+# Main function
 def main():
 	global DO_CHAIKIN
 	renderer = Renderer()
-	#poly = basic_shapes.cube()
-	#poly = basic_shapes.triangle()
-	poly = ObjMesh('data/fox.obj').to_polygon()
+	if input_file:
+		poly = ObjMesh(input_file).to_polygon()
+	elif shape:
+		if shape not in vars(basic_shapes).keys():
+			raise Exception('Unrecognized shape:', shape)
+		poly = vars(basic_shapes)[shape]()
+	else:
+		raise Exception('You must give an input file or a shape. One or the other, but not none at all')
 
-	DO_CHAIKIN = 0
-
-	if DO_CHAIKIN:
-		for _ in range(1):
+	if plot != 'evolution' and plot != 'animation':
+		for _ in range(chaikin_gens):
 			print(' - 3D Chaikin -')
 			poly = Polygon.Chaikin3D(poly, 4)
 			print('Chaikin done')
 
-	#renderer.draw_polygon(poly, alpha = 1, draw_text = False)
+	if plot == 'simple':
+		renderer.draw_polygon(poly, 'any', alpha)
+	elif plot == 'full':
+		draw_full(renderer, poly)
+	elif plot == 'evolution':
+		draw_chaikin_evolution(renderer, poly, chaikin_gens)
+	elif plot == 'animation':
+	   chaikin_animation(renderer, poly, chaikin_gens)
+	else:
+		raise Exception('Unrecognized shape:', plot)
 
-	#draw_full(renderer, poly)
-	#draw_chaikin_evolution(renderer, poly, 4)
-	#chaikin_animation(renderer, poly, 3)
-
-	#figure_data = graphical_conn_dd + main_conn_dd + poly_dd
-	#renderer.draw(figure_data)
-
-	print('num nodes:', len(poly.nodes))
-	renderer.draw_polygon(poly)
-
-	print('done')
 	return poly
 
 if __name__ == '__main__':
 	main()
-

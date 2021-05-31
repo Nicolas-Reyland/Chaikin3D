@@ -55,7 +55,7 @@ class Node:
 			# find triangular connection_list
 			for sub_conn in filter(lambda sub_conn: not sub_conn.contains_node(self), conn_node.get_connections_by_type(type_)):
 				sub_conn_node = sub_conn.get_partner_node(conn_node)
-				if C.Connection.are_connected(sub_conn_node, self, 'any'):
+				if C.Connection.are_connected(sub_conn_node, self, type_):
 					triplets.append([
 						self.coords,
 						conn_node.coords,
