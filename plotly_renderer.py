@@ -93,19 +93,24 @@ class Renderer:
 		self.subplot_col_limit = 0
 
 	def get_polygon_draw_data(self, polygon : Polygon, type_ : str = 'any', alpha : float = 0.8, draw_text : bool = True, color : str = 'lightblue') -> list[go.Mesh3d]:
-		X, Y, Z = [], [], []
-		I, J, K = [], [], []
-		vertex_list = []
-		vertex_index_list = []
-		for triplet in polygon._hash_iter_triplets(type_):
-			index_list = []
-			for vertex in triplet:
-				if vertex not in vertex_list:
-					vertex_list.append(vertex)
-					index_list.append(len(vertex_list) - 1)
-				else:
-					index_list.append(vertex_list.index(vertex))
-			vertex_index_list.append(index_list)
+		if polygon.vertex_list is None or polygon.vertex_index_list is None:
+			X, Y, Z = [], [], []
+			I, J, K = [], [], []
+			vertex_list = []
+			vertex_index_list = []
+			for triplet in polygon._hash_iter_triplets(type_):
+				index_list = []
+				for vertex in triplet:
+					if vertex not in vertex_list:
+						vertex_list.append(vertex)
+						index_list.append(len(vertex_list) - 1)
+					else:
+						index_list.append(vertex_list.index(vertex))
+				vertex_index_list.append(index_list)
+
+		else:
+			vertex_list = polygon.vertex_list
+			vertex_index_list = polygon.vertex_index_list
 
 		X, Y, Z = list(zip(*vertex_list))
 		I, J, K = list(zip(*vertex_index_list))

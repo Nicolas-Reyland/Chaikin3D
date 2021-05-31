@@ -1,6 +1,7 @@
 #
 import math
 import basic_shapes
+from wavefront_reader import ObjMesh
 
 RENDERER = 'plotly' # 'mpl'
 
@@ -73,8 +74,9 @@ def chaikin_animation(renderer : Renderer, poly : Polygon, n : int) -> None:
 	frames : list[go.Frame] = []
 	old_poly = Polygon(poly.nodes.copy())
 	for gen in range(n):
+		print('Generation: {}'.format(gen))
 		alpha_poly_dd = renderer.get_polygon_draw_data(poly, alpha = .6, color = 'lightblue')
-		main_conn_dd = main_conn_dd = renderer.get_connections_draw_data(poly, type_ = 'main', color = 'darkred')
+		main_conn_dd = renderer.get_connections_draw_data(poly, type_ = 'main', color = 'darkred')
 		frames.append(go.Frame(
 			data=alpha_poly_dd + main_conn_dd,
 			name='Chaikin Gen {}'.format(gen)
@@ -83,8 +85,8 @@ def chaikin_animation(renderer : Renderer, poly : Polygon, n : int) -> None:
 	fig = go.Figure(frames=frames)
 	# add first frame
 	alpha_poly_dd = renderer.get_polygon_draw_data(poly, alpha = .6, color = 'lightblue')
-	main_conn_dd = main_conn_dd = renderer.get_connections_draw_data(poly, type_ = 'main', color = 'darkred')
-	fig.add_trace(alpha_poly_dd + main_conn_dd)
+	main_conn_dd = renderer.get_connections_draw_data(poly, type_ = 'main', color = 'darkred')
+	#fig.add_trace(alpha_poly_dd + main_conn_dd)
 	#
 	frame_args = lambda duration: 	{
 										"frame": {"duration": duration},
@@ -145,8 +147,9 @@ def chaikin_animation(renderer : Renderer, poly : Polygon, n : int) -> None:
 def main():
 	global DO_CHAIKIN
 	renderer = Renderer()
-	poly = basic_shapes.cube()
+	#poly = basic_shapes.cube()
 	#poly = basic_shapes.triangle()
+	poly = ObjMesh('data/fox.obj').to_polygon()
 
 	DO_CHAIKIN = 0
 
@@ -154,15 +157,21 @@ def main():
 		for _ in range(1):
 			print(' - 3D Chaikin -')
 			poly = Polygon.Chaikin3D(poly, 4)
+			print('Chaikin done')
+
 	#renderer.draw_polygon(poly, alpha = 1, draw_text = False)
 
 	#draw_full(renderer, poly)
-	draw_chaikin_evolution(renderer, poly, 5)
-	print('done')
+	#draw_chaikin_evolution(renderer, poly, 4)
+	#chaikin_animation(renderer, poly, 3)
 
 	#figure_data = graphical_conn_dd + main_conn_dd + poly_dd
 	#renderer.draw(figure_data)
 
+	print('num nodes:', len(poly.nodes))
+	renderer.draw_polygon(poly)
+
+	print('done')
 	return poly
 
 if __name__ == '__main__':

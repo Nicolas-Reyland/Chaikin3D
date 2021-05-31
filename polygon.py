@@ -9,8 +9,10 @@ from copy import deepcopy
 matrix.EPSILON = 10e-6
 
 class Polygon:
-	def __init__(self, nodes : list[N.Node]):
+	def __init__(self, nodes : list[N.Node], vertex_list = None, vertex_index_list = None):
 		self.nodes = nodes
+		self.vertex_list = vertex_list
+		self.vertex_index_list = vertex_index_list
 
 	def __str__(self):
 		return '\n* '.join(map(str, self.nodes))
@@ -33,7 +35,7 @@ class Polygon:
 					continue
 				# it is unique, so we can add it to the list
 				triplet_list.append(triplet)
-		#print('num triplets', len(triplet_list))
+		print('num triplets', len(triplet_list))
 		return triplet_list
 
 	def _hash_iter_triplets(self, type_ : str = 'any'):
@@ -49,7 +51,7 @@ class Polygon:
 				triplet_hash_set.add(triplet_hash)
 				# it is unique, so we can add it to the list
 				triplet_list.append(triplet)
-		#print('num hash triplets', len(triplet_hash_set))
+		print('num hash triplets', len(triplet_hash_set))
 		return triplet_list
 
 	def _set_recursion_limit(self):
@@ -61,6 +63,7 @@ class Polygon:
 			for conn in node.get_connections_by_type(type_):
 				if conn not in connection_list:
 					connection_list.append(conn)
+		print('num connections', len(connection_list))
 		return connection_list
 
 	@staticmethod
@@ -190,6 +193,27 @@ class Polygon:
 				#print('connected last with', node)
 
 		return Polygon(nodes)
+
+	@staticmethod
+	def from_standard_vertex_lists(vertex_list : list[list[float]], vertex_index_list : list[list[int]]) -> Polygon:
+		# build nodes
+		nodes : list[N.Node] = list(map(N.Node.from_point, vertex_list))
+		# connect using the index list
+		for index in range(len(vertex_index_list)):
+			vertex_index = vertex_index_list[index]
+			vertex_index[0] -= 1
+			vertex_index[1] -= 1
+			vertex_index[2] -= 1
+			vertex_index_list[index] = vertex_index
+			i, j, k = vertex_index
+			A = nodes[i - 1]
+			B = nodes[j - 1]
+			C = nodes[k - 1]
+			A.connect(B, 'main')
+			B.connect(C, 'main')
+			C.connect(A, 'main')
+		# return polygon
+		return Polygon(nodes, vertex_list, vertex_index_list)
 
 	@staticmethod
 	def Chaikin3D(polygon : Polygon, n : int = 4) -> Polygon:
