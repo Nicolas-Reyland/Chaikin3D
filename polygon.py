@@ -295,17 +295,24 @@ class Polygon:
 		# connect all the sub_nodes together
 		#processed_triplets : list[list[tuple[float]]] = []
 		chaikin_groups_list : list[set[N.Node]] = []
+
 		for old_node in old_nodes:
-			#print('old_node', old_node)
-			chaikin_nodes_1 = node_dict[old_node]
-			for chaikin_node in chaikin_nodes_1:
-				groups : list[set[N.Node]] = Polygon._find_chaikin_groups_for_node(chaikin_node)
-				n : int = len(groups)
-				#print(n, 'chaikin groups')
-				for _ in range(n):
-					group = groups.pop()
-					if group not in chaikin_groups_list:
-						chaikin_groups_list.append(group)
+			old_group_list : list[set[N.Node]] = Polygon._find_chaikin_groups_for_node(old_node)
+			for old_group in old_group_list:
+				new_group : set[N.Node] = set()
+				for old_node in old_group:
+					new_nodes = node_dict[old_node]
+					for new_node in new_nodes:
+						for other_old_node in old_group:
+							if old_node != other_old_node and any([C.Connection.are_connected(new_node, other_new_node) for other_new_node in node_dict[other_old_node]]):
+								break
+						else:
+							continue
+						# found
+						new_group.add(new_node)
+						# don't break because there are two new nodes per old node
+				if new_group not in chaikin_groups_list:
+					chaikin_groups_list.append(new_group)
 
 		#print('num raw groups:', len(chaikin_groups_list))
 		ordered_groups : list[list[N.Node]] = list(map(Polygon._order_chaikin_group, chaikin_groups_list))
@@ -313,7 +320,6 @@ class Polygon:
 		for ogroup in ordered_groups:
 			#print('ordered group', ogroup)
 			Polygon._connect_ordered_chaikin_group(ogroup)
-
 
 		# construct new node list
 		new_node_list : list[N.Node] = []

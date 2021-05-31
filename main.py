@@ -89,7 +89,7 @@ def draw_full(renderer : Renderer, poly : Polygon) -> None:
 def draw_chaikin_evolution(renderer : Renderer, poly : Polygon, n : int, coef : float, alpha : float = .8) -> None:
 	# find best row-col combination
 	assert n > 0
-	near = math.sqrt(n)
+	near = math.sqrt(n + 1)
 	rows = int(near) + (0 if near == int(near) else 1)
 	cols = rows
 	renderer.init_subplots(rows, cols, subplot_titles=['Chaikin Gen {}'.format(i) for i in range(n)])
@@ -223,7 +223,7 @@ def main():
 	elif plot == 'full':
 		draw_full(renderer, poly)
 	elif plot == 'evolution':
-		draw_chaikin_evolution(renderer, poly, chaikin_gens + 1, chaikin_coef, alpha)
+		draw_chaikin_evolution(renderer, poly, chaikin_gens, chaikin_coef, alpha)
 	elif plot == 'animation':
 	   chaikin_animation(renderer, poly, chaikin_gens, chaikin_coef, alpha)
 	else:
