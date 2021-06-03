@@ -129,11 +129,9 @@ CMD 2: ```python3 chaikin3d.py -i data/deer.obj -rm true -a 1.0 -smc false```
 
 <img src="pics/simple-deer.png"
 alt="1 simple deer no main connections alpha 1"
-style="float: right; margin-right: 10px;"
-height="600px" /> <img src="pics/simple-deer-no-smc.png"
+style="float: left; margin-left: 10px;" width="48%;" /> <img src="pics/simple-deer-no-smc.png"
 alt="2 simple deer no main connections alpha 1"
-style="float: left; margin-left: 10px;"
-height="600px" />
+style="float: right; margin-right: 10px;" width="48%;" />
 
 
 ## TODO
