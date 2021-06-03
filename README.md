@@ -19,15 +19,18 @@ You MAY want matplotlib, but it is not mandatory:
 pip install matplotlib
 ```
 To install matrix, you need to get it from [my repo](https://github.com/Nicolas-Reyland/matrix). You can simply add the matrix.py file in this project's folder, but you can also install matrix.
-__NOTE__: when installing matrix, if you fail to install the noise module (it can be a mess sometimes), you can simply chage this line: ```import numpy as np, random, noise``` to ```import numpy as np, random#, noise``` at the beginning of the matrix.py file (commenting out the noise module import). The noise module won't be used in *this* project.
 
-If you wish to only use matrix for this project (which is very likely), please enter these commands:
+If you wish to only use matrix for this project (which is very likely), enter these commands:
 ```
 cd Chaikin3D
 git clone https://github.com/Nicolas-Reyland/matrix
 cp matrix/matrix.py .
 rm -ri matrix # can remove the -i, but I don't want to be responsible for any damage
 ```
+
+You can also install the matrix module, by following the instructions in the matrix repo.
+
+__NOTE__: when installing matrix, if you fail to install the noise module (it can be a mess sometimes), you can simply chage this line: ```import numpy as np, random, noise``` to ```import numpy as np, random#, noise``` at the beginning of the matrix.py file (commenting out the noise module import). The noise module won't be used in *this* project.
 
 If you are using Windows, download the matrix repo (https://github.com/Nicolas-Reyland/matrix) and copy the matrix.py file into the Chaikin3D folder.
 
