@@ -1,9 +1,9 @@
 #
 from __future__ import annotations
-from polygon import Polygon
+from polyhedron import Polyhedron
 
 def cube():
-	poly = Polygon.from_raw_points((
+	poly = Polyhedron.from_raw_points((
 		(0,0,0), #  0 A
 		(1,0,0), #  1 B
 		(1,0,1), #  2 C
@@ -43,7 +43,7 @@ def triangle():
 	C = (.5,1,0)
 	D = (.5,.2,1)
 
-	poly = Polygon.from_raw_points((
+	poly = Polyhedron.from_raw_points((
 		A,#
 		B,#
 		C,#
@@ -58,4 +58,3 @@ def triangle():
 	False)
 
 	return poly
-

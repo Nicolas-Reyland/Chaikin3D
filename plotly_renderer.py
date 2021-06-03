@@ -1,7 +1,7 @@
-# Polygon rendering
+# Polyhedron rendering
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
-from polygon import Polygon
+from polyhedron import Polyhedron
 
 DO_CHAIKIN = True
 
@@ -92,10 +92,10 @@ class Renderer:
 		self.subplot_col_index = 0
 		self.subplot_col_limit = 0
 
-	def get_polygon_draw_data(self, polygon : Polygon, type_ : str = 'any', alpha : float = 0.8, draw_text : bool = False, color : str = 'lightblue') -> list[go.Mesh3d]:
+	def get_polyhedron_draw_data(self, polyhedron : Polyhedron, type_ : str = 'any', alpha : float = 0.8, draw_text : bool = False, color : str = 'lightblue') -> list[go.Mesh3d]:
 		vertex_list = []
 		vertex_index_list = []
-		for triplet in polygon._hash_iter_triplets(type_):
+		for triplet in polyhedron._hash_iter_triplets(type_):
 			index_list = []
 			for vertex in triplet:
 				if vertex not in vertex_list:
@@ -106,7 +106,7 @@ class Renderer:
 			vertex_index_list.append(index_list)
 
 		if not vertex_list and not vertex_index_list:
-			print('No polygon data')
+			print('No polyhedron data')
 			return []
 
 		X, Y, Z = list(zip(*vertex_list))
@@ -120,12 +120,12 @@ class Renderer:
 			opacity=alpha
 		)]
 
-	def draw_polygon(self, polygon : Polygon, alpha : float = 0.8, draw_text : bool = True) -> None:
-		self.draw(data=self.get_polygon_draw_data(polygon, alpha, draw_text))
+	def draw_polyhedron(self, polyhedron : Polyhedron, alpha : float = 0.8, draw_text : bool = True) -> None:
+		self.draw(data=self.get_polyhedron_draw_data(polyhedron, alpha, draw_text))
 
-	def get_connections_draw_data(self, polygon : Polygon, type_ : str = 'any', color : str = 'lightblue', width : int = 2) -> list[go.Scatter3d]:
+	def get_connections_draw_data(self, polyhedron : Polyhedron, type_ : str = 'any', color : str = 'lightblue', width : int = 2) -> list[go.Scatter3d]:
 		figure_data : list[go.Scatter3d] = []
-		for connection in polygon.get_connections(type_):
+		for connection in polyhedron.get_connections(type_):
 			A, B = connection.A.coords, connection.B.coords
 			figure_data.append(go.Scatter3d(
 				x = [A[0], B[0]],
@@ -143,8 +143,8 @@ class Renderer:
 			))
 		return figure_data
 
-	def draw_connections(self, polygon : Polygon, type_ : str = 'any', color : str = 'lightblue', width : int = 2) -> None:
-		self.draw(data=self.get_connections_draw_data(polygon, type_, color, width))
+	def draw_connections(self, polyhedron : Polyhedron, type_ : str = 'any', color : str = 'lightblue', width : int = 2) -> None:
+		self.draw(data=self.get_connections_draw_data(polyhedron, type_, color, width))
 
 
 '''

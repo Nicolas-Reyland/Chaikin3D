@@ -1,8 +1,8 @@
-# Polygon rendering
+# Polyhedron rendering
 from mpl_toolkits.mplot3d import Axes3D
 from mpl_toolkits.mplot3d.art3d import Poly3DCollection
 import matplotlib.pyplot as plt
-from polygon import Polygon
+from polyhedron import Polyhedron
 
 DO_CHAIKIN = True
 
@@ -30,8 +30,8 @@ class Renderer:
 		# adding manually to the figure
 		self.fig.add_axes(self.ax)
 
-	def draw_polygon(self, polygon : Polygon, alpha : float = 0.8, draw_text : bool = True):
-		for triangle in polygon:
+	def draw_polyhedron(self, polyhedron : Polyhedron, alpha : float = 0.8, draw_text : bool = True):
+		for triangle in polyhedron:
 			collection = Poly3DCollection(triangle)
 			collection.set_edgecolor('#000')
 			collection.set_facecolor(gen_random_color())
@@ -44,4 +44,3 @@ class Renderer:
 					self.ax.text(x, y, pos_z, '({:.2f}, {:.2f}, {:.2f})'.format(x, y, z), (1,1,1))
 			self.ax.add_collection3d(collection)
 		plt.show()
-

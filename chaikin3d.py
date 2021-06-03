@@ -53,13 +53,13 @@ else:
 FILE_MODE = None
 
 # functions
-def draw_full(renderer : Renderer, poly : Polygon) -> None:
+def draw_full(renderer : Renderer, poly : Polyhedron) -> None:
 	main_conn_dd = renderer.get_connections_draw_data(poly, type_ = 'main', color = 'darkred')
 	graphical_conn_dd = renderer.get_connections_draw_data(poly, type_ = 'graphical', color = 'black')
-	main_poly_dd = renderer.get_polygon_draw_data(poly, type_ = 'main', alpha = .6, color = 'lightblue')
-	graphical_poly_dd = renderer.get_polygon_draw_data(poly, type_ = 'graphical', alpha = .6, color = 'lightblue')
-	alpha_poly_dd = renderer.get_polygon_draw_data(poly, alpha = .6, color = 'lightblue')
-	poly_dd = renderer.get_polygon_draw_data(poly, alpha = 1, color = 'lightblue')
+	main_poly_dd = renderer.get_polyhedron_draw_data(poly, type_ = 'main', alpha = .6, color = 'lightblue')
+	graphical_poly_dd = renderer.get_polyhedron_draw_data(poly, type_ = 'graphical', alpha = .6, color = 'lightblue')
+	alpha_poly_dd = renderer.get_polyhedron_draw_data(poly, alpha = .6, color = 'lightblue')
+	poly_dd = renderer.get_polyhedron_draw_data(poly, alpha = 1, color = 'lightblue')
 	all_connection_dd = graphical_conn_dd + main_conn_dd
 
 	print(' - drawing -')
@@ -101,7 +101,7 @@ def draw_full(renderer : Renderer, poly : Polygon) -> None:
 
 	renderer.draw_subplots()
 
-def draw_chaikin_evolution(renderer : Renderer, poly : Polygon, n : int, coef : float, alpha : float = .8) -> None:
+def draw_chaikin_evolution(renderer : Renderer, poly : Polyhedron, n : int, coef : float, alpha : float = .8) -> None:
 	# find best row-col combination
 	assert n > 0
 	near = math.sqrt(n + 1)
@@ -112,7 +112,7 @@ def draw_chaikin_evolution(renderer : Renderer, poly : Polygon, n : int, coef : 
 	for i in range(n + 1):
 		print('Generation: {}'.format(i))
 		# get values
-		alpha_poly_dd = renderer.get_polygon_draw_data(poly, alpha = alpha, color = 'lightblue')
+		alpha_poly_dd = renderer.get_polyhedron_draw_data(poly, alpha = alpha, color = 'lightblue')
 		if smc: main_conn_dd = renderer.get_connections_draw_data(poly, type_ = 'main', color = 'darkred')
 		if sgc: graphical_conn_dd = renderer.get_connections_draw_data(poly, type_ = 'graphical', color = 'black')
 		# add to subplot
@@ -127,16 +127,16 @@ def draw_chaikin_evolution(renderer : Renderer, poly : Polygon, n : int, coef : 
 		# go to next plot
 		renderer.next_subplot()
 		# Chaikin
-		poly = Polygon.Chaikin3D(poly, coef, verbose, FILE_MODE)
+		poly = Polyhedron.Chaikin3D(poly, coef, verbose, FILE_MODE)
 
 	renderer.draw_subplots()
 
-def chaikin_animation(renderer : Renderer, poly : Polygon, n : int, coef : float, alpha : float = .6) -> None:
+def chaikin_animation(renderer : Renderer, poly : Polyhedron, n : int, coef : float, alpha : float = .6) -> None:
 	frames : list[go.Frame] = []
-	old_poly = Polygon(poly.nodes.copy())
+	old_poly = Polyhedron(poly.nodes.copy())
 	for gen in range(n):
 		print('Generation: {}'.format(gen))
-		alpha_poly_dd = renderer.get_polygon_draw_data(poly, alpha = alpha, color = 'lightblue')
+		alpha_poly_dd = renderer.get_polyhedron_draw_data(poly, alpha = alpha, color = 'lightblue')
 		if smc: main_conn_dd = renderer.get_connections_draw_data(poly, type_ = 'main', color = 'darkred')
 		else: main_conn_dd = []
 		if sgc: graphical_conn_dd = renderer.get_connections_draw_data(poly, type_ = 'graphical', color = 'black')
@@ -145,10 +145,10 @@ def chaikin_animation(renderer : Renderer, poly : Polygon, n : int, coef : float
 			data=alpha_poly_dd + graphical_conn_dd + main_conn_dd,
 			name='Chaikin Gen {}'.format(gen)
 		))
-		if gen < n: poly = Polygon.Chaikin3D(poly, coef, verbose, FILE_MODE)
+		if gen < n: poly = Polyhedron.Chaikin3D(poly, coef, verbose, FILE_MODE)
 	fig = go.Figure(frames=frames)
 	# add first frame
-	alpha_poly_dd = renderer.get_polygon_draw_data(poly, alpha = alpha, color = 'lightblue')
+	alpha_poly_dd = renderer.get_polyhedron_draw_data(poly, alpha = alpha, color = 'lightblue')
 	if smc: main_conn_dd = renderer.get_connections_draw_data(poly, type_ = 'main', color = 'darkred')
 	else: main_conn_dd = []
 	if sgc: graphical_conn_dd = renderer.get_connections_draw_data(poly, type_ = 'graphical', color = 'black')
@@ -215,7 +215,7 @@ def main():
 	global DO_CHAIKIN
 	renderer = Renderer()
 	if input_file:
-		poly = ObjMesh(input_file, rotate_mesh).to_polygon()
+		poly = ObjMesh(input_file, rotate_mesh).to_polyhedron()
 		FILE_MODE = True
 	elif shape:
 		if shape not in vars(basic_shapes).keys():
@@ -229,11 +229,11 @@ def main():
 		assert chaikin_gens >= 0
 		for _ in range(chaikin_gens):
 			print(' - 3D Chaikin -')
-			poly = Polygon.Chaikin3D(poly, chaikin_coef, verbose, FILE_MODE)
+			poly = Polyhedron.Chaikin3D(poly, chaikin_coef, verbose, FILE_MODE)
 			print('Chaikin done')
 
 	if plot == 'simple':
-		poly_dd = renderer.get_polygon_draw_data(poly, 'any', alpha)
+		poly_dd = renderer.get_polyhedron_draw_data(poly, 'any', alpha)
 		if smc: main_conn_dd = renderer.get_connections_draw_data(poly, type_ = 'main', color = 'darkred')
 		else: main_conn_dd = []
 		if sgc: graphical_conn_dd = renderer.get_connections_draw_data(poly, type_ = 'graphical', color = 'black')

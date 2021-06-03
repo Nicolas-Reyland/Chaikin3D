@@ -8,7 +8,7 @@ from copy import deepcopy
 
 matrix.EPSILON = 10e-6
 
-class Polygon:
+class Polyhedron:
 	def __init__(self, nodes : list[N.Node], vertex_list = None, vertex_index_list = None):
 		self.nodes = nodes
 		self.vertex_list = vertex_list
@@ -31,7 +31,7 @@ class Polygon:
 		for node in self.nodes:
 			for triplet in node.get_triplets(type_):
 				# check unique-ness
-				if Polygon._triplet_in_list(triplet_list, triplet):
+				if Polyhedron._triplet_in_list(triplet_list, triplet):
 					continue
 				# it is unique, so we can add it to the list
 				triplet_list.append(triplet)
@@ -80,7 +80,7 @@ class Polygon:
 		length = len(triplets)
 		while index < length:
 			triplet = triplets.pop(index) # pop it from the list
-			if Polygon._triplet_in_list(triplets, triplet):
+			if Polyhedron._triplet_in_list(triplets, triplet):
 				length -= 1
 			else:
 				# add it back and go one forward
@@ -89,7 +89,7 @@ class Polygon:
 		return triplets
 
 	@staticmethod
-	def from_raw_points(points : list[tuple[float]], index_list : list[int], inverse_index_list : bool = False, connect_endpoints : bool = True) -> Polygon:
+	def from_raw_points(points : list[tuple[float]], index_list : list[int], inverse_index_list : bool = False, connect_endpoints : bool = True) -> Polyhedron:
 		'''
 		'''
 		nodes : list[N.Node] = []
@@ -136,12 +136,12 @@ class Polygon:
 				node.connect(last_node, 'main')
 				#print('connected last with', node)
 
-		return Polygon(nodes)
+		return Polyhedron(nodes)
 
 	@staticmethod
-	def from_triangular_points(points : list[tuple[float]], index_list : list[int], inverse_index_list : bool = False, connect_endpoints : bool = True) -> Polygon:
-		'''Create a polygon object from an ordered list of (x,y,z) points/coordinates
-		The index_list indicates all the "real" points of the polygon. All points that are not in this index_list will be understood
+	def from_triangular_points(points : list[tuple[float]], index_list : list[int], inverse_index_list : bool = False, connect_endpoints : bool = True) -> Polyhedron:
+		'''Create a polyhedron object from an ordered list of (x,y,z) points/coordinates
+		The index_list indicates all the "real" points of the polyhedron. All points that are not in this index_list will be understood
 		as 'graphical connection points'. You an also choose to give the index_list of the graphical connection points only. You then
 		have to specify the 'inverse_index_list' as being 'True'. This will inverse the list. If 'connect_endpoints' is
 		set to true, the last point and the first point will be connected as a 'main' connection (non graphical)
@@ -192,10 +192,10 @@ class Polygon:
 				node.connect(last_node, 'main')
 				#print('connected last with', node)
 
-		return Polygon(nodes)
+		return Polyhedron(nodes)
 
 	@staticmethod
-	def from_standard_vertex_lists(vertex_list : list[list[float]], vertex_index_list : list[list[int]]) -> Polygon:
+	def from_standard_vertex_lists(vertex_list : list[list[float]], vertex_index_list : list[list[int]]) -> Polyhedron:
 		# build nodes
 		nodes : list[N.Node] = list(map(N.Node.from_point, vertex_list))
 		# connect using the index list
@@ -212,15 +212,15 @@ class Polygon:
 			A.connect(B, 'main')
 			B.connect(C, 'main')
 			C.connect(A, 'main')
-		# return polygon
-		return Polygon(nodes, vertex_list, vertex_index_list)
+		# return polyhedron
+		return Polyhedron(nodes, vertex_list, vertex_index_list)
 
 	@staticmethod
-	def Chaikin3D(polygon : Polygon, n : int = 4, verbose : bool = False, file_mode : bool = False) -> Polygon:
+	def Chaikin3D(polyhedron : Polyhedron, n : int = 4, verbose : bool = False, file_mode : bool = False) -> Polyhedron:
 		'''ratio could also be float ?
 		'''
 		# change recursion limit
-		polygon._set_recursion_limit()
+		polyhedron._set_recursion_limit()
 		t1 = time.perf_counter()
 		# init
 		base_ratio = (n - 1) / n
@@ -228,14 +228,14 @@ class Polygon:
 		node_dict : dict[N.Node, list[N.Node]] = dict()
 		new_connections : list[C.Connection] = []
 
-		old_nodes = deepcopy(polygon.nodes)
+		old_nodes = deepcopy(polyhedron.nodes)
 
 		sub_node_count = 0
 
 		#
-		total_nodes = len(polygon.nodes)
+		total_nodes = len(polyhedron.nodes)
 		if verbose: print('Calculating new node positions for {} verticies'.format(total_nodes))
-		for node_index,current_node in enumerate(polygon.nodes):
+		for node_index,current_node in enumerate(polyhedron.nodes):
 			if verbose and node_index % 100 == 0: print('[{}/{}] done ({:.2f}%)'.format(node_index, total_nodes, 100 * node_index / total_nodes))
 			#print('\ncurrent node:', current_node)
 			# create sub-nodes
@@ -251,7 +251,7 @@ class Polygon:
 					# calculate new pos (calculations done from num_connections to current node)
 					u = matrix.vector.vector(partner_node.coords, current_node.coords)
 					# get the right coefficient
-					if partner_node not in polygon.nodes: # partner is one of the new nodes (already has been truncated once)
+					if partner_node not in polyhedron.nodes: # partner is one of the new nodes (already has been truncated once)
 						#print(' - special ratio')
 						ratio = special_ratio
 					else:
@@ -299,8 +299,8 @@ class Polygon:
 		if verbose: print('Reconnect the new nodes (using the old nodes as starting point)')
 		for old_node_index,old_node in enumerate(old_nodes):
 			if verbose and old_node_index % 100 == 0: print('[{}/{}] done (old nodes) ({:.2f}%)'.format(old_node_index, total_nodes, 100 * old_node_index / total_nodes))
-			old_group_list : list[set[N.Node]] = Polygon._find_chaikin_groups_for_node(old_node)
-			for old_group in filter(lambda g: g not in processed_groups and (not file_mode or Polygon._nec_group_cond(g)), old_group_list): # and Polygon._nec_group_cond(g)
+			old_group_list : list[set[N.Node]] = Polyhedron._find_chaikin_groups_for_node(old_node)
+			for old_group in filter(lambda g: g not in processed_groups and (not file_mode or Polyhedron._nec_group_cond(g)), old_group_list): # and Polyhedron._nec_group_cond(g)
 				new_group : set[N.Node] = set()
 				for old_node in old_group:
 					new_nodes = node_dict[old_node]
@@ -320,13 +320,13 @@ class Polygon:
 		total_groups = len(chaikin_groups_list)
 		if verbose: print('Ordering the groups ({})'.format(total_groups))
 		#print('num raw groups:', len(chaikin_groups_list))
-		ordered_groups : list[list[N.Node]] = list(map(Polygon._order_chaikin_group, chaikin_groups_list))
+		ordered_groups : list[list[N.Node]] = list(map(Polyhedron._order_chaikin_group, chaikin_groups_list))
 
 		if verbose: print('Connecting the groups ({})'.format(total_groups))
 		for i,ogroup in enumerate(ordered_groups):
 			if verbose and i % 100 == 0: print('[{}/{}] done ({:.2f}%)'.format(i, total_groups, 100 * i / total_groups))
 			#print('ordered group', ogroup)
-			Polygon._connect_ordered_chaikin_group(ogroup)
+			Polyhedron._connect_ordered_chaikin_group(ogroup)
 
 		# construct new node list
 		if verbose: print('Building the new nodes list...')
@@ -336,9 +336,9 @@ class Polygon:
 
 		#print('num nodes:', len(new_node_list))
 
-		# return the final polygon
+		# return the final polyhedron
 		if verbose: print('Chaikin 3D finished {} nodes in {:.3} sec'.format(total_nodes, time.perf_counter() - t1))
-		return Polygon(new_node_list)
+		return Polyhedron(new_node_list)
 
 	@staticmethod
 	def _nec_group_cond(group):
@@ -367,7 +367,7 @@ class Polygon:
 				#
 				for sub_conn in second_node.get_connections_by_type('main'):
 					partner_node = sub_conn.get_partner_node(second_node)
-					local_group_set_list : list[set[N.Node]] = Polygon._rec_find_chaikin_group_with_plane(
+					local_group_set_list : list[set[N.Node]] = Polyhedron._rec_find_chaikin_group_with_plane(
 						chaikin_node,
 						end_node,
 						second_node,
@@ -401,7 +401,7 @@ class Polygon:
 		for conn in current_node.get_connections_by_type('main'):
 			partner_node = conn.get_partner_node(current_node)
 			# sub_local_group_set_list are the chaikin groups that go through the partner_node (long & complicated name for something very simple)
-			sub_local_group_set_list = Polygon._rec_find_chaikin_group_with_plane(
+			sub_local_group_set_list = Polyhedron._rec_find_chaikin_group_with_plane(
 				start_node,
 				end_node,
 				second_node,
@@ -431,7 +431,7 @@ class Polygon:
 		groups_list : list[set[N.Node]] = []
 		for conn in current_node.get_connections_by_type('main'):
 			partner_node = conn.get_partner_node(current_node)
-			groups = Polygon._rec_find_chaikin_group(start_node, partner_node, current_group.copy())
+			groups = Polyhedron._rec_find_chaikin_group(start_node, partner_node, current_group.copy())
 			for group in groups:
 				if group not in groups_list:
 					groups_list.append(group)

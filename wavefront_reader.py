@@ -1,6 +1,6 @@
 #
 from __future__ import annotations
-from polygon import Polygon
+from polyhedron import Polyhedron
 import os
 
 class ObjMesh:
@@ -12,7 +12,7 @@ class ObjMesh:
 		self.vertex_indices : list[list[int]] = []
 		self.parse(rotate)
 		# lambdas
-		self.to_polygon = lambda : Polygon.from_standard_vertex_lists(self.vertices, self.vertex_indices)
+		self.to_polyhedron = lambda : Polyhedron.from_standard_vertex_lists(self.vertices, self.vertex_indices)
 
 	def parse(self, rotate : bool = False):
 		lines = open(self.path, 'r').readlines()
