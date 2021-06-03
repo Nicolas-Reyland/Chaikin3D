@@ -1,5 +1,5 @@
 # Chaikin3D
-Expansion of the Chakin Algorithm to the 3rd dimension.
+Expansion of the Chaikin Algorithm to the 3rd dimension.
 
 ## Installation
 
