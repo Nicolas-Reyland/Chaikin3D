@@ -246,7 +246,7 @@ def main():
 	elif plot == 'animation':
 	   chaikin_animation(renderer, poly, chaikin_gens, chaikin_coef, alpha)
 	else:
-		raise Exception('Unrecognized shape:', plot)
+		raise Exception('Unrecognized plot:', plot)
 
 	return poly
 
