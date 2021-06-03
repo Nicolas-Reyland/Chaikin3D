@@ -37,9 +37,9 @@ If you are using Windows, download the matrix repo (https://github.com/Nicolas-R
 
 ## Some explanations first
 
-This project supports more "exotic" polygon types. In fact, since we are going to change the polygon, raw data of the verticies isn't sufficient. We need info about which edges are important, and which are not. For example, in a cube, the diagonal edge (to split the square into two triangles) is not "important": its purpose is only to bind two vertices so that triangle can be drawn to the screen. That's why we need to distinguish *main* and *graphical* connections between our nodes (vertices).
+This project supports more "exotic" polyhedron (a polyhedron is a polygon in space/3D) types. In fact, since we are going to change the polyhedron, raw data of the verticies isn't sufficient. We need info about which edges are important, and which are not. For example, in a cube, the diagonal edge (to split the square into two triangles) is not "important": its purpose is only to bind two vertices so that triangle can be drawn to the screen. That's why we need to distinguish *main* and *graphical* connections between our nodes (vertices).
 
-That is why the polygonal approximation of meshes that were loaded from *.obj* files are not perfect. There is no way for me to know if a connection between two nodes is really a part of the mesh or if its only purpose is to form triangles (you can normally only draw triangles). There are no "graphical" connections in those meshes :(
+That is why the polyhedral approximation of meshes that were loaded from *.obj* files are not perfect. There is no way for me to know if a connection between two nodes is really a part of the mesh or if its only purpose is to form triangles (you can normally only draw triangles). There are no "graphical" connections in those meshes :(
 
 Here are the main connections of a cube:
 
@@ -74,13 +74,13 @@ Not that you can use the ```python3 chaikin3d.py -h``` command.
 
 Another note: every option takes an argument. If an option takes a boolean argument, then *1*, *t* and *true* (case insensitive) will mean "true". For "false", these are accepted values: *0*, *f*, *false* (case insensitive).
 
-You will first have to select a polygon/mesh to render or use. There are two options: you can load a *.obj* file using the ```-i``` (```--input```) option and appending the path like this:
+You will first have to select a polyhedron/mesh to render or use. There are two options: you can load a *.obj* file using the ```-i``` (```--input```) option and appending the path like this:
 ```python3 chaikin3d.py -i data/dog.obj``` (if you try this and the mesh is rotated, please add this: ```-rm true``` option).
-You can also use the ```-s``` (```--shape```) option to load a predefined polygon. They are defined in the *basic_shapes.py* file. You can define your own polygons in there. You can, for example, use ```python3 chaikin3d.py -s cube``` or ```python3 chaikin3d.py -s triangle```. If you wish to add your own shapes, please take a look at the file and add your own! You only need to create a function which returns a *polygon.Polygon* object and append it's name after the ```-s``` option to load it.
-If you only load a polygon, it will simply be drawn.
+You can also use the ```-s``` (```--shape```) option to load a predefined polyhedron. They are defined in the *basic_shapes.py* file. You can define your own polyhedrons in there. You can, for example, use ```python3 chaikin3d.py -s cube``` or ```python3 chaikin3d.py -s triangle```. If you wish to add your own shapes, please take a look at the file and add your own! You only need to create a function which returns a *polyhedron.Polyhedron* object and append it's name after the ```-s``` option to load it.
+If you only load a polyhedron, it will simply be drawn.
 
 
-Then, you can choose the number of Chaikin generations (or iterations) you want to run on the given polygon. That is done using the ```-c``` (```--chakin```) option. The default value is 0. To run one iteration, you could use ```python3 chaikin3d.py -s triangle -c 1```.
+Then, you can choose the number of Chaikin generations (or iterations) you want to run on the given polyhedron. That is done using the ```-c``` (```--chakin```) option. The default value is 0. To run one iteration, you could use ```python3 chaikin3d.py -s triangle -c 1```.
 You might also want to control the Chaikin coefficient. This is done using the ```-cc``` option.
 Here is an example usage: ```python chaikin3d.py -s cube -c 3 -cc 3```. The default value is 4.
 
@@ -95,7 +95,7 @@ You can now choose how you'd like to draw your mesh and what exactly you'd like 
  * ```-rm``` or ```--rotate-mesh``` (only with the ```-i``` option)
 
 There are 4 types of plots (see examples below):
- * "simple" plot : this plot only draws your polygon to the screen
+ * "simple" plot : this plot only draws your polyhedron to the screen
  * "full" plot : this one draws a lot of data separately: your connections (by type, etc.), your vertices and different mesh representations. Useful for understanding how things work and debugging in general
  * "evolution" plot : the evolution plot takes into account the number of chaikin generations that you want (```-c``` option). I will render one generation after another in a grid-format (like the "full" plot)
  * "animation" plot (DO NOT USE) : this plot should, in theory, create an animation, rendering all the chaikin generations from 0 to the value given in the ```-c``` option
