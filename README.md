@@ -76,7 +76,7 @@ Another note: every option takes an argument. If an option takes a boolean argum
 
 You will first have to select a polyhedron/mesh to render or use. There are two options: you can load a *.obj* file using the ```-i``` (```--input```) option and appending the path like this:
 ```python3 chaikin3d.py -i data/dog.obj``` (if you try this and the mesh is rotated, please add this: ```-rm true``` option).
-You can also use the ```-s``` (```--shape```) option to load a predefined polyhedron. They are defined in the *basic_shapes.py* file. You can define your own polyhedrons in there. You can, for example, use ```python3 chaikin3d.py -s cube``` or ```python3 chaikin3d.py -s triangle```. If you wish to add your own shapes, please take a look at the file and add your own! You only need to create a function which returns a *polyhedron.Polyhedron* object and append it's name after the ```-s``` option to load it.
+You can also use the ```-s``` (```--shape```) option to load a predefined polyhedron. They are defined in the *basic_shapes.py* file. You can define your own polyhedra in there. You can, for example, use ```python3 chaikin3d.py -s cube``` or ```python3 chaikin3d.py -s triangle```. If you wish to add your own shapes, please take a look at the file and add your own! You only need to create a function which returns a *polyhedron.Polyhedron* object and append it's name after the ```-s``` option to load it.
 If you only load a polyhedron, it will simply be drawn.
 
 
