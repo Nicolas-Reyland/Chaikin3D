@@ -89,7 +89,7 @@ You can now choose how you'd like to draw your mesh and what exactly you'd like 
  * ```-sgc``` or ```--show-graphical-connections```
  * ```-rm``` or ```--rotate-mesh``` (only with the ```-i``` option)
 
-There are 4 types of plots:
+There are 4 types of plots (see examples below):
  * "simple" plot : this plot only draws your polygon to the screen
  * "full" plot : this one draws a lot of data separately: your connections (by type, etc.), your vertices and different mesh representations. Useful for understanding how things work and debugging in general
  * "evolution" plot : the evolution plot takes into account the number of chaikin generations that you want (```-c``` option). I will render one generation after another in a grid-format (like the "full" plot)
