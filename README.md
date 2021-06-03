@@ -123,8 +123,21 @@ CMD: ```python3 chaikin3d.py -s cube -p evolution -c 5```
 CMD: ```python3 chaikin3d.py -s triangle -p full -c 1 -cc 3```
 ![full triangle chaikin with coeff 3](pics/full-triangle-chaikin-cc-3.png)
 
+CMD 1: ```python3 chaikin3d.py -i data/deer.obj -rm true -a 1.0```
+
+CMD 2: ```python3 chaikin3d.py -i data/deer.obj -rm true -a 1.0 -smc false```
+
+<img src="pics/simple-deer.png"
+alt="1 simple deer no main connections alpha 1"
+style="float: right; margin-right: 10px;"
+height="600px" /> <img src="pics/simple-deer-no-smc.png"
+alt="2 simple deer no main connections alpha 1"
+style="float: left; margin-left: 10px;"
+height="600px" />
+
 
 ## TODO
+ * Change color of triangles & nodes (by type)
  * Save result to .obj file (keeping original textures ??)
  * Chaikin group ordering & connection on load when encountering faces with more than 3 vertices
  * Finsh animation plot
