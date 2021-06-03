@@ -124,6 +124,19 @@ CMD: ```python3 chaikin3d.py -s triangle -p full -c 1 -cc 3```
 ![full triangle chaikin with coeff 3](pics/full-triangle-chaikin-cc-3.png)
 
 
+## TODO
+ * Save result to .obj file (keeping original textures ??)
+ * Chaikin group ordering & connection on load when encountering faces with more than 3 vertices
+ * Finsh animation plot
+ * Better Chaikin group detection
+ * Optimization of the Chaikin3D algorithm
+     - maybe parallelism ?
+     - FFI with C++ or C (much more likely to happen than parallelism + much faster)
+ * Fix issue of python crashing (no errors, just crashing) when trying to apply chaikin3D on a large number of nodes & connections
+ * Save the chaikin groups on-load & chaikin group inheritance
+ * Change scale when plotting (e.g. data/cat.obj)
+
+
 ## Note
 If you have any issues using this project or need any help, please feel free to tell me on github !
 If you want to help me developping this project, please tell me too !
