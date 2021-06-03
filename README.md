@@ -84,7 +84,7 @@ There is a ```-v```/```--verbose``` switch too. If you turn it on, you will get 
 You can now choose how you'd like to draw your mesh and what exactly you'd like to draw. This is done using the folloying options:
  * ```-p``` or ```--plot```
  * ```-a``` or ```--alpha```
- * ```-r``` or ```--renderer``` (PLEASE DO NOT USE YET)
+ * ```-r``` or ```--renderer``` (DO NOT USE)
  * ```-smc``` or ```--show-main-connections```
  * ```-sgc``` or ```--show-graphical-connections```
  * ```-rm``` or ```--rotate-mesh``` (only with the ```-i``` option)
@@ -93,7 +93,7 @@ There are 4 types of plots (see examples below):
  * "simple" plot : this plot only draws your polygon to the screen
  * "full" plot : this one draws a lot of data separately: your connections (by type, etc.), your vertices and different mesh representations. Useful for understanding how things work and debugging in general
  * "evolution" plot : the evolution plot takes into account the number of chaikin generations that you want (```-c``` option). I will render one generation after another in a grid-format (like the "full" plot)
- * "animation" plot (DO NOT USE YET) : this plot should, in theory, create an animation, rendering all the chaikin generations from 0 to the value given in the ```-c``` option
+ * "animation" plot (DO NOT USE) : this plot should, in theory, create an animation, rendering all the chaikin generations from 0 to the value given in the ```-c``` option
 The default value is "simple"
 
 The ```-a```/```--alpha``` switch allows you to change the alpha/opacity value (ranging from 0.0 to 1.0) of the faces in the "simple", "evolution" and "animation" plots (every plot except the "full" plot <- there are already alpha changes). Default value: 0.8
