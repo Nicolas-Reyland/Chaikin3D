@@ -86,9 +86,17 @@ Use the ```-rm```/```--rotate-mesh``` to rotate meshes that look ... rotated **o
 
 Here are some examples of what can be done:
 
-![python3 chaikin.py -i data/dog.obj -rm true -p simple -r plotly](pics/simple-dog.png)
+CMD: ```python3 chaikin.py -i data/dog.obj -rm true```
+![only loading the dog](pics/simple-dog.png)
 
-![python3 chaikin.py -i data/dog.obj -rm true -p simple -r plotly -c 1 -cc 4](pics/simple-dog-chaikin.png)
+CMD: ```python3 chaikin.py -i data/dog.obj -rm true -c 1```
+![loading the dog and running one itertion of chaikin](pics/simple-dog-chaikin.png)
+
+CMD: ```python3 chaikin3d.py -s cube -p evolution -c 5```
+![cube evolution](pics/evolution-cube-chaikin.png)
+
+CMD: ```python3 chaikin3d.py -s triangle -p full -c 1 -cc 3```
+![full triangle chaikin with coeff 3](pics/full-triangle-chaikin-cc-3.png)
 
 
 ## Note
