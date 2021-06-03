@@ -226,7 +226,6 @@ def main():
 		raise Exception('You must give an input file or a shape. One or the other, but not none at all')
 
 	if plot != 'evolution' and plot != 'animation':
-		assert chaikin_gens >= 0
 		for _ in range(chaikin_gens):
 			print(' - 3D Chaikin -')
 			poly = Polygon.Chaikin3D(poly, chaikin_coef, verbose, FILE_MODE)
