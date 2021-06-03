@@ -36,6 +36,31 @@ This project supports more "exotic" polygon types. In fact, since we are going t
 
 That is why the polygonal approximation of meshes that were loaded from *.obj* files are not perfect. There is no way for me to know if a connection between two nodes is really a part of the mesh or if its only purpose is to form triangles (you can normally only draw triangles). There are no "graphical" connections in those meshes :(
 
+Here are the main connections of a cube:
+
+<img src="pics/cube-main-connections.png"
+     alt="Cube main connections"
+     style="float: left; margin-left: 10px;" />
+
+Here are the graphical connections of a cube:
+
+<img src="pics/cube-graphical-connections.png"
+     alt="Cube graphical connections"
+     style="float: left; margin-left: 10px;" />
+
+Here are all the connections of a cube:
+
+<img src="pics/cube-all-connections.png"
+     alt="Cube all connections"
+     style="float: left; margin-left: 10px;" />
+
+And when you draw all this:
+
+<img src="pics/simple-cube.png"
+     alt="Simple cube rendering"
+     style="float: left; margin-left: 10px;" />
+
+
 For examples of what I mean with "graphical" connections, try these commands: ```python3 chaikin3d.py -s cube -p full -c 0``` and ```python3 chaikin3d.py -s cube -p full -c 1```. The grapchical connections are the black lines, while the main connections are the red lines.
 
 
