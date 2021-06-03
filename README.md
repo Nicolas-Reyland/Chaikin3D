@@ -143,7 +143,7 @@ style="float: left; margin-left: 10px;" width="48%;" /> <img src="pics/simple-de
 alt="2 simple deer no main connections alpha 1"
 style="float: right; margin-right: 10px;" width="48%;" />
 
-*There are 25486 nodes in the CMD1 image, so rotating the mesh + the connections to match the camera rotation of the other mesh screenshots was a little too much for my toaster PC*
+*There are 25486 nodes in the last two deer meshes*
 
 
 
