@@ -34,7 +34,7 @@ If you are using Windows, download the matrix repo (https://github.com/Nicolas-R
 
 This project supports more "exotic" polygon types. In fact, since we are going to change the polygon, raw data of the verticies isn't sufficient. We need info about which edges are important, and which are not. For example, in a cube, the diagonal edge (to split the square into two triangles) is not "important": its purpose is only to bind two vertices so that triangle can be drawn to the screen. That's why we need to distinguish *main* and *graphical* connections between our nodes (vertices).
 
-That is why the polygonal approximation of meshes that were loaded from *.obj* files are not perfect. There is no way for me to know if a connection between two nodes is really a part of the mesh or if its only purpose is to form triangles (you can normally only draw triangles).
+That is why the polygonal approximation of meshes that were loaded from *.obj* files are not perfect. There is no way for me to know if a connection between two nodes is really a part of the mesh or if its only purpose is to form triangles (you can normally only draw triangles). There are no "graphical" connections in those meshes :(
 
 For examples of what I mean with "graphical" connections, try these commands: ```python3 chaikin3d.py -s cube -p full -c 0``` and ```python3 chaikin3d.py -s cube -p full -c 1```. The grapchical connections are the black lines, while the main connections are the red lines.
 
@@ -80,6 +80,15 @@ The ```-smc``` switch allows to choose if you want to render the main connection
 The ```-sgc``` switch allows to choose if you want to render the graphical connections for the "simple", "evolution" and "animation" plots. Default value: "false"
 
 Use the ```-rm```/```--rotate-mesh``` to rotate meshes that look ... rotated **on load** (therefore, you can only use this option with the ```-i```/```--input``` option).
+
+
+## Examples
+
+Here are some examples of what can be done:
+
+![python3 chaikin.py -i data/dog.obj -rm true -p simple -r plotly](pics/simple-dog.png)
+
+![python3 chaikin.py -i data/dog.obj -rm true -p simple -r plotly -c 1 -cc 4](pics/simple-dog-chaikin.png)
 
 
 ## Note
