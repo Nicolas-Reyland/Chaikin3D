@@ -133,7 +133,7 @@ class Renderer:
 				z = [A[2], B[2]],
 				marker={
 					'size': 2,
-					'color': gen_random_color() if color == 'random' else color
+					'color': gen_random_color() if color == 'random' else 'green'
 				},
 				line={
 					'color': gen_random_color() if color == 'random' else color,

@@ -3,7 +3,7 @@ from __future__ import annotations
 import node as N
 import connection as C
 import matrix
-import sys
+import sys, time
 from copy import deepcopy
 
 matrix.EPSILON = 10e-6
@@ -221,6 +221,7 @@ class Polygon:
 		'''
 		# change recursion limit
 		polygon._set_recursion_limit()
+		t1 = time.perf_counter()
 		# init
 		base_ratio = (n - 1) / n
 		special_ratio = (n - 2) / (n - 1) # when the vector has already been trunced once
@@ -336,7 +337,7 @@ class Polygon:
 		#print('num nodes:', len(new_node_list))
 
 		# return the final polygon
-		if verbose: print('Chaiking 3D done')
+		if verbose: print('Chaikin 3D finished in {}'.format(time.perf_counter() - t1))
 		return Polygon(new_node_list)
 
 	@staticmethod
