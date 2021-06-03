@@ -337,7 +337,7 @@ class Polygon:
 		#print('num nodes:', len(new_node_list))
 
 		# return the final polygon
-		if verbose: print('Chaikin 3D finished in {}'.format(time.perf_counter() - t1))
+		if verbose: print('Chaikin 3D finished {} nodes in {:.3} sec'.format(total_nodes, time.perf_counter() - t1))
 		return Polygon(new_node_list)
 
 	@staticmethod
