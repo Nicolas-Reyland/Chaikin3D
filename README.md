@@ -133,9 +133,23 @@ style="float: left; margin-left: 10px;" width="48%;" /> <img src="pics/simple-de
 alt="2 simple deer no main connections alpha 1"
 style="float: right; margin-right: 10px;" width="48%;" />
 
+CMD 1: ```python3 chaikin3d.py -i data/deer.obj -rm true -a 1.0 -smc true -c 1 -v 1``` (verbose switch not mandatory)
+
+CMD 2: ```python3 chaikin3d.py -i data/deer.obj -rm true -a 1.0 -smc true -c 1 -v 1``` (verbose switch not mandatory)
+
+<img src="pics/simple-deer-chaikin.png"
+alt="1 simple deer no main connections alpha 1"
+style="float: left; margin-left: 10px;" width="48%;" /> <img src="pics/simple-deer-chaikin-no-smc.png"
+alt="2 simple deer no main connections alpha 1"
+style="float: right; margin-right: 10px;" width="48%;" />
+
+*There are 25486 nodes in the CMD1 image, so rotating the mesh + the connections to match the camera rotation of the other mesh screenshots was a little too much for my toaster PC*
+
+
 
 ## TODO
- * Change color of triangles & nodes (by type)
+ * Ability to change the color of triangles, nodes & connections (by type)
+ * Better memory optimization (should come with C/C++ FFI implementation)
  * Save result to .obj file (keeping original textures ??)
  * Chaikin group ordering & connection on load when encountering faces with more than 3 vertices
  * Finsh animation plot
