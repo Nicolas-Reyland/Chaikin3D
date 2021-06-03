@@ -111,7 +111,7 @@ Use the ```-rm```/```--rotate-mesh``` to rotate meshes that look ... rotated **o
 
 Here are some examples of what can be done:
 
-CMD: ```python3 chaikin.py -i data/dog.obj -rm true```
+CMD: ```python3 chaikin3d.py -i data/dog.obj -rm true```
 ![only loading the dog](pics/simple-dog.png)
 
 CMD: ```python3 chaikin.py -i data/dog.obj -rm true -c 1```
