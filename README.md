@@ -132,7 +132,7 @@ CMD: ```python3 chaikin3d.py -s triangle -p full -c 1 -cc 3```
 
 ![full triangle chaikin with coeff 3](pics/full-triangle-chaikin-cc-3.png)
 
-*The "solid" statement means that the alpha value of the triangles has been set to 1.0 (no transparency at all)*
+*The "solid" statement means that the alpha value of the triangles has been set to 1.0 (no transparency)*
 
 CMD 1: ```python3 chaikin3d.py -i data/deer.obj -rm true -a 1.0```
 
@@ -154,7 +154,7 @@ style="float: left; margin-left: 10px;" width="48%;" /> <img src="pics/simple-de
 alt="2 simple deer no main connections alpha 1"
 style="float: right; margin-right: 10px;" width="48%;" />
 
-*There are 25486 nodes in the last two deer meshes*
+*There are 25486 nodes in the last deer mesh. Loading thoses meshes should take at least a few minutes.*
 
 
 
