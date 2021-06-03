@@ -128,6 +128,8 @@ CMD: ```python3 chaikin3d.py -s cube -p evolution -c 5```
 CMD: ```python3 chaikin3d.py -s triangle -p full -c 1 -cc 3```
 ![full triangle chaikin with coeff 3](pics/full-triangle-chaikin-cc-3.png)
 
+*The "solid" statement means that the alpha value of the triangles has been set to 1.0 (no transparency at all)*
+
 CMD 1: ```python3 chaikin3d.py -i data/deer.obj -rm true -a 1.0```
 
 CMD 2: ```python3 chaikin3d.py -i data/deer.obj -rm true -a 1.0 -smc false```
