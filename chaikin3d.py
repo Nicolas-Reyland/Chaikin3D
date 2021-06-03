@@ -69,7 +69,7 @@ def draw_full(renderer : Renderer, poly : Polygon) -> None:
 		'All connections',
 		'Faces using main connections',
 		'Faces using graphical connections',
-		'Solid faces',
+		'All faces (solid)',
 		'All faces',
 		'All faces + main connections',
 		'All faces + all connections'
