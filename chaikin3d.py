@@ -8,9 +8,9 @@ parser = ArgumentParser(description='Apply the Chaikin algorithm, expanded for t
 
 parser.add_argument('-i', '--input', type=str, help='input file (df. None)')
 parser.add_argument('-s', '--shape', type=str, help='shape (df. cube)')
-parser.add_argument('-c', '--chaikin', type=int, help='number of chaikin generations (df. 0)')
-parser.add_argument('-v', '--verbose', type=str, help='verbose (boolean) (df. false)')
+parser.add_argument('-cg', '--chaikin-generations', type=int, help='number of chaikin generations (df. 0)')
 parser.add_argument('-cc', '--chaikin-coef', type=float, help='Chaikin coefficient (df. 4)')
+parser.add_argument('-v', '--verbose', type=str, help='verbose (boolean) (df. false)')
 parser.add_argument('-p', '--plot', type=str, help='plot type ["simple", "full", "evolution", "animation"] (df. simple)')
 parser.add_argument('-a', '--alpha', type=float, help='Alpha/Opacity value for mesh rendering (df. 0.8)')
 parser.add_argument('-r', '--renderer', type=str, help='renderer ["plotly", "mpl"] (df. plotly)')
@@ -33,7 +33,7 @@ shape = args['shape'] if args['shape'] or input_file else 'cube'
 if shape and input_file:
 	raise Exception('You must either give an input file or a shape. You cannot give both')
 
-chaikin_gens = args['chaikin'] if args['chaikin'] else 0
+chaikin_gens = args['chaikin_generations'] if args['chaikin_generations'] else 0
 verbose = parse_bool(args['verbose']) if args['verbose'] else False
 chaikin_coef = args['chaikin_coef'] if args['chaikin_coef'] else 4
 plot = args['plot'] if args['plot'] else 'simple'
@@ -229,7 +229,7 @@ def main():
 		assert chaikin_gens >= 0
 		for _ in range(chaikin_gens):
 			print(' - 3D Chaikin -')
-			poly = Polyhedron.Chaikin3D(poly, chaikin_coef, verbose, FILE_MODE)
+			poly = Polyhedron.Chaikin3D(poly, chaikin_coef, verbose, False)#FILE_MODE)
 			print('Chaikin done')
 
 	if plot == 'simple':

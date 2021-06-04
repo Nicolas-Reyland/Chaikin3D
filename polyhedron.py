@@ -4,6 +4,7 @@ import node as N
 import connection as C
 import matrix
 import sys, time
+from dataholders import VirtualDict, VirtualSet
 from copy import deepcopy
 
 matrix.EPSILON = 10e-6
@@ -24,35 +25,19 @@ class Polyhedron:
 		return self.nodes[index]
 
 	def __iter__(self):
-		return iter(self._hash_iter_triplets())
+		return iter(self._iter_triangles())
 
-	def _iter_triplets(self, type_ : str = 'any'):
-		triplet_list = []
+	def _iter_triangles(self, type_ : str = 'any') -> list[N.Triangle]:
+		triangle_list = []
 		for node in self.nodes:
-			for triplet in node.get_triplets(type_):
+			for triangle in node.get_triangles(type_):
 				# check unique-ness
-				if Polyhedron._triplet_in_list(triplet_list, triplet):
+				if Polyhedron._triangle_in_list(triangle_list, triangle):
 					continue
 				# it is unique, so we can add it to the list
-				triplet_list.append(triplet)
-		print('num triplets', len(triplet_list))
-		return triplet_list
-
-	def _hash_iter_triplets(self, type_ : str = 'any'):
-		triplet_list = []
-		triplet_hash_set = set()
-		triplet_hash_func = lambda triplet: sum([sum([int(triplet[i][j] * 10e3) ** (j + 3) for j in range(3)]) for i in range(3)]) # pay atention to when a triplet is unique !
-		for node in self.nodes:
-			for triplet in node.get_triplets(type_):
-				# check unique-ness
-				triplet_hash = triplet_hash_func(triplet)
-				if triplet_hash in triplet_hash_set:
-					continue
-				triplet_hash_set.add(triplet_hash)
-				# it is unique, so we can add it to the list
-				triplet_list.append(triplet)
-		print('num hash triplets', len(triplet_hash_set))
-		return triplet_list
+				triangle_list.append(triangle)
+		print('num triangles (' + str(type_) + ')', len(triangle_list))
+		return triangle_list
 
 	def _set_recursion_limit(self):
 		sys.setrecursionlimit(10**6)
@@ -63,30 +48,30 @@ class Polyhedron:
 			for conn in node.get_connections_by_type(type_):
 				if conn not in connection_list:
 					connection_list.append(conn)
-		print('num connections', len(connection_list))
+		print('num connections (' + type_ + ') ', len(connection_list))
 		return connection_list
 
 	@staticmethod
-	def _triplet_in_list(triplet_list, triplet) -> bool:
-		if triplet in triplet_list: return True
-		for other_triplet in triplet_list:
-			if triplet[0] in other_triplet and triplet[1] in other_triplet and triplet[2] in other_triplet:
+	def _triangle_in_list(triangle_list, triangle) -> bool:
+		if triangle in triangle_list: return True
+		for other_triangle in triangle_list:
+			if triangle[0] in other_triangle and triangle[1] in other_triangle and triangle[2] in other_triangle:
 				return True
 		return False
 
 	@staticmethod
-	def unique_triplets(triplets):
+	def unique_triangles(triangles):
 		index = 0
-		length = len(triplets)
+		length = len(triangles)
 		while index < length:
-			triplet = triplets.pop(index) # pop it from the list
-			if Polyhedron._triplet_in_list(triplets, triplet):
+			triangle = triangles.pop(index) # pop it from the list
+			if Polyhedron._triangle_in_list(triangles, triangle):
 				length -= 1
 			else:
 				# add it back and go one forward
-				triplets.insert(index, triplet)
+				triangles.insert(index, triangle)
 				index += 1
-		return triplets
+		return triangles
 
 	@staticmethod
 	def from_raw_points(points : list[tuple[float]], index_list : list[int], inverse_index_list : bool = False, connect_endpoints : bool = True) -> Polyhedron:
@@ -198,20 +183,29 @@ class Polyhedron:
 	def from_standard_vertex_lists(vertex_list : list[list[float]], vertex_index_list : list[list[int]]) -> Polyhedron:
 		# build nodes
 		nodes : list[N.Node] = list(map(N.Node.from_point, vertex_list))
+		to_connect = []
 		# connect using the index list
-		for index in range(len(vertex_index_list)):
-			vertex_index = vertex_index_list[index]
-			vertex_index[0] -= 1
-			vertex_index[1] -= 1
-			vertex_index[2] -= 1
-			vertex_index_list[index] = vertex_index
-			i, j, k = vertex_index
-			A = nodes[i]
-			B = nodes[j]
-			C = nodes[k]
-			A.connect(B, 'main')
-			B.connect(C, 'main')
-			C.connect(A, 'main')
+		for i in range(len(vertex_index_list)):
+			# get the indices
+			node_groupe_index_list = vertex_index_list[i]
+			# get the corresponding (ordered) group
+			ogroup = [nodes[index] for index in node_groupe_index_list]
+			# connect the main connections (circular connection)
+			group_size = len(ogroup)
+			print('group of size:', group_size)
+			for j in range(group_size - 1):
+				ogroup[j].connect(ogroup[j + 1], 'main')
+			# connect later
+			if group_size > 3:
+				to_connect.append(ogroup[:])
+
+		# connect later
+		for ogroup in to_connect:
+			group_obj = Group(ogroup)
+			group_obj.order()
+			# connect the graphical connections
+			group_obj.inter_connect('graphical')
+
 		# return polyhedron
 		return Polyhedron(nodes, vertex_list, vertex_index_list)
 
@@ -225,11 +219,11 @@ class Polyhedron:
 		# init
 		base_ratio = (n - 1) / n
 		special_ratio = (n - 2) / (n - 1) # when the vector has already been trunced once
-		node_dict : dict[N.Node, list[N.Node]] = dict()
+		node_virt_dict : VirtualDict = VirtualDict()
 		new_connections : list[C.Connection] = []
 
+		print('Creating a deepcopy of the polyhedron nodes...')
 		old_nodes = deepcopy(polyhedron.nodes)
-
 		sub_node_count = 0
 
 		#
@@ -241,7 +235,6 @@ class Polyhedron:
 			# create sub-nodes
 			num_new_connections = num_graphical_nodes = 0
 			sub_node_list : list[N.Node] = []
-			graphical_connections : list[C.Connection] = []
 			for conn in current_node.connection_list:
 				if conn.type_ == 'main':
 					#
@@ -278,8 +271,7 @@ class Polyhedron:
 					sub_node_list.append(sub_node)
 					num_new_connections += 1
 				elif conn.type_ == 'graphical':
-					graphical_connections.append(conn)
-					#print(' - added graphical connection:', conn)
+					continue
 				else:
 					raise Exception('Unknown connection type:', conn.type_)
 			# connect all the sub-nodes together (might find something to avoid connection-crossing -> len(sub_node_list) > 3)
@@ -289,52 +281,52 @@ class Polyhedron:
 					sub_node_list[i].connect(sub_node_list[j], 'main')
 
 			# add those sub-nodes to the new nodes list
-			node_dict[old_nodes[node_index]] = sub_node_list
+			node_virt_dict[old_nodes[node_index]] = sub_node_list
 			#print('sub-nodes:', len(sub_node_list))
 			sub_node_count += len(sub_node_list)
 
-		# connect all the sub_nodes together
-		chaikin_groups_list : list[set[N.Node]] = []
-		processed_groups = []
+		# connect all the groups together
+		chaikin_group_list : list[Group] = []
+		processed_groups = VirtualSet()
 		if verbose: print('Reconnect the new nodes (using the old nodes as starting point)')
 		for old_node_index,old_node in enumerate(old_nodes):
 			if verbose and old_node_index % 100 == 0: print('[{}/{}] done (old nodes) ({:.2f}%)'.format(old_node_index, total_nodes, 100 * old_node_index / total_nodes))
-			old_group_list : list[set[N.Node]] = Polyhedron._find_chaikin_groups_for_node(old_node)
-			for old_group in filter(lambda g: g not in processed_groups and (not file_mode or Polyhedron._nec_group_cond(g)), old_group_list): # and Polyhedron._nec_group_cond(g)
-				new_group : set[N.Node] = set()
-				for old_node in old_group:
-					new_nodes = node_dict[old_node]
+			# find all the old groups that this 'old_node' is part of
+			old_group_list : list[VirtualSet] = Polyhedron._find_chaikin_groups_for_node(old_node)
+			for old_group in filter(lambda g: g not in processed_groups, old_group_list):#	and Polyhedron._nec_group_cond(g), old_group_list):
+				new_group : VirtualSet = VirtualSet()
+				for old_node_2 in old_group:
+					new_nodes = node_virt_dict[old_node_2]
 					for new_node in new_nodes:
 						for other_old_node in old_group:
-							if old_node != other_old_node and any([C.Connection.are_connected(new_node, other_new_node) for other_new_node in node_dict[other_old_node]]):
+							if old_node_2 != other_old_node and any([C.Connection.are_connected(new_node, other_new_node) for other_new_node in node_virt_dict[other_old_node]]):
 								break
 						else:
 							continue
 						# found
 						new_group.add(new_node)
 						# don't break because there are two new nodes per old node
-				if new_group not in chaikin_groups_list:
-					chaikin_groups_list.append(new_group)
-				processed_groups.append(old_group)
 
-		total_groups = len(chaikin_groups_list)
+				if new_group not in chaikin_group_list:
+					chaikin_group_list.append(new_group)
+				processed_groups.add(old_group)
+
+		total_groups = len(chaikin_group_list)
+		group_objects = list(map(Group, chaikin_group_list))
 		if verbose: print('Ordering the groups ({})'.format(total_groups))
-		#print('num raw groups:', len(chaikin_groups_list))
-		ordered_groups : list[list[N.Node]] = list(map(Polyhedron._order_chaikin_group, chaikin_groups_list))
+		#print('num raw groups:', len(group_objects))
+		for group in group_objects: group.order()
 
 		if verbose: print('Connecting the groups ({})'.format(total_groups))
-		for i,ogroup in enumerate(ordered_groups):
+		for i,group in enumerate(group_objects):
 			if verbose and i % 100 == 0: print('[{}/{}] done ({:.2f}%)'.format(i, total_groups, 100 * i / total_groups))
-			#print('ordered group', ogroup)
-			Polyhedron._connect_ordered_chaikin_group(ogroup)
+			group.inter_connect('graphical')
 
 		# construct new node list
 		if verbose: print('Building the new nodes list...')
 		new_node_list : list[N.Node] = []
-		for _,sub_nodes in node_dict.items():
+		for _,sub_nodes in node_virt_dict:
 			new_node_list.extend(sub_nodes)
-
-		#print('num nodes:', len(new_node_list))
 
 		# return the final polyhedron
 		if verbose: print('Chaikin 3D finished {} nodes in {:.3} sec'.format(total_nodes, time.perf_counter() - t1))
@@ -342,8 +334,8 @@ class Polyhedron:
 
 	@staticmethod
 	def _nec_group_cond(group):
-		if type(group) == set: group = list(group)
-		num_elements = len(group)
+		assert type(group) == VirtualSet
+		num_elements = group.size
 		for i in range(num_elements):
 			for j in range(i+1, num_elements):
 				if not C.Connection.are_connected(group[i], group[j], 'main'):
@@ -351,8 +343,8 @@ class Polyhedron:
 		return True
 
 	@staticmethod
-	def _find_chaikin_groups_for_node(chaikin_node : N.Node) -> list[set[N.Node]]:
-		chaikin_group_set_list : list[set[N.Node]] = []
+	def _find_chaikin_groups_for_node(chaikin_node : N.Node) -> list[VirtualSet]:
+		chaikin_group_set_list : list[VirtualSet] = []
 		main_connections = chaikin_node.get_connections_by_type('main')
 		num_main_connections = len(main_connections)
 
@@ -367,12 +359,12 @@ class Polyhedron:
 				#
 				for sub_conn in second_node.get_connections_by_type('main'):
 					partner_node = sub_conn.get_partner_node(second_node)
-					local_group_set_list : list[set[N.Node]] = Polyhedron._rec_find_chaikin_group_with_plane(
+					local_group_set_list : list[VirtualSet] = Polyhedron._rec_find_chaikin_group_with_plane(
 						chaikin_node,
 						end_node,
 						second_node,
 						partner_node,
-						{end_node, chaikin_node, second_node},
+						VirtualSet([end_node, chaikin_node, second_node]),
 						plane
 					)
 					for local_group in local_group_set_list:
@@ -382,9 +374,7 @@ class Polyhedron:
 		return chaikin_group_set_list
 
 	@staticmethod
-	def _rec_find_chaikin_group_with_plane(start_node : N.Node, end_node : N.Node, second_node : N.Node, current_node : N.Node, current_group : set[N.Node], plane : matrix.Plane) -> list[set[N.Node]]:
-		'''Same as the '_rec_find_chaikin_group' function, but uses plane geometry properties to check if the group is valid
-		'''
+	def _rec_find_chaikin_group_with_plane(start_node : N.Node, end_node : N.Node, second_node : N.Node, current_node : N.Node, current_group : VirtualSet, plane : matrix.Plane) -> list[VirtualSet]:
 
 		# end of group ?
 		if current_node == end_node:
@@ -397,7 +387,7 @@ class Polyhedron:
 		current_group.add(current_node)
 
 		# continue search
-		local_group_set_list : list[set[N.Node]] = []
+		local_group_set_list : list[VirtualSet] = []
 		for conn in current_node.get_connections_by_type('main'):
 			partner_node = conn.get_partner_node(current_node)
 			# sub_local_group_set_list are the chaikin groups that go through the partner_node (long & complicated name for something very simple)
@@ -416,60 +406,62 @@ class Polyhedron:
 
 		return local_group_set_list
 
-	@staticmethod
-	def _rec_find_chaikin_group(start_node : N.Node, current_node : N.Node, current_group : set[N.Node]) -> list[set[N.Node]]:
-		# found the start node again ?
-		if current_node == start_node:
-			return [current_group]
-		if current_node in current_group:
-			return []
+class Group:
+	def __init__(self, iterable, do_order : bool = False):
+		self.group = VirtualSet(iterable)
+		self.ogroup = None
+		self.ordered = False
+		self.size = len(iterable)
+		assert self.size > 2 # >= 3
+		if do_order:
+			self.order()
 
-		# add to group
-		current_group.add(current_node)
+	def __iter__(self):
+		return iter(self.ogroup) if self.ordered else iter(group)
 
-		# continue search
-		groups_list : list[set[N.Node]] = []
-		for conn in current_node.get_connections_by_type('main'):
-			partner_node = conn.get_partner_node(current_node)
-			groups = Polyhedron._rec_find_chaikin_group(start_node, partner_node, current_group.copy())
-			for group in groups:
-				if group not in groups_list:
-					groups_list.append(group)
-
-		return groups_list
-
-	@staticmethod
-	def _connect_ordered_chaikin_group(ordered_group : list[N.Node], connection_type : str = 'graphical') -> None:
-		length = len(ordered_group)
-		num_iter = int(matrix.np.log2(length)) - 1
-		#print('number of iterations: {} for {} nodes'.format(num_iter, length))
-		for x in range(num_iter):
-			step = 2 ** (x + 1)
-			#print('step:', step)
-			prev_node = ordered_group[0]
-			for i in range(step, length, step):
-				current_node = ordered_group[i]
-				prev_node.connect(current_node, connection_type)
-				prev_node = current_node
-			# connect last one to first one
-			ordered_group[0].connect(prev_node, 'graphical')
-
-	@staticmethod
-	def _order_chaikin_group(group_set : set[N.Node]) -> list[N.Node]:
+	def order(self, force : bool = False) -> None:
+		if not force and self.ordered: return
 		# initialize variables
-		group_list : list[N.Node] = list(group_set)
+		group_list : list[N.Node] = list(self.group)
 		current_node = group_list.pop(0)
-		ordered_group = [current_node]
+		self.ogroup = [current_node]
 		# connect the next ones (don't care if we go 'left' or 'right')
 		while group_list:
 			for remaining_node in group_list:
 				if C.Connection.are_connected(current_node, remaining_node):
-					ordered_group.append(remaining_node)
+					self.ogroup.append(remaining_node)
 					group_list.remove(remaining_node)
 					current_node = remaining_node
 					break
-			else:
-				print('no connection found. returning empty group')
-				return []
 
-		return ordered_group
+		self.ordered = True
+
+	def cycle_connect(self, connection_type : str = 'main') -> None:
+		self.order()
+		for i in range(self.size - 1):
+			self.ogroup[i].connect(self.ogroup[i + 1], connection_type)
+
+	def inter_connect(self, connection_type : str = 'graphical') -> None:
+		assert self.ordered
+		num_iter = int(matrix.np.log2(self.size)) - 1
+		#
+		for x in range(num_iter):
+			step = 2 ** (x + 1)
+			#print('step:', step)
+			prev_node = self.ogroup[0]
+			for i in range(step, self.size, step):
+				current_node = self.ogroup[i]
+				prev_node.connect(current_node, connection_type)
+				prev_node = current_node
+			# connect last one to first one
+			self.ogroup[0].connect(prev_node, connection_type)
+
+
+
+
+
+
+
+
+
+#

@@ -95,9 +95,9 @@ class Renderer:
 	def get_polyhedron_draw_data(self, polyhedron : Polyhedron, type_ : str = 'any', alpha : float = 0.8, draw_text : bool = False, color : str = 'lightblue') -> list[go.Mesh3d]:
 		vertex_list = []
 		vertex_index_list = []
-		for triplet in polyhedron._hash_iter_triplets(type_):
+		for triangle in polyhedron._iter_triangles(type_):
 			index_list = []
-			for vertex in triplet:
+			for vertex in triangle:
 				if vertex not in vertex_list:
 					vertex_list.append(vertex)
 					index_list.append(len(vertex_list) - 1)

@@ -66,7 +66,7 @@ And when you draw all this:
      style="float: left; margin-left: 10px;" />
 
 
-For examples of what I mean with "graphical" connections, try these commands: ```python3 chaikin3d.py -s cube -p full -c 0``` and ```python3 chaikin3d.py -s cube -p full -c 1```. The grapchical connections are the black lines, while the main connections are the red lines.
+For examples of what I mean with "graphical" connections, try these commands: ```python3 chaikin3d.py -s cube -p full -cg 0``` and ```python3 chaikin3d.py -s cube -p full -cg 1```. The grapchical connections are the black lines, while the main connections are the red lines.
 
 
 ## Usage
@@ -80,9 +80,9 @@ You can also use the ```-s``` (```--shape```) option to load a predefined polyhe
 If you only load a polyhedron, it will simply be drawn.
 
 
-Then, you can choose the number of Chaikin generations (or iterations) you want to run on the given polyhedron. That is done using the ```-c``` (```--chakin```) option. The default value is 0. To run one iteration, you could use ```python3 chaikin3d.py -s triangle -c 1```.
+Then, you can choose the number of Chaikin generations (or iterations) you want to run on the given polyhedron. That is done using the ```-c``` (```--chaikin-generations```) option. The default value is 0. To run one iteration, you could use ```python3 chaikin3d.py -s triangle -cg 1```.
 You might also want to control the Chaikin coefficient. This is done using the ```-cc``` option.
-Here is an example usage: ```python chaikin3d.py -s cube -c 3 -cc 3```. The default value is 4.
+Here is an example usage: ```python chaikin3d.py -s cube -cg 3 -cc 3```. The default value is 4.
 
 There is a ```-v```/```--verbose``` switch too. If you turn it on, you will get info about the chaikin algorithm progress. This might be useful for meshes with a lot of vertices or when having a lot of iterations. The default value is "false".
 
@@ -120,15 +120,15 @@ CMD: ```python3 chaikin3d.py -i data/dog.obj -rm true```
 
 ![only loading the dog](pics/simple-dog.png)
 
-CMD: ```python3 chaikin3d.py -i data/dog.obj -rm true -c 1```
+CMD: ```python3 chaikin3d.py -i data/dog.obj -rm true -cg 1```
 
 ![loading the dog and running one itertion of chaikin](pics/simple-dog-chaikin.png)
 
-CMD: ```python3 chaikin3d.py -s cube -p evolution -c 5```
+CMD: ```python3 chaikin3d.py -s cube -p evolution -cg 5```
 
 ![cube evolution](pics/evolution-cube-chaikin.png)
 
-CMD: ```python3 chaikin3d.py -s triangle -p full -c 1 -cc 3```
+CMD: ```python3 chaikin3d.py -s triangle -p full -cg 1 -cc 3```
 
 ![full triangle chaikin with coeff 3](pics/full-triangle-chaikin-cc-3.png)
 
@@ -144,9 +144,9 @@ style="float: left; margin-left: 10px;" width="48%;" /> <img src="pics/simple-de
 alt="2 simple deer no main connections alpha 1"
 style="float: right; margin-right: 10px;" width="48%;" />
 
-CMD 1: ```python3 chaikin3d.py -i data/deer.obj -rm true -a 1.0 -smc true -c 1 -v 1``` (verbose switch not mandatory)
+CMD 1: ```python3 chaikin3d.py -i data/deer.obj -rm true -a 1.0 -smc true -cg 1 -v 1``` (verbose switch not mandatory)
 
-CMD 2: ```python3 chaikin3d.py -i data/deer.obj -rm true -a 1.0 -smc true -c 1 -v 1``` (verbose switch not mandatory)
+CMD 2: ```python3 chaikin3d.py -i data/deer.obj -rm true -a 1.0 -smc true -cg 1 -v 1``` (verbose switch not mandatory)
 
 <img src="pics/simple-deer-chaikin.png"
 alt="1 simple deer no main connections alpha 1"

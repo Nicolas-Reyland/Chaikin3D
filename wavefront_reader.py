@@ -26,7 +26,7 @@ class ObjMesh:
 				vertex_indices_str.append(line[2:])
 
 		print('obj file -> num vertices:', len(vertices_str))
-		print('obj file -> num connections:', len(vertex_indices_str))
+		print('obj file -> num groups:', len(vertex_indices_str))
 
 		for vertex_str in vertices_str:
 			raw_vert = list(filter(None, vertex_str.split()))
@@ -37,11 +37,19 @@ class ObjMesh:
 
 		for vertex_index_str in vertex_indices_str:
 			raw_vert_index = list(filter(None, vertex_index_str.split()))
-			if len(raw_vert_index) > 3:
-				for i in range(len(raw_vert_index) - 3):
+			vertex_list = list(map(lambda s: int(s.split('/')[0]) - 1, raw_vert_index)) # - 1 because indexes are starting at 1 in .obj files
+			num_vertices = len(raw_vert_index)
+			vertex_index_group = []
+			for i in range(num_vertices):
+				vertex_index_group.append(vertex_list[i])
+			self.vertex_indices.append(vertex_index_group)
+
+			'''
+			if num_vertices > 3:
+				for i in range(num_vertices - 2): # not " - 3", but " - 2" because we want to connect last to first too
 					sub_vertex_list = []
 					for j in range(i, i + 3):
-						index = int(raw_vert_index[j].split('/')[0])
+						index = int(raw_vert_index[j % num_vertices].split('/')[0])
 						sub_vertex_list.append(index)
 					self.vertex_indices.append(sub_vertex_list)
 			else:
@@ -50,3 +58,4 @@ class ObjMesh:
 					index = int(raw_sub_vertex_index.split('/')[0])
 					vertex_index.append(index)
 				self.vertex_indices.append(vertex_index)
+			'''
