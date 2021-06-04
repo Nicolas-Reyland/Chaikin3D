@@ -160,6 +160,7 @@ style="float: right; margin-right: 10px;" width="48%;" />
 
 
 ## TODO
+ * IMPORTANT: save groups on-load, so we don't have to search for them (that's why it takes so long btw, especially when having multiple chaikin iterations)
  * Ability to change the color of triangles, nodes & connections (by type)
  * Better memory optimization (should come with C/C++ FFI implementation)
  * Save result to .obj file (keeping original textures ??)
