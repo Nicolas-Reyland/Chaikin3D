@@ -80,7 +80,7 @@ You can also use the ```-s``` (```--shape```) option to load a predefined polyhe
 If you only load a polyhedron, it will simply be drawn.
 
 
-Then, you can choose the number of Chaikin generations (or iterations) you want to run on the given polyhedron. That is done using the ```-c``` (```--chaikin-generations```) option. The default value is 0. To run one iteration, you could use ```python3 chaikin3d.py -s triangle -cg 1```.
+Then, you can choose the number of Chaikin generations (or iterations) you want to run on the given polyhedron. That is done using the ```-cg``` (```--chaikin-generations```) option. The default value is 0. To run one iteration, you could use ```python3 chaikin3d.py -s triangle -cg 1```.
 You might also want to control the Chaikin coefficient. This is done using the ```-cc``` option.
 Here is an example usage: ```python chaikin3d.py -s cube -cg 3 -cc 3```. The default value is 4.
 
@@ -97,8 +97,8 @@ You can now choose how you'd like to draw your mesh and what exactly you'd like 
 There are 4 types of plots (see examples below):
  * "simple" plot : this plot only draws your polyhedron to the screen
  * "full" plot : this one draws a lot of data separately: your connections (by type, etc.), your vertices and different mesh representations. Useful for understanding how things work and debugging in general
- * "evolution" plot : the evolution plot takes into account the number of chaikin generations that you want (```-c``` option). I will render one generation after another in a grid-format (like the "full" plot)
- * "animation" plot (DO NOT USE) : this plot should, in theory, create an animation, rendering all the chaikin generations from 0 to the value given in the ```-c``` option
+ * "evolution" plot : the evolution plot takes into account the number of chaikin generations that you want (```-cg``` option). I will render one generation after another in a grid-format (like the "full" plot)
+ * "animation" plot (DO NOT USE) : this plot should, in theory, create an animation, rendering all the chaikin generations from 0 to the value given in the ```-cg``` option
 The default value is "simple"
 
 The ```-a```/```--alpha``` switch allows you to change the alpha/opacity value (ranging from 0.0 to 1.0) of the faces in the "simple", "evolution" and "animation" plots (every plot except the "full" plot <- there are already alpha changes). Default value: 0.8
