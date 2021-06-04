@@ -189,22 +189,19 @@ class Polyhedron:
 			# get the indices
 			node_groupe_index_list = vertex_index_list[i]
 			# get the corresponding (ordered) group
-			ogroup = [nodes[index] for index in node_groupe_index_list]
+			group = Group([nodes[index] for index in node_groupe_index_list])
 			# connect the main connections (circular connection)
-			group_size = len(ogroup)
-			print('group of size:', group_size)
-			for j in range(group_size - 1):
-				ogroup[j].connect(ogroup[j + 1], 'main')
+			group.cycle_connect('main')
+			# order the group (should already be orderer tho -> else the cycle connection would fuck everything up)
+			group.order()
 			# connect later
-			if group_size > 3:
-				to_connect.append(ogroup[:])
+			if group.size > 3:
+				to_connect.append(group)
 
 		# connect later
 		for ogroup in to_connect:
-			group_obj = Group(ogroup)
-			group_obj.order()
 			# connect the graphical connections
-			group_obj.inter_connect('graphical')
+			ogroup.inter_connect('graphical', order_first = True)
 
 		# return polyhedron
 		return Polyhedron(nodes, vertex_list, vertex_index_list)
@@ -416,8 +413,22 @@ class Group:
 		if do_order:
 			self.order()
 
+	def __str__(self) -> str:
+		return '[{}] o: {} s: {}'.format(', '.join(map(str, self.group)), self.ordered, self.size)
+
+	def __repr__(self) -> str:
+		return str(self)
+
+	def __len__(self):
+		return self.size
+
 	def __iter__(self):
 		return iter(self.ogroup) if self.ordered else iter(group)
+
+	def __getitem__(self, index : int):
+		if self.ordered:
+			return self.ogroup[index]
+		return self.group[index]
 
 	def order(self, force : bool = False) -> None:
 		if not force and self.ordered: return
@@ -437,11 +448,13 @@ class Group:
 		self.ordered = True
 
 	def cycle_connect(self, connection_type : str = 'main') -> None:
-		self.order()
+		assert not self.ordered
 		for i in range(self.size - 1):
-			self.ogroup[i].connect(self.ogroup[i + 1], connection_type)
+			self.group[i].connect(self.group[i + 1], connection_type)
+		self.group[-1].connect(self.group[0], connection_type)
 
-	def inter_connect(self, connection_type : str = 'graphical') -> None:
+	def inter_connect(self, connection_type : str = 'graphical', order_first : bool = False) -> None:
+		if order_first: self.order(True)
 		assert self.ordered
 		num_iter = int(matrix.np.log2(self.size)) - 1
 		#

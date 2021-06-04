@@ -123,7 +123,7 @@ class Renderer:
 	def draw_polyhedron(self, polyhedron : Polyhedron, alpha : float = 0.8, draw_text : bool = True) -> None:
 		self.draw(data=self.get_polyhedron_draw_data(polyhedron, alpha, draw_text))
 
-	def get_connections_draw_data(self, polyhedron : Polyhedron, type_ : str = 'any', color : str = 'lightblue', width : int = 2) -> list[go.Scatter3d]:
+	def get_connections_draw_data(self, polyhedron : Polyhedron, type_ : str = 'any', line_color : str = 'yellow', node_color : str = 'green', width : int = 2) -> list[go.Scatter3d]:
 		figure_data : list[go.Scatter3d] = []
 		for connection in polyhedron.get_connections(type_):
 			A, B = connection.A.coords, connection.B.coords
@@ -133,10 +133,10 @@ class Renderer:
 				z = [A[2], B[2]],
 				marker={
 					'size': 2,
-					'color': gen_random_color() if color == 'random' else 'green'
+					'color': gen_random_color() if node_color == 'random' else node_color
 				},
 				line={
-					'color': gen_random_color() if color == 'random' else color,
+					'color': gen_random_color() if line_color == 'random' else line_color,
 					'width': 2,
 					'dash': 'solid'
 				}
@@ -145,32 +145,3 @@ class Renderer:
 
 	def draw_connections(self, polyhedron : Polyhedron, type_ : str = 'any', color : str = 'lightblue', width : int = 2) -> None:
 		self.draw(data=self.get_connections_draw_data(polyhedron, type_, color, width))
-
-
-'''
-fig = go.Figure(
-	data=[
-		go.Scatter3d(
-			x = [0,1,2],
-			y = [0,2,1],
-			z = [1,1,1],
-			line=dict(
-				color='darkblue',
-				width=2
-			)
-		),
-		go.Scatter3d(
-			x = [2,1,2],
-			y = [2,1,0],
-			z = [0,2,0],
-			line=dict(
-				color='darkblue',
-				width=2
-			)
-		)
-	]
-)
-
-
-fig.show()
-'''
