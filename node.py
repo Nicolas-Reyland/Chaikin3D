@@ -13,8 +13,7 @@ class Node:
 	def __eq__(self, other : Node) -> bool:
 		return self.x == other.x and \
 				self.y == other.y and \
-				self.z == other.z and \
-				self.num_connections == other.num_connections
+				self.z == other.z
 
 	def __str__(self) -> str:
 		return f'[({self.x:.2f},{self.y:.2f},{self.z:.2f}); num_connections = {self.num_connections}]'

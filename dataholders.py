@@ -30,11 +30,15 @@ class VirtualDict:
 class VirtualSet:
     def __init__(self, iterable = []):
         self.data = []
-        for value in iterable:
-            if value not in self.data:
-                self.data.append(value)
+        if iterable:
+            if type(iterable) == VirtualSet or type(iterable) == set:
+                self.data = list(iterable)
             else:
-                print('Warning: doublon in VirtualSet initial-data iterable')
+                for value in iterable:
+                    if value not in self.data:
+                        self.data.append(value)
+                    else:
+                        print('Warning: doublon in VirtualSet initial-data iterable')
         self.size = len(self.data)
 
     def __str__(self):
@@ -67,6 +71,6 @@ class VirtualSet:
         return self.data.pop(0)
 
     def copy(self):
-        return VirtualSet(self.data.copy())
+        return VirtualSet(self)
 
 #

@@ -8,12 +8,13 @@ from dataholders import VirtualDict, VirtualSet
 from copy import deepcopy
 
 matrix.EPSILON = 10e-6
+MAX_GROUP_SEARCH_RECURSION = 10 # MAX_GROUP_SIZE
+VERBOSE_STEP = 10
 
 class Polyhedron:
-	def __init__(self, nodes : list[N.Node], vertex_list = None, vertex_index_list = None):
+	def __init__(self, nodes : list[N.Node], groups : list[Group] = None):
 		self.nodes = nodes
-		self.vertex_list = vertex_list
-		self.vertex_index_list = vertex_index_list
+		self.groups = groups
 
 	def __str__(self):
 		return '\n* '.join(map(str, self.nodes))
@@ -48,7 +49,7 @@ class Polyhedron:
 			for conn in node.get_connections_by_type(type_):
 				if conn not in connection_list:
 					connection_list.append(conn)
-		print('num connections (' + type_ + ') ', len(connection_list))
+		print('num connections (' + type_ + ')', len(connection_list))
 		return connection_list
 
 	@staticmethod
@@ -183,6 +184,7 @@ class Polyhedron:
 	def from_standard_vertex_lists(vertex_list : list[list[float]], vertex_index_list : list[list[int]]) -> Polyhedron:
 		# build nodes
 		nodes : list[N.Node] = list(map(N.Node.from_point, vertex_list))
+		groups : list[Group] = []
 		to_connect = []
 		# connect using the index list
 		for i in range(len(vertex_index_list)):
@@ -197,6 +199,8 @@ class Polyhedron:
 			# connect later
 			if group.size > 3:
 				to_connect.append(group)
+			# add group to list
+			groups.append(group)
 
 		# connect later
 		for ogroup in to_connect:
@@ -204,7 +208,7 @@ class Polyhedron:
 			ogroup.inter_connect('graphical', order_first = True)
 
 		# return polyhedron
-		return Polyhedron(nodes, vertex_list, vertex_index_list)
+		return Polyhedron(nodes, groups)
 
 	@staticmethod
 	def Chaikin3D(polyhedron : Polyhedron, n : int = 4, verbose : bool = False, file_mode : bool = False) -> Polyhedron:
@@ -219,7 +223,7 @@ class Polyhedron:
 		node_virt_dict : VirtualDict = VirtualDict()
 		new_connections : list[C.Connection] = []
 
-		print('Creating a deepcopy of the polyhedron nodes...')
+		if verbose: print('Creating a deepcopy of the polyhedron nodes...')
 		old_nodes = deepcopy(polyhedron.nodes)
 		sub_node_count = 0
 
@@ -227,7 +231,7 @@ class Polyhedron:
 		total_nodes = len(polyhedron.nodes)
 		if verbose: print('Calculating new node positions for {} verticies'.format(total_nodes))
 		for node_index,current_node in enumerate(polyhedron.nodes):
-			if verbose and node_index % 100 == 0: print('[{}/{}] done ({:.2f}%)'.format(node_index, total_nodes, 100 * node_index / total_nodes))
+			if verbose and node_index % VERBOSE_STEP == 0: print('[{}/{}] done ({:.2f}%)'.format(node_index, total_nodes, 100 * node_index / total_nodes))
 			#print('\ncurrent node:', current_node)
 			# create sub-nodes
 			num_new_connections = num_graphical_nodes = 0
@@ -286,37 +290,45 @@ class Polyhedron:
 		chaikin_group_list : list[Group] = []
 		processed_groups = VirtualSet()
 		if verbose: print('Reconnect the new nodes (using the old nodes as starting point)')
-		for old_node_index,old_node in enumerate(old_nodes):
-			if verbose and old_node_index % 100 == 0: print('[{}/{}] done (old nodes) ({:.2f}%)'.format(old_node_index, total_nodes, 100 * old_node_index / total_nodes))
-			# find all the old groups that this 'old_node' is part of
-			old_group_list : list[VirtualSet] = Polyhedron._find_chaikin_groups_for_node(old_node)
-			for old_group in filter(lambda g: g not in processed_groups, old_group_list):#	and Polyhedron._nec_group_cond(g), old_group_list):
-				new_group : VirtualSet = VirtualSet()
-				for old_node_2 in old_group:
-					new_nodes = node_virt_dict[old_node_2]
-					for new_node in new_nodes:
-						for other_old_node in old_group:
-							if old_node_2 != other_old_node and any([C.Connection.are_connected(new_node, other_new_node) for other_new_node in node_virt_dict[other_old_node]]):
-								break
-						else:
-							continue
-						# found
-						new_group.add(new_node)
-						# don't break because there are two new nodes per old node
+		for index,old_group in enumerate(polyhedron.groups):
+			if verbose and index % VERBOSE_STEP == 0: print('[{}/{}] done (old nodes) ({:.2f}%)'.format(index, total_nodes, 100 * old_node_index / total_nodes))
+			new_group : VirtualSet = VirtualSet()
+			for old_node_2 in old_group:
+				new_nodes = node_virt_dict[old_node_2]
+				for new_node in new_nodes:
+					for other_old_node in old_group:
+						if old_node_2 != other_old_node and any([C.Connection.are_connected(new_node, other_new_node) for other_new_node in node_virt_dict[other_old_node]]):
+							break
+					else:
+						continue
+					# found
+					new_group.add(new_node)
+					# don't break because there are two new nodes per old node
 
-				if new_group not in chaikin_group_list:
-					chaikin_group_list.append(new_group)
-				processed_groups.add(old_group)
+			if new_group not in chaikin_group_list:
+				chaikin_group_list.append(new_group)
+			processed_groups.add(old_group)
 
 		total_groups = len(chaikin_group_list)
 		group_objects = list(map(Group, chaikin_group_list))
 		if verbose: print('Ordering the groups ({})'.format(total_groups))
 		#print('num raw groups:', len(group_objects))
-		for group in group_objects: group.order()
+		i = 0
+		total = len(group_objects)
+		max_group_size = MAX_GROUP_SEARCH_RECURSION + 3
+		while i < total:
+			group = group_objects[i]
+			if verbose and i % VERBOSE_STEP == 0: print('[{}/{}] done ({:.2f}%)'.format(i, total_groups, 100 * i / total_groups))
+			if group.size > max_group_size:
+				group_objects.pop(i)
+				total -= 1
+				continue
+			group.order()
+			i += 1
 
 		if verbose: print('Connecting the groups ({})'.format(total_groups))
 		for i,group in enumerate(group_objects):
-			if verbose and i % 100 == 0: print('[{}/{}] done ({:.2f}%)'.format(i, total_groups, 100 * i / total_groups))
+			if verbose and i % VERBOSE_STEP == 0: print('[{}/{}] done ({:.2f}%)'.format(i, total_groups, 100 * i / total_groups))
 			group.inter_connect('graphical')
 
 		# construct new node list
@@ -371,14 +383,29 @@ class Polyhedron:
 		return chaikin_group_set_list
 
 	@staticmethod
-	def _rec_find_chaikin_group_with_plane(start_node : N.Node, end_node : N.Node, second_node : N.Node, current_node : N.Node, current_group : VirtualSet, plane : matrix.Plane) -> list[VirtualSet]:
+	def _rec_find_chaikin_group_with_plane(start_node : N.Node, end_node : N.Node, second_node : N.Node, current_node : N.Node, current_group : VirtualSet, plane : matrix.Plane, depth : int = 0) -> list[VirtualSet]:
 
 		# end of group ?
 		if current_node == end_node:
 			return [current_group]
+		if depth > MAX_GROUP_SEARCH_RECURSION:
+			#print('RECURSION BREAK')
+			return []
 		# invalid node ?
 		if current_node in current_group or not plane.point_on_plane(current_node.coords):
 			return []
+		'''
+		else:
+			for i in range(len(current_group) - 1):
+				if not C.Connection.are_connected(current_group[i], current_group[i + 1], 'main'):
+					raise Exception('hm')
+				if i > 2:
+					if current_group[i].coords in map(lambda n: n.coords, list(current_group[:i]) + list(current_group[i+1:])):
+						raise Exception('hm2')
+			if not all([plane.point_on_plane(node.coords) for node in current_group]):
+				print('yes')
+			print(len(current_group))
+		'''
 
 		# add to group
 		current_group.add(current_node)
@@ -394,7 +421,8 @@ class Polyhedron:
 				second_node,
 				partner_node,
 				current_group.copy(),
-				plane
+				plane,
+				depth + 1
 			)
 			# add unique groups
 			for group in sub_local_group_set_list:
