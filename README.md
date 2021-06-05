@@ -94,6 +94,10 @@ You can now choose how you'd like to draw your mesh and what exactly you'd like 
  * ```-smc``` or ```--show-main-connections```
  * ```-sgc``` or ```--show-graphical-connections```
  * ```-rm``` or ```--rotate-mesh``` (only with the ```-i``` option)
+ * ```-nc``` or ```--node-color```
+ * ```-pc``` or ```-polygon-color```
+ * ```-mcc``` or ```--main-connection-color```
+ * ```-gcc``` or ```--graphical-connection-color```
 
 There are 4 types of plots (see examples below):
  * "simple" plot : this plot only draws your polyhedron to the screen
@@ -112,6 +116,7 @@ The ```-sgc``` switch allows to choose if you want to render the graphical conne
 
 Use the ```-rm```/```--rotate-mesh``` to rotate meshes that look ... rotated **on load** (therefore, you can only use this option with the ```-i```/```--input``` option).
 
+The ```-nc```, ```-pc```, ```-mcc``` and ```-gcc``` options let you customize the colors for the nodes (df. green), polygons (df. lightblue), main connections (df. darkred) and graphical connections (df. black). You can give color-names or colors with this format: *#12ab34*. The value *random* is valid and will generate a new random color for each node/polygon/main connection/graphical connection.
 
 ## Examples
 
@@ -121,7 +126,7 @@ CMD: ```python3 chaikin3d.py -i data/dog.obj -rm true -sgc true```
 
 ![only loading the dog](pics/simple-dog.png)
 
-CMD: ```python3 chaikin3d.py -i data/dog.obj -rm true -cg 1```
+CMD: ```python3 chaikin3d.py -i data/dog.obj -rm true -sgc true -cg 1```
 
 ![loading the dog and running one itertion of chaikin](pics/simple-dog-chaikin.png)
 
