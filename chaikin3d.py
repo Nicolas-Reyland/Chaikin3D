@@ -78,7 +78,6 @@ def draw_full(renderer : Renderer, poly : Polyhedron) -> None:
 	poly_dd = renderer.get_polyhedron_draw_data(poly, alpha = 1, color = polygon_color)
 	all_connection_dd = graphical_conn_dd + main_conn_dd
 
-	print(' - drawing -')
 	renderer.init_subplots(3, 3, subplot_titles=[
 		'Main connections',
 		'Graphical connections',

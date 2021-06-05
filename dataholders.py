@@ -27,6 +27,18 @@ class VirtualDict:
         index = self.key_list.index(key)
         return self.value_list[index]
 
+    def keys(self):
+        return self.key_list
+
+    def values(self):
+        return self.value_list
+
+    def contains_key(self, key) -> bool:
+        return key in self.key_list
+
+    def contains_value(self, value) -> bool:
+        return value in self.value_list
+
 class VirtualSet:
     def __init__(self, iterable = []):
         self.data = []

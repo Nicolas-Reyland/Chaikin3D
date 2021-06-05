@@ -27,6 +27,7 @@ class Renderer:
 
 	def draw(self, data : list):
 		fig = go.Figure(data, *self.args, **self.kwargs)
+		print(' - drawing plot -')
 		fig.show()
 
 	def init_subplots(self, rows : int, cols : int, *args, **kwargs) -> None:
@@ -84,6 +85,7 @@ class Renderer:
 		self.subplot_col_index += 1
 
 	def draw_subplots(self):
+		print(' - drawing subplots -')
 		self.subplot_fig.show()
 		# don't reset figure on purpose (why do it ? could be used later by user)
 		self.active_subplot = False
