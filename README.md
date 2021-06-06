@@ -177,7 +177,7 @@ style="float: right; margin-right: 10px;" width="48%;" />
 
 
 ## Note
-If you have any issues using this project or need any help, please feel free to tell me on github !
+If you have any issues using this project or need any help, please feel free to tell me [on github](https://github.com/Nicolas-Reyland/Chaikin3D/issues) !
 If you want to help me developping this project, please tell me too !
 
 
