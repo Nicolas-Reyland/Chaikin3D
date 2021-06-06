@@ -165,17 +165,14 @@ style="float: right; margin-right: 10px;" width="48%;" />
 
 
 ## TODO
- * Ability to change the color of triangles, nodes & connections (by type)
+ * Fix issue where plotly would just freeze the program (Windows only & might be a plotly issue ?)
  * Better memory optimization (should come with C/C++ FFI implementation)
  * Save result to .obj file (keeping original textures ??)
- * Chaikin group ordering & connection on load when encountering faces with more than 3 vertices
  * Finsh animation plot
- * Better Chaikin group detection
  * Optimization of the Chaikin3D algorithm
      - maybe parallelism ?
      - FFI with C++ or C (much more likely to happen than parallelism + much faster)
  * Fix issue of python crashing (no errors, just crashing) when trying to apply chaikin3D on a large number of nodes & connections
- * Save the chaikin groups on-load & chaikin group inheritance
  * Change scale when plotting (e.g. data/cat.obj)
 
 
