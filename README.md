@@ -292,9 +292,12 @@ style="float: left; margin-left: 10px;" width="48%;" /> <img src="pics/simple-de
 alt="2 simple deer no main connections alpha 1"
 style="float: right; margin-right: 10px;" width="48%;" />
 
-CMD 1: ```python chaikin3d.py -i data/deer.obj -rm true -a 1.0 -smc true -cg 1 -v 1``` (verbose switch not mandatory)
-
-CMD 2: ```python chaikin3d.py -i data/deer.obj -rm true -a 1.0 -smc true -cg 1 -v 1``` (verbose switch not mandatory)
+```
+python chaikin3d.py -i data/deer.obj -rm true -a 1.0 -smc true -cg 1 -v 1
+```
+```
+python chaikin3d.py -i data/deer.obj -rm true -a 1.0 -smc true -cg 1 -v 1
+```
 
 <img src="pics/simple-deer-chaikin.png"
 alt="1 simple deer no main connections alpha 1"
@@ -302,8 +305,7 @@ style="float: left; margin-left: 10px;" width="48%;" /> <img src="pics/simple-de
 alt="2 simple deer no main connections alpha 1"
 style="float: right; margin-right: 10px;" width="48%;" />
 
-*There are 25486 nodes in the last deer mesh. Loading thoses meshes should take at least a few minutes.*
-
+*Verbose switch (```-v true```) not mandatory. There are 25486 nodes in the last deer mesh. Loading thoses meshes should take at least a few minutes.*
 
 
 ## TODO
