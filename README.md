@@ -69,12 +69,12 @@ And when you draw all this:
      style="float: left; margin-left: 10px;" />
 
 
-For examples of what I mean with "graphical" connections, try these commands: ```python3 chaikin3d.py -s cube -p full -cg 0``` and ```python3 chaikin3d.py -s cube -p full -cg 1```. The grapchical connections are the black lines, while the main connections are the red lines.
+For examples of what I mean with "graphical" connections, try these commands: ```python chaikin3d.py -s cube -p full -cg 0``` and ```python chaikin3d.py -s cube -p full -cg 1```. The grapchical connections are the black lines, while the main connections are the red lines.
 
 
 ## Usage
 
-To get help, use the ```python3 chaikin3d.py -h``` command.
+To get help, use the ```python chaikin3d.py -h``` command.
 
 Note: every option takes an argument. If an option takes a boolean argument, then *1*, *t* and *true* (case insensitive) will mean "true". For "false", these are accepted values: *0*, *f*, *false* (case insensitive).
 
@@ -90,7 +90,7 @@ Loading a polyhedron is the only thing you must do. You will get an error if you
 #### Input option
 
 You will first have to select a polyhedron/mesh to render or use. You can load a *.obj* (only supported extension, for now) file using the ```-i``` (```--input```) option and appending the path like this:
-```python3 chaikin3d.py -i data/dog.obj``` (if you try this and the mesh is somehow rotated, please add this to your command line: ```-rm true```).
+```python chaikin3d.py -i data/dog.obj``` (if you try this and the mesh is somehow rotated, please add this to your command line: ```-rm true```).
 
 #### Evaluate option
 
@@ -109,18 +109,18 @@ The loaded polyhedron object is named ```poly```. If you did not load a file, th
 
 Load a a cube, then apply the chaikin algorithm on it:
 ```
-python3 chaikin3d.py -i data/cube.obj -e "poly = Polyhedron.Chaikin3D(poly)"
+python chaikin3d.py -i data/cube.obj -e "poly = Polyhedron.Chaikin3D(poly)"
 ```
-*Note: this is equivalent to ```python3 chaikin3d.py -i data/cube.obj -cg 1```*
+*Note: this is equivalent to ```python chaikin3d.py -i data/cube.obj -cg 1```*
 
 Load a tetrahedron, then rotate it by 45° with code you potentially wrote in a file named "my_own_code.py":
 ```
-python3 chaikin3d.py -i data/tetrahedron.obj -e "poly = __import__('my_own_code').rotate_tetrahedron(poly, 45)"
+python chaikin3d.py -i data/tetrahedron.obj -e "poly = __import__('my_own_code').rotate_tetrahedron(poly, 45)"
 ```
 
 Generate a new polyhedron
 ```
-python3 chaikin3d.py -e "poly = __import__('evaluations').generate_diamond(num_points = 25)"
+python chaikin3d.py -e "poly = __import__('evaluations').generate_diamond(num_points = 25)"
 ```
 
 
@@ -142,13 +142,13 @@ You might also want to control the *Chaikin coefficient*. This is done using the
 #### Examples
 
 One generation on a cube
-```python3 chaikin3d.py -i data/cube.obj -cg 1```
+```python chaikin3d.py -i data/cube.obj -cg 1```
 
 Two generations on a deeer (yes, a deer)
-```python3 chaikin3d.py -i data/deer.obj -cg 2```
+```python chaikin3d.py -i data/deer.obj -cg 2```
 
 One iteration on a tetrahedron, with a coefficient of 3
-```python3 chaikin3d.py -i data/tetrahedron.obj -cg 1 -cc 3```
+```python chaikin3d.py -i data/tetrahedron.obj -cg 1 -cc 3```
 
 
 ### Graphical Options
@@ -194,27 +194,27 @@ There is a ```-v```/```--verbose``` switch too. If you turn it on, you will get 
 
 Here are some examples of what can be done:
 
-CMD: ```python3 chaikin3d.py -i data/dog.obj -rm true -sgc true```
+CMD: ```python chaikin3d.py -i data/dog.obj -rm true -sgc true```
 
 ![only loading the dog](pics/simple-dog.png)
 
-CMD: ```python3 chaikin3d.py -i data/dog.obj -rm true -sgc true -cg 1```
+CMD: ```python chaikin3d.py -i data/dog.obj -rm true -sgc true -cg 1```
 
 ![loading the dog and running one itertion of chaikin](pics/simple-dog-chaikin.png)
 
-CMD: ```python3 chaikin3d.py -s cube -p evolution -cg 5```
+CMD: ```python chaikin3d.py -s cube -p evolution -cg 5```
 
 ![cube evolution](pics/evolution-cube-chaikin.png)
 
-CMD: ```python3 chaikin3d.py -s triangle -p full -cg 1 -cc 3```
+CMD: ```python chaikin3d.py -s triangle -p full -cg 1 -cc 3```
 
 ![full triangle chaikin with coeff 3](pics/full-triangle-chaikin-cc-3.png)
 
 *The "solid" statement means that the alpha value of the triangles has been set to 1.0 (no transparency)*
 
-CMD 1: ```python3 chaikin3d.py -i data/deer.obj -rm true -a 1.0```
+CMD 1: ```python chaikin3d.py -i data/deer.obj -rm true -a 1.0```
 
-CMD 2: ```python3 chaikin3d.py -i data/deer.obj -rm true -a 1.0 -smc false```
+CMD 2: ```python chaikin3d.py -i data/deer.obj -rm true -a 1.0 -smc false```
 
 <img src="pics/simple-deer.png"
 alt="1 simple deer no main connections alpha 1"
@@ -222,9 +222,9 @@ style="float: left; margin-left: 10px;" width="48%;" /> <img src="pics/simple-de
 alt="2 simple deer no main connections alpha 1"
 style="float: right; margin-right: 10px;" width="48%;" />
 
-CMD 1: ```python3 chaikin3d.py -i data/deer.obj -rm true -a 1.0 -smc true -cg 1 -v 1``` (verbose switch not mandatory)
+CMD 1: ```python chaikin3d.py -i data/deer.obj -rm true -a 1.0 -smc true -cg 1 -v 1``` (verbose switch not mandatory)
 
-CMD 2: ```python3 chaikin3d.py -i data/deer.obj -rm true -a 1.0 -smc true -cg 1 -v 1``` (verbose switch not mandatory)
+CMD 2: ```python chaikin3d.py -i data/deer.obj -rm true -a 1.0 -smc true -cg 1 -v 1``` (verbose switch not mandatory)
 
 <img src="pics/simple-deer-chaikin.png"
 alt="1 simple deer no main connections alpha 1"
