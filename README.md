@@ -73,6 +73,7 @@ For examples of what I mean with "graphical" connections, try these commands: ``
 
 
 ## Usage
+
 To get help, use the ```python3 chaikin3d.py -h``` command.
 
 Note: every option takes an argument. If an option takes a boolean argument, then *1*, *t* and *true* (case insensitive) will mean "true". For "false", these are accepted values: *0*, *f*, *false* (case insensitive).
@@ -92,6 +93,7 @@ You will first have to select a polyhedron/mesh to render or use. You can load a
 ```python3 chaikin3d.py -i data/dog.obj``` (if you try this and the mesh is somehow rotated, please add this to your command line: ```-rm true```).
 
 #### Evaluate option
+
 The ```-e```/```--evaluate``` option can be used in two ways (or more):
 
 The evaluation options takes a string as input, which will be run as python code right after the loading of the polyhedron mesh file (if any has been given). You should use this option to generate your own polyhedrons or to customize the one that has been loaded. There are a few things you should know:
@@ -122,14 +124,34 @@ python3 chaikin3d.py -e "poly = __import__('evaluations').generate_diamond(num_p
 ```
 
 
+### Chaikin Algorithm
+
+#### Related Options:
+
+ * ```-cg```/```--chaikin-generations```
+ * ```-cc```/```--chaikin-coef```
+
+#### Chaikin Generations
+
+To choose the number of Chaikin generations (or iterations) you want to run on the given polyhedron, you should be using the ```-cg```/```--chaikin-generations``` option. The default value is 0. To run one iteration, you could use ```-cg 1``` (for 2 iterations : ```-cg 2```, you got it).
+
+#### Chaikin Coeffiecient
+
+You might also want to control the *Chaikin coefficient*. This is done using the ```-cc``` option. This value is used to *cut* the edges at 1/coef and (coef-1)/coef. George Chaikin chose "4" as beeing the right coefficient. This cust the edges into three parts: first 25%, 50%, 25% ([2D Chaikin's Corner Cutting Algorithm](https://sighack.com/post/chaikin-curves)).
+
+#### Examples
+
+One generation on a cube
+```python3 chaikin3d.py -i data/cube.obj -cg 1```
+
+Two generations on a deeer (yes, a deer)
+```python3 chaikin3d.py -i data/deer.obj -cg 2```
+
+One iteration on a tetrahedron, with a coefficient of 3
+```python3 chaikin3d.py -i data/tetrahedron.obj -cg 1 -cc 3```
 
 
-
-Then, you can choose the number of Chaikin generations (or iterations) you want to run on the given polyhedron. That is done using the ```-cg``` (```--chaikin-generations```) option. The default value is 0. To run one iteration, you could use ```python3 chaikin3d.py -s triangle -cg 1```.
-You might also want to control the Chaikin coefficient. This is done using the ```-cc``` option.
-Here is an example usage: ```python chaikin3d.py -s cube -cg 3 -cc 3```. The default value is 4.
-
-There is a ```-v```/```--verbose``` switch too. If you turn it on, you will get info about the chaikin algorithm progress. This might be useful for meshes with a lot of vertices or when having a lot of iterations. The default value is "false".
+### Graphical Options
 
 You can now choose how you'd like to draw your mesh and what exactly you'd like to draw. This is done using the folloying options:
  * ```-p``` or ```--plot```
@@ -161,6 +183,12 @@ The ```-sgc``` switch allows to choose if you want to render the graphical conne
 Use the ```-rm```/```--rotate-mesh``` to rotate meshes that look ... rotated **on load** (therefore, you can only use this option with the ```-i```/```--input``` option).
 
 The ```-nc```, ```-pc```, ```-mcc``` and ```-gcc``` options let you customize the colors for the nodes (df. green), polygons (df. lightblue), main connections (df. darkred) and graphical connections (df. black). You can give color-names or colors with this format: *#12ab34*. The value *random* is valid and will generate a new random color for each node/polygon/main connection/graphical connection.
+
+### Other Options
+
+
+There is a ```-v```/```--verbose``` switch too. If you turn it on, you will get info about the chaikin algorithm progress. This might be useful for meshes with a lot of vertices or when having a lot of iterations. The default value is "false".
+
 
 ## Examples
 
