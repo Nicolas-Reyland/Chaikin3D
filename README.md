@@ -153,7 +153,10 @@ One iteration on a tetrahedron, with a coefficient of 3
 
 ### Graphical Options
 
-You can now choose how you'd like to draw your mesh and what exactly you'd like to draw. This is done using the folloying options:
+Graphical options let you choose how you want to plot your mesh. You can customize most of the graphical aspects of your plots.
+
+#### Related Options
+
  * ```-p``` or ```--plot```
  * ```-a``` or ```--alpha```
  * ```-r``` or ```--renderer``` (DO NOT USE)
@@ -165,12 +168,16 @@ You can now choose how you'd like to draw your mesh and what exactly you'd like 
  * ```-mcc``` or ```--main-connection-color```
  * ```-gcc``` or ```--graphical-connection-color```
 
+#### Plot Types
+
 There are 4 types of plots (see examples below):
  * "simple" plot : this plot only draws your polyhedron to the screen
  * "full" plot : this one draws a lot of data separately: your connections (by type, etc.), your vertices and different mesh representations. Useful for understanding how things work and debugging in general
  * "evolution" plot : the evolution plot takes into account the number of chaikin generations that you want (```-cg``` option). I will render one generation after another in a grid-format (like the "full" plot)
  * "animation" plot (DO NOT USE) : this plot should, in theory, create an animation, rendering all the chaikin generations from 0 to the value given in the ```-cg``` option
 The default value is "simple"
+
+#### How to plot (colors, etc.)
 
 The ```-a```/```--alpha``` switch allows you to change the alpha/opacity value (ranging from 0.0 to 1.0) of the faces in the "simple", "evolution" and "animation" plots (every plot except the "full" plot <- there are already alpha changes). Default value: 0.8
 
@@ -184,8 +191,17 @@ Use the ```-rm```/```--rotate-mesh``` to rotate meshes that look ... rotated **o
 
 The ```-nc```, ```-pc```, ```-mcc``` and ```-gcc``` options let you customize the colors for the nodes (df. green), polygons (df. lightblue), main connections (df. darkred) and graphical connections (df. black). You can give color-names or colors with this format: *#12ab34*. The value *random* is valid and will generate a new random color for each node/polygon/main connection/graphical connection.
 
+#### Examples
+
+Show a cube with no transparency at all and only (yellow) graphical connections
+```python chaikin3d.py -i data/cube.obj -smc false -sgc true -gcc yellow```
+
+
+
 ### Other Options
 
+```-v```/```--verbose```
+```-t```/```--test```
 
 There is a ```-v```/```--verbose``` switch too. If you turn it on, you will get info about the chaikin algorithm progress. This might be useful for meshes with a lot of vertices or when having a lot of iterations. The default value is "false".
 
@@ -238,6 +254,7 @@ style="float: right; margin-right: 10px;" width="48%;" />
 
 ## TODO
  * Fix issue where plotly would just freeze the program (Windows only & might be a plotly issue ?)
+ * Add example pics after every example line in README (e.g. ```-e``` option examples)
  * Better memory optimization (should come with C/C++ FFI implementation)
  * Save result to .obj file (keeping original textures ??)
  * Finsh animation plot
