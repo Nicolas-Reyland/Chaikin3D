@@ -73,14 +73,56 @@ For examples of what I mean with "graphical" connections, try these commands: ``
 
 
 ## Usage
-Not that you can use the ```python3 chaikin3d.py -h``` command.
+To get help, use the ```python3 chaikin3d.py -h``` command.
 
-Another note: every option takes an argument. If an option takes a boolean argument, then *1*, *t* and *true* (case insensitive) will mean "true". For "false", these are accepted values: *0*, *f*, *false* (case insensitive).
+Note: every option takes an argument. If an option takes a boolean argument, then *1*, *t* and *true* (case insensitive) will mean "true". For "false", these are accepted values: *0*, *f*, *false* (case insensitive).
 
-You will first have to select a polyhedron/mesh to render or use. There are two options: you can load a *.obj* file using the ```-i``` (```--input```) option and appending the path like this:
-```python3 chaikin3d.py -i data/dog.obj``` (if you try this and the mesh is rotated, please add this: ```-rm true``` option).
-You can also use the ```-s``` (```--shape```) option to load a predefined polyhedron. They are defined in the *basic_shapes.py* file. You can define your own polyhedra in there. You can, for example, use ```python3 chaikin3d.py -s cube``` or ```python3 chaikin3d.py -s triangle```. If you wish to add your own shapes, please take a look at the file and add your own! You only need to create a function which returns a *polyhedron.Polyhedron* object and append it's name after the ```-s``` option to load it.
-If you only load a polyhedron, it will simply be drawn.
+### Loading the polyhedron
+
+Loading a polyhedron is the only thing you must do. You will get an error if you do not. If the only thing you do is loading a mesh, it will simply be drawn to the screen using the default settings.
+
+#### Related Options:
+
+ * ```-i```/```--input```
+ * ```-e```/```--evaluate```
+
+#### Input option
+
+You will first have to select a polyhedron/mesh to render or use. You can load a *.obj* (only supported extension, for now) file using the ```-i``` (```--input```) option and appending the path like this:
+```python3 chaikin3d.py -i data/dog.obj``` (if you try this and the mesh is somehow rotated, please add this to your command line: ```-rm true```).
+
+#### Evaluate option
+The ```-e```/```--evaluate``` option can be used in two ways (or more):
+
+The evaluation options takes a string as input, which will be run as python code right after the loading of the polyhedron mesh file (if any has been given). You should use this option to generate your own polyhedrons or to customize the one that has been loaded. There are a few things you should know:
+
+You have access, in the local variables to the following python objects:
+ * ```Polyhedron``` (*polyhedron.py*)
+ * ```WaveFrontReader``` (*wavefront_reader.py*)
+ * ```Renderer``` (*plotly_renderer.py* / *mpl_renderer.py*)
+
+The loaded polyhedron object is named ```poly```. If you did not load a file, there is no such variable. You then have to create it. When you create the ```poly``` variable, it must be of type ```Polhyhedron```.
+
+#### Examples
+
+Load a a cube, then apply the chaikin algorithm on it:
+```
+python3 chaikin3d.py -i data/cube.obj -e "poly = Polyhedron.Chaikin3D(poly)"
+```
+*Note: this is equivalent to ```python3 chaikin3d.py -i data/cube.obj -cg 1```*
+
+Load a tetrahedron, then rotate it by 45° with code you potentially wrote in a file named "my_own_code.py":
+```
+python3 chaikin3d.py -i data/tetrahedron.obj -e "poly = __import__('my_own_code').rotate_tetrahedron(poly, 45)"
+```
+
+Generate a new polyhedron
+```
+python3 chaikin3d.py -e "poly = __import__('evaluations').generate_diamond(num_points = 25)"
+```
+
+
+
 
 
 Then, you can choose the number of Chaikin generations (or iterations) you want to run on the given polyhedron. That is done using the ```-cg``` (```--chaikin-generations```) option. The default value is 0. To run one iteration, you could use ```python3 chaikin3d.py -s triangle -cg 1```.
