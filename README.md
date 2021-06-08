@@ -3,7 +3,7 @@ Expansion of the Chaikin Algorithm to the 3rd dimension (polyhedral approximatio
 
 **_IMPORTANT NOTE_**: Some features are currently broken. Will fix them after my finals :)
 
-## Installation
+# Installation
 
 You need to have python (version 3+) and pip installed.
 
@@ -37,7 +37,7 @@ __NOTE__: when installing matrix, if you fail to install the noise module (it ca
 If you are using Windows, download the matrix repo (https://github.com/Nicolas-Reyland/matrix) and copy the matrix.py file into the Chaikin3D folder.
 
 
-## Some explanations first
+# Some explanations first
 
 This project supports more "exotic" polyhedron (a polyhedron is a polygon in space/3D) types. In fact, since we are going to change the polyhedron, raw data of the verticies isn't sufficient. We need info about which edges are important, and which are not. For example, in a cube, the diagonal edge (to split the square into two triangles) is not "important": its purpose is only to bind two vertices so that triangle can be drawn to the screen. That's why we need to distinguish *main* and *graphical* connections between our nodes (vertices).
 
@@ -72,27 +72,26 @@ And when you draw all this:
 For examples of what I mean with "graphical" connections, try these commands: ```python chaikin3d.py -s cube -p full -cg 0``` and ```python chaikin3d.py -s cube -p full -cg 1```. The grapchical connections are the black lines, while the main connections are the red lines.
 
 
-## Usage
+# Usage
 
 To get help, use the ```python chaikin3d.py -h``` command.
+See the [additional info tab](#additional-info) to get info about how exactly to enter your values.
 
-Note: every option takes an argument. If an option takes a boolean argument, then *1*, *t* and *true* (case insensitive) will mean "true". For "false", these are accepted values: *0*, *f*, *false* (case insensitive).
-
-### Loading the polyhedron
+## Loading the polyhedron
 
 Loading a polyhedron is the only thing you must do. You will get an error if you do not. If the only thing you do is loading a mesh, it will simply be drawn to the screen using the default settings.
 
-#### Related Options:
+### Related Options:
 
  * ```-i```/```--input```
  * ```-e```/```--evaluate```
 
-#### Input option
+### Input option
 
 You will first have to select a polyhedron/mesh to render or use. You can load a *.obj* (only supported extension, for now) file using the ```-i``` (```--input```) option and appending the path like this:
 ```python chaikin3d.py -i data/dog.obj``` (if you try this and the mesh is somehow rotated, please add this to your command line: ```-rm true```).
 
-#### Evaluate option
+### Evaluate option
 
 The ```-e```/```--evaluate``` option can be used in two ways (or more):
 
@@ -105,7 +104,7 @@ You have access, in the local variables to the following python objects:
 
 The loaded polyhedron object is named ```poly```. If you did not load a file, there is no such variable. You then have to create it. When you create the ```poly``` variable, it must be of type ```Polhyhedron```.
 
-#### Examples
+### Examples
 
 Load a a cube, then apply the chaikin algorithm on it:
 ```
@@ -129,22 +128,22 @@ python chaikin3d.py -e "poly = __import__('evaluations').generate_diamond(num_po
 ```
 
 
-### Chaikin Algorithm
+## Chaikin Algorithm
 
-#### Related Options:
+### Related Options:
 
  * ```-cg```/```--chaikin-generations```
  * ```-cc```/```--chaikin-coef```
 
-#### Chaikin Generations
+### Chaikin Generations
 
 To choose the number of Chaikin generations (or iterations) you want to run on the given polyhedron, you should be using the ```-cg```/```--chaikin-generations``` option. The default value is 0. To run one iteration, you could use ```-cg 1``` (for 2 iterations : ```-cg 2```, you got it).
 
-#### Chaikin Coeffiecient
+### Chaikin Coeffiecient
 
 You might also want to control the *Chaikin coefficient*. This is done using the ```-cc``` option. This value is used to *cut* the edges at 1/coef and (coef-1)/coef. George Chaikin chose "4" as beeing the right coefficient. This cust the edges into three parts: first 25%, 50%, 25% ([2D Chaikin's Corner Cutting Algorithm](https://sighack.com/post/chaikin-curves)).
 
-#### Examples
+### Examples
 
 One iteration on a deeer (yes, a deer)
 ```
@@ -174,11 +173,11 @@ alt="1 chaikin iteration on deer"
 style="float: left; margin-left: 10px;" width="20%;" />
 
 
-### Graphical Options
+## Graphical Options
 
 Graphical options let you choose how you want to plot your mesh. You can customize most of the graphical aspects of your plots.
 
-#### Related Options
+### Related Options
 
  * ```-p```/```--plot```
  * ```-a```/```--alpha```
@@ -192,7 +191,7 @@ Graphical options let you choose how you want to plot your mesh. You can customi
  * ```-mcc```/```--main-connection-color```
  * ```-gcc```/```--graphical-connection-color```
 
-#### Plot Types
+### Plot Types
 
 There are 4 types of plots (see examples below):
  * "simple" plot : this plot only draws your polyhedron to the screen
@@ -201,7 +200,7 @@ There are 4 types of plots (see examples below):
  * "animation" plot (DO NOT USE) : this plot should, in theory, create an animation, rendering all the chaikin generations from 0 to the value given in the ```-cg``` option
 The default value is "simple"
 
-#### How to plot (colors, etc.)
+### How to plot (colors, etc.)
 
 The ```-a```/```--alpha``` switch allows you to change the alpha/opacity value (ranging from 0.0 to 1.0) of the faces in the "simple", "evolution" and "animation" plots (every plot except the "full" plot <- there are already alpha changes). Default value: 0.8
 
@@ -217,7 +216,7 @@ Use the ```-rm```/```--rotate-mesh``` to rotate meshes that look ... rotated **o
 
 The ```-nc```, ```-pc```, ```-mcc``` and ```-gcc``` options let you customize the colors for the nodes (df. green), polygons (df. lightblue), main connections (df. darkred) and graphical connections (df. black). You can give color-names or colors with this format: *#12ab34*. The value *random* is valid and will generate a new random color for each node/polygon/main connection/graphical connection.
 
-#### Examples
+### Examples
 
 Show a cube with no transparency at all and only (yellow) graphical connections
 ```
@@ -229,20 +228,35 @@ style="float: left; margin-left: 10px;" width="20%;" />
 
 
 
-### Other Options
+## Other Options
 
 ```-v```/```--verbose```
 ```-t```/```--test```
 
 There is a ```-v```/```--verbose``` switch too. If you turn it on, you will get info about the chaikin algorithm progress. This might be useful for meshes with a lot of vertices or when having a lot of iterations. The default value is "false".
 
+## Additional info
 
-## Examples
+### Global option rule
+
+Every option takes either a **bool** (see below), **string**, **int** & **float**. There are no *standalone* options (which take no argument).
+
+
+### Colors
+
+You can use the [CSS color code](https://www.w3.org/wiki/CSS/Properties/color/keywords) (extended colors too) to specify a color. An rgb value can be passed through the format *#rrggbb*, or any valid VSS color value.
+
+### Boolean values
+
+For boolean values, *1*, *t* and *true* (case insensitive) will mean "true". And *0*, *f*, *false* (case insensitive) will mean "false".
+
+
+# Examples
 
 Here are some more examples of what can be done:
 
 
-#### Dogs
+### Dogs
 
 ```
 python chaikin3d.py -i data/dog.obj -rm true -sgc true
@@ -258,7 +272,7 @@ alt="simple dog chaikin"
 style="float: right; margin-right: 10px;" width="48%;" />
 
 
-#### Cubic evolution
+### Cubic evolution
 
 ```
 python chaikin3d.py -i data/cube.obj -p evolution -cg 5
@@ -267,7 +281,7 @@ python chaikin3d.py -i data/cube.obj -p evolution -cg 5
 ![cube evolution](pics/evolution-cube-chaikin.png)
 
 
-#### Full of triangles
+### Full of triangles
 
 ```
 python chaikin3d.py -i data/tetrahedron.obj -p full -cg 1 -cc 3
@@ -278,7 +292,7 @@ python chaikin3d.py -i data/tetrahedron.obj -p full -cg 1 -cc 3
 *The "solid" statement means that the alpha value of the triangles has been set to 1.0 (no transparency)*
 
 
-#### Bigger meshes
+### Bigger meshes
 
 ```
 python chaikin3d.py -i data/deer.obj -rm true -a 1.0
@@ -308,7 +322,7 @@ style="float: right; margin-right: 10px;" width="48%;" />
 *Verbose switch (```-v true```) not mandatory. There are 25486 nodes in the last deer mesh. Loading thoses meshes should take at least a few minutes.*
 
 
-## TODO
+# TODO
  * Fix issue where plotly would just freeze the program (Windows only & might be a plotly issue ?)
  * Add example pics after every example line in README (e.g. ```-e``` option examples)
  * Better memory optimization (should come with C/C++ FFI implementation)
