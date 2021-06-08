@@ -1,7 +1,21 @@
 # Chaikin3D
-Expansion of the Chaikin Algorithm to the 3rd dimension (Polyhedral Approximation / Polyhedron Subdivisions).
+
+Expansion of the Chaikin Algorithm to the 3rd dimension.
+
+(Polyhedral Approximation / Polyhedron Subdivisions / Subdivision Surface).
 
 **_IMPORTANT NOTE_**: Some features are currently broken. Will fix them after my finals :)
+
+# Contents
+
+ - [Contents](#contents)
+ - [Installation](#installation)
+ - [Some explanations first](#some-explanations-first)
+ - [Usage](#usage)
+ - [Examples](#examples)
+ - [Todo](#todo)
+ - [Note](#note)
+
 
 # Installation
 
