@@ -1,6 +1,7 @@
 #
 from __future__ import annotations
 import connection as C
+from dataholders import VirtualSet
 
 
 class Node:
@@ -39,8 +40,8 @@ class Node:
 		if type_ == 'any': return self.connection_list
 		return list(filter(lambda conn: conn.type_ == type_, self.connection_list))
 
-	def get_triangles(self, type_ : str = 'any') -> list[Triangle]:
-		triangles = []
+	def get_triangles(self, type_ : str = 'any') -> VirtualSet:
+		triangles = VirtualSet()
 		for conn in self.get_connections_by_type(type_):
 			# find the other, "partner", node in the connection
 			conn_node = conn.get_partner_node(self)
@@ -48,7 +49,7 @@ class Node:
 			for sub_conn in filter(lambda sub_conn: not sub_conn.contains_node(self), conn_node.get_connections_by_type(type_)):
 				sub_conn_node = sub_conn.get_partner_node(conn_node)
 				if C.Connection.are_connected(sub_conn_node, self, type_):
-					triangles.append(Triangle(
+					triangles.add(Triangle(
 						self.coords,
 						conn_node.coords,
 						sub_conn_node.coords

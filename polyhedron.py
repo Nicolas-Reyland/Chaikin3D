@@ -8,7 +8,6 @@ from dataholders import VirtualDict, VirtualSet
 from copy import deepcopy
 
 matrix.EPSILON = 10e-6
-MAX_GROUP_SEARCH_RECURSION = 20 # MAX_GROUP_SIZE
 VERBOSE_STEP = 10
 
 class Polyhedron:
@@ -28,17 +27,14 @@ class Polyhedron:
 	def __iter__(self):
 		return iter(self._iter_triangles())
 
-	def _iter_triangles(self, type_ : str = 'any') -> list[N.Triangle]:
-		triangle_list = []
+	def _iter_triangles(self, type_ : str = 'any') -> VirtualSet:
+		triangle_set = VirtualSet()
 		for node in self.nodes:
 			for triangle in node.get_triangles(type_):
-				# check unique-ness
-				if Polyhedron._triangle_in_list(triangle_list, triangle):
-					continue
-				# it is unique, so we can add it to the list
-				triangle_list.append(triangle)
-		print('num triangles (' + str(type_) + ')', len(triangle_list))
-		return triangle_list
+				# add the triangle. if there is alreadw this triangle in the set, it will not be added
+				triangle_set.add(triangle)
+		print('num triangles (' + str(type_) + ')', triangle_set.size)
+		return triangle_set
 
 	def _set_recursion_limit(self):
 		sys.setrecursionlimit(10**6)
@@ -75,112 +71,6 @@ class Polyhedron:
 		return triangles
 
 	@staticmethod
-	def from_raw_points(points : list[tuple[float]], index_list : list[int], inverse_index_list : bool = False, connect_endpoints : bool = True) -> Polyhedron:
-		'''
-		'''
-		nodes : list[N.Node] = []
-		num_points = len(points)
-		processed_points = []
-		index = num_nodes = 0
-		if inverse_index_list:
-			index_set = set(range(len(points))) # all indexes
-			index_set -= set(index_list) # remove those from the initially given index_list
-			index_list = list(index_set) # reassign index_list
-		# process all points at least once
-		while index < num_points:
-			if index in index_list:
-				connection_type = 'main'
-			else:
-				connection_type = 'graphical'
-			current = points[index]
-			#print('doing', current, 'conn type:', connection_type)
-			node = N.Node(current[0], current[1], current[2])
-			# check for reconnection
-			if current in processed_points:
-				point_index = processed_points.index(current)
-				connect_node = nodes[point_index]
-				connect_node.connect(nodes[-1], connection_type)
-				index += 1
-				#print('already processed point:', connect_node, '&', nodes[-1])
-				continue
-			# connect
-			if num_nodes > 0:
-				node.connect(nodes[-1], connection_type)
-				#print('-1 connected', node, 'with', nodes[-1])
-
-			# append
-			nodes.append(node)
-			processed_points.append(current)
-			num_nodes += 1
-			# incr index
-			index += 1
-		# process edge-points (non yet-connected)
-		if connect_endpoints:
-			#print('connecting endpoints')
-			last_node = nodes[-1]
-			for node in filter(lambda n: n.num_connections < 3, nodes[:-1]):
-				node.connect(last_node, 'main')
-				#print('connected last with', node)
-
-		return Polyhedron(nodes)
-
-	@staticmethod
-	def from_triangular_points(points : list[tuple[float]], index_list : list[int], inverse_index_list : bool = False, connect_endpoints : bool = True) -> Polyhedron:
-		'''Create a polyhedron object from an ordered list of (x,y,z) points/coordinates
-		The index_list indicates all the "real" points of the polyhedron. All points that are not in this index_list will be understood
-		as 'graphical connection points'. You an also choose to give the index_list of the graphical connection points only. You then
-		have to specify the 'inverse_index_list' as being 'True'. This will inverse the list. If 'connect_endpoints' is
-		set to true, the last point and the first point will be connected as a 'main' connection (non graphical)
-		'''
-		nodes : list[N.Node] = []
-		num_points = len(points)
-		processed_points = []
-		index = num_nodes = 0
-		if inverse_index_list:
-			index_set = set(range(len(points))) # all indexes
-			index_set -= set(index_list) # remove those from the initially given index_list
-			index_list = list(index_set) # reassign index_list
-		# process all points at least once
-		while index < num_points:
-			if index in index_list:
-				connection_type = 'main'
-			else:
-				connection_type = 'graphical'
-			current = points[index]
-			#print('doing', current, 'conn type:', connection_type)
-			node = N.Node(current[0], current[1], current[2])
-			# check for reconnection
-			if current in processed_points:
-				point_index = processed_points.index(current)
-				connect_node = nodes[point_index]
-				connect_node.connect(nodes[-1], connection_type)
-				index += 1
-				#print('not a main connection:', connect_node, '&', nodes[-1])
-				continue
-			# connect
-			if num_nodes > 0:
-				node.connect(nodes[-1], connection_type)
-				#print('-1 connected', node, 'with', nodes[-1])
-				if num_nodes > 1:
-					node.connect(nodes[-2], connection_type)
-					#print('-2 connected', node, 'with', nodes[-2])
-			# append
-			nodes.append(node)
-			processed_points.append(current)
-			num_nodes += 1
-			# incr index
-			index += 1
-		# process edge-points (non yet-connected)
-		if connect_endpoints:
-			#print('connecting endpoints')
-			last_node = nodes[-1]
-			for node in filter(lambda n: n.num_connections < 3, nodes[:-1]):
-				node.connect(last_node, 'main')
-				#print('connected last with', node)
-
-		return Polyhedron(nodes)
-
-	@staticmethod
 	def from_standard_vertex_lists(vertex_list : list[list[float]], vertex_index_list : list[list[int]]) -> Polyhedron:
 		# build nodes
 		nodes : list[N.Node] = list(map(N.Node.from_point, vertex_list))
@@ -211,7 +101,7 @@ class Polyhedron:
 		return Polyhedron(nodes, groups)
 
 	@staticmethod
-	def Chaikin3D(polyhedron : Polyhedron, n : int = 4, verbose : bool = False, file_mode : bool = False) -> Polyhedron:
+	def Chaikin3D(polyhedron : Polyhedron, n : int = 4, verbose : bool = False) -> Polyhedron:
 		'''ratio could also be float ?
 		'''
 		# change recursion limit
@@ -223,10 +113,10 @@ class Polyhedron:
 		node_virt_dict : VirtualDict = VirtualDict()
 		new_connections : list[C.Connection] = []
 
-		if verbose: print('Creating a deepcopy of the polyhedron...')
-		old_polyhedron = deepcopy(polyhedron)
-		old_nodes = old_polyhedron.nodes
-		old_groups = old_polyhedron.groups
+		if verbose: print('Copying polyhedron data...')
+		#old_polyhedron = deepcopy(polyhedron)
+		old_nodes = polyhedron.nodes#.copy()#old_polyhedron.nodes
+		old_groups = polyhedron.groups#.copy()	#old_polyhedron.groups # if we don't want to make the method static, but return a new polyhedron without modifying this one, should need this !
 		sub_node_count = 0
 
 		final_group_set : VirtualSet = VirtualSet()
@@ -235,7 +125,7 @@ class Polyhedron:
 		total_nodes = len(polyhedron.nodes)
 		if verbose: print('Calculating new node positions for {} verticies'.format(total_nodes))
 		for node_index,current_node in enumerate(polyhedron.nodes):
-			if verbose and node_index % VERBOSE_STEP == 0: print('[{}/{}] done ({:.2f}%)'.format(node_index, total_nodes, 100 * node_index / total_nodes))
+			if verbose and node_index % VERBOSE_STEP == 0: print('[{}/{}] calculated ({:.2f}%)'.format(node_index, total_nodes, 100 * node_index / total_nodes))
 			#print('\ncurrent node:', current_node)
 			# create sub-nodes
 			num_new_connections = num_graphical_nodes = 0
@@ -280,6 +170,7 @@ class Polyhedron:
 				else:
 					raise Exception('Unknown connection type:', conn.type_)
 			# connect all the sub-nodes together (might find something to avoid connection-crossing -> len(group_set) > 3)
+			#print('group set', group_set)
 			group = Group(group_set)
 			# connect
 			group.cycle_connect('main')
@@ -296,19 +187,25 @@ class Polyhedron:
 		total_groups = len(old_groups)
 		if verbose: print('Reconnect the new nodes (using the old nodes as starting point)')
 		for index,old_group in enumerate(old_groups):
-			if verbose and index % VERBOSE_STEP == 0: print('[{}/{}] done (old groups) ({:.2f}%)'.format(index, total_groups, 100 * index / total_groups))
+			if verbose and index % VERBOSE_STEP == 0: print('[{}/{}] new groups found ({:.2f}%)'.format(index, total_groups, 100 * index / total_groups))
 			new_group : VirtualSet = VirtualSet()
-			for old_node_2 in old_group:
-				new_nodes = node_virt_dict[old_node_2]
+			for old_node in old_group:
+				new_nodes = node_virt_dict[old_node]
+				two_nodes = []
 				for new_node in new_nodes:
 					for other_old_node in old_group:
-						if old_node_2 != other_old_node and any([C.Connection.are_connected(new_node, other_new_node) for other_new_node in node_virt_dict[other_old_node]]):
+						if old_node != other_old_node and len([0 for other_new_node in node_virt_dict[other_old_node] if C.Connection.are_connected(new_node, other_new_node)]) > 0: # any([C.Connection.are_connected(new_node, other_new_node) for other_new_node in node_virt_dict[other_old_node]]): # 
 							break
 					else:
 						continue
 					# found
-					new_group.add(new_node)
+					two_nodes.append(new_node)
 					# don't break because there are two new nodes per old node
+				if len(two_nodes) == 2:
+					new_group.add(two_nodes[0])
+					new_group.add(two_nodes[1])
+				else:
+					print('Bizarre group found.')
 
 			new_group = Group(new_group)
 			if new_group not in group_objects:
@@ -320,22 +217,13 @@ class Polyhedron:
 		#print('num raw groups:', len(group_objects))
 		i = 0
 		total = len(group_objects)
-		max_group_size = MAX_GROUP_SEARCH_RECURSION + 3
-		while i < total:
-			group = group_objects[i]
-			if verbose and i % VERBOSE_STEP == 0: print('[{}/{}] done ({:.2f}%)'.format(i, total_groups, 100 * i / total_groups))
-			if group.size > max_group_size:
-				group_objects.pop(i)
-				total -= 1
-				continue
+		for i,group in enumerate(group_objects):
+			if verbose and i % VERBOSE_STEP == 0: print('[{}/{}] ordered ({:.2f}%)'.format(i, total_groups, 100 * i / total_groups))
 			group.order()
-			i += 1
 
-		total_groups = len(group_objects)
-		if verbose: print('New number of groups (recursion depth):', total_groups)
 		if verbose: print('Connecting the groups ({})'.format(total_groups))
 		for i,group in enumerate(group_objects):
-			if verbose and i % VERBOSE_STEP == 0: print('[{}/{}] done ({:.2f}%)'.format(i, total_groups, 100 * i / total_groups))
+			if verbose and i % VERBOSE_STEP == 0: print('[{}/{}] connected ({:.2f}%)'.format(i, total_groups, 100 * i / total_groups))
 			group.inter_connect('graphical')
 
 		# construct new node list
@@ -395,9 +283,6 @@ class Polyhedron:
 		# end of group ?
 		if current_node == end_node:
 			return [current_group]
-		if depth > MAX_GROUP_SEARCH_RECURSION:
-			#print('RECURSION BREAK')
-			return []
 		# invalid node ?
 		if current_node in current_group or not plane.point_on_plane(current_node.coords):
 			return []
@@ -443,8 +328,8 @@ class Group:
 		self.group = VirtualSet(iterable)
 		self.ogroup = None
 		self.ordered = False
-		self.size = len(iterable)
-		assert self.size > 2 # >= 3
+		self.size = self.group.size
+		#assert self.size > 2 # >= 3
 		if do_order:
 			self.order()
 
@@ -467,6 +352,11 @@ class Group:
 
 	def order(self, force : bool = False) -> None:
 		if not force and self.ordered: return
+		# trivial case
+		if self.size < 3:
+			self.ogroup = self.group
+			self.ordered = True
+			return
 		# initialize variables
 		group_list : list[N.Node] = list(self.group)
 		current_node = group_list.pop(0)
@@ -474,11 +364,24 @@ class Group:
 		# connect the next ones (don't care if we go 'left' or 'right')
 		while group_list:
 			for remaining_node in group_list:
-				if C.Connection.are_connected(current_node, remaining_node):
+				if C.Connection.are_connected(current_node, remaining_node, 'main'):
 					self.ogroup.append(remaining_node)
 					group_list.remove(remaining_node)
 					current_node = remaining_node
 					break
+			else:
+				print('current_node')
+				_debug_print_full_node(current_node)
+				print('group_list')
+				_debug_print_full_nodes(group_list)
+				print('ordered group')
+				_debug_print_full_nodes(self.ogroup)
+				print('group')
+				_debug_print_full_nodes(self.group)
+				raise Exception('broken group')
+				print('Warning: broken group found. attaching remaning nodes: {}'.format(len(group_list)))
+				self.ogroup.extend(group_list)
+				break
 
 		self.ordered = True
 
@@ -505,8 +408,23 @@ class Group:
 			self.ogroup[0].connect(prev_node, connection_type)
 
 
+def _debug_print_full_node(node, num_tabs = 0):
+	prefix = '\t' * num_tabs
+	print(f'{prefix}{str(node)}:')
+	print(f'{prefix} main :')
+	for conn in node.get_connections_by_type('main'):
+		print(f'{prefix}\t - {str(conn)}')
+	print(f'{prefix} graphical :')
+	for conn in node.get_connections_by_type('graphical'):
+		print(f'{prefix}\t - {str(conn)}')
 
 
+def _debug_print_full_nodes(nodes, num_tabs = 0):
+	prefix = '\t' * num_tabs
+	print(f'{prefix}Num nodes: {len(nodes)}')
+	for node in nodes:
+		_debug_print_full_node(node, num_tabs + 1)
+		print()
 
 
 

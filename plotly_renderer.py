@@ -26,7 +26,7 @@ class Renderer:
 		self.subplot_col_limit = 0
 
 	def draw(self, data : list):
-		fig = go.Figure(data, *self.args, **self.kwargs)
+		fig = go.Figure(data, *self.args, **self.kwargs)#, layout = go.Layout(scene=dict(aspectratio=dict(x=1,y=1,z=1))), *self.args, **self.kwargs)
 		print(' - drawing plot -')
 		fig.show()
 

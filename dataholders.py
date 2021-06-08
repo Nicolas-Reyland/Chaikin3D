@@ -74,8 +74,8 @@ class VirtualSet:
                 return False
         return True
 
-    def add(self, value) -> bool:
-        if value not in self.data:
+    def add(self, value, verify : bool = True) -> bool:
+        if not verify or value not in self.data:
             self.data.append(value)
             self.size += 1
 

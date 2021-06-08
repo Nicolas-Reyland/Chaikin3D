@@ -1,14 +1,13 @@
 #
-import math
-import basic_shapes
-from wavefront_reader import ObjMesh
+from math import sqrt
+from wavefront_reader import WaveFrontReader
 
 from argparse import ArgumentParser
 parser = ArgumentParser(description='Apply the Chaikin algorithm, expanded for the 3D space')
 
 # polyhedron
 parser.add_argument('-i', '--input', type=str, help='input file (df. None)')
-parser.add_argument('-s', '--shape', type=str, help='shape (df. cube)')
+parser.add_argument('-e', '--evaluate', type=str, help='python str to evaluate right after the loading phase (df. "")')
 parser.add_argument('-rm', '--rotate-mesh', type=str, help='Rotate the mesh when loading a file (df. false)')
 # chaikin algorithm
 parser.add_argument('-cg', '--chaikin-generations', type=int, help='number of chaikin generations (df. 0)')
@@ -25,6 +24,8 @@ parser.add_argument('-pc', '--polygon-color', type=str, help='Polygon color (df.
 parser.add_argument('-nc', '--node-color', type=str, help='Node color (df. "green")')
 parser.add_argument('-mcc', '--main-connection-color', type=str, help='Main connection color (df. "darkred")')
 parser.add_argument('-gcc', '--graphical-connection-color', type=str, help='Graphical connection (df. "black")')
+# other
+parser.add_argument('-t', '--test', type=str, help='Only used with \'-i\'. The input file should be tested for many attributes (df. false)')
 
 #
 args = vars(parser.parse_args())
@@ -38,10 +39,7 @@ def parse_bool(s):
 
 # polyhedron
 input_file = args['input']
-#print(args)
-shape = args['shape'] if args['shape'] or input_file else 'cube'
-if shape and input_file:
-	raise Exception('You must either give an input file or a shape. You cannot give both')
+evaluation_string = args['evaluate'] if args['evaluate'] else ''
 rotate_mesh = parse_bool(args['rotate_mesh']) if args['rotate_mesh'] else False
 # chaikin
 chaikin_gens = args['chaikin_generations'] if args['chaikin_generations'] else 0
@@ -58,6 +56,21 @@ polygon_color = args['polygon_color'] if args['polygon_color'] else 'lightblue'
 node_color = args['node_color'] if args['node_color'] else 'green'
 main_conn_color = args['main_connection_color'] if args['main_connection_color'] else 'darkred'
 graph_conn_color = args['graphical_connection_color'] if args['graphical_connection_color'] else 'black'
+# other
+test = args['test'] if args['test'] else False
+
+
+# Test Mode
+if test:
+	invalid_option = [
+		''
+	]
+	for invalid_option in invalid_options:
+		if args[invalid_option] is not None:
+			raise Exception('Cannot use this option with \'-t\'/\'--test\': {}'.format(invalid_option))
+
+
+
 
 if RENDERER == 'plotly':
 	from plotly_renderer import *
@@ -119,7 +132,7 @@ def draw_full(renderer : Renderer, poly : Polyhedron) -> None:
 def draw_chaikin_evolution(renderer : Renderer, poly : Polyhedron, n : int, coef : float, alpha : float = .8) -> None:
 	# find best row-col combination
 	assert n > 0
-	near = math.sqrt(n + 1)
+	near = sqrt(n + 1)
 	cols = int(near) + (0 if near == int(near) else 1)
 	rows = cols if cols ** (cols - 1) <= n else cols - 1
 	print('cols', cols, 'rows', rows)
@@ -227,26 +240,38 @@ def chaikin_animation(renderer : Renderer, poly : Polyhedron, n : int, coef : fl
 
 # Main function
 def main():
-	global DO_CHAIKIN
+	# create a renderer
 	renderer = Renderer()
-	if input_file:
-		poly = ObjMesh(input_file, rotate_mesh).to_polyhedron()
-		FILE_MODE = True
-	elif shape:
-		if shape not in vars(basic_shapes).keys():
-			raise Exception('Unrecognized shape:', shape)
-		poly = vars(basic_shapes)[shape]()
-		FILE_MODE = False
-	else:
-		raise Exception('You must give an input file or a shape. One or the other, but not none at all')
 
+	# input file
+	if input_file:
+		reader = WaveFrontReader(input_file, True, rotate_mesh, verbose)
+		poly = reader.to_polyhedron()
+
+	# evaluate
+	if evaluation_string:
+		# evaluate the code
+		from polyhedron import Polyhedron
+		eval(evaluation_string)
+		# checks on the "poly" variable
+		if 'poly' not in vars():
+			raise Exception('You have to define a variable named "poly" in your evaluation string, when not giving an input file')
+		if type(poly) != Polyhedron:
+			raise TypeError('The "poly" variable does not have the type "Polyhedron"')
+
+	# do we have a polyhedron
+	if not input_file and not evaluation_string:
+		raise Exception('You have to give a polyhedron! Either through the "-i", "-e" or both options! (cf. README)')
+
+	# do chaikin generations before any graphics ?
 	if plot != 'evolution' and plot != 'animation':
 		assert chaikin_gens >= 0
 		for _ in range(chaikin_gens):
 			print(' - 3D Chaikin -')
-			poly = Polyhedron.Chaikin3D(poly, chaikin_coef, verbose, False)#FILE_MODE)
+			poly = Polyhedron.Chaikin3D(poly, chaikin_coef, verbose)
 			print('Chaikin done')
 
+	# switch the plot type
 	if plot == 'simple':
 		poly_dd = renderer.get_polyhedron_draw_data(poly, 'any', alpha)
 		if smc: main_conn_dd = renderer.get_connections_draw_data(poly, type_ = 'main', line_color = main_conn_color, node_color = node_color)
@@ -261,9 +286,7 @@ def main():
 	elif plot == 'animation':
 	   chaikin_animation(renderer, poly, chaikin_gens, chaikin_coef, alpha)
 	else:
-		raise Exception('Unrecognized plot:', plot)
-
-	return poly
+		raise Exception('Unrecognized plot: "{}"'.format(plot))
 
 if __name__ == '__main__':
 	main()
