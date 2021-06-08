@@ -111,11 +111,16 @@ Load a a cube, then apply the chaikin algorithm on it:
 ```
 python chaikin3d.py -i data/cube.obj -e "poly = Polyhedron.Chaikin3D(poly)"
 ```
+
+<img src="pics/simple-cube-chaikin.png"
+alt="1 chaikin iteration on cube"
+style="float: left; margin-left: 10px;" width="20%;" />
+
 *Note: this is equivalent to ```python chaikin3d.py -i data/cube.obj -cg 1```*
 
 Load a tetrahedron, then rotate it by 45° with code you potentially wrote in a file named "my_own_code.py":
 ```
-python chaikin3d.py -i data/tetrahedron.obj -e "poly = __import__('my_own_code').rotate_tetrahedron(poly, 45)"
+python chaikin3d.py -i data/tetrahedron.obj -e "poly = __import__('my_own_code').rotate_tetrahedron(poly, x_rot = 12, y_rot = 45, z_rot = 0)"
 ```
 
 Generate a new polyhedron
@@ -141,20 +146,32 @@ You might also want to control the *Chaikin coefficient*. This is done using the
 
 #### Examples
 
-One generation on a cube
+One iteration on a deeer (yes, a deer)
 ```
-python chaikin3d.py -i data/cube.obj -cg 1
+python chaikin3d.py -i data/deer.obj -cg 1
 ```
 
-Two generations on a deeer (yes, a deer)
+<img src="pics/simple-deer-chaikin.png"
+alt="2 chaikin iteration on deer"
+style="float: left; margin-left: 10px;" width="20%;" />
+
+Two iterations on a cube
 ```
-python chaikin3d.py -i data/deer.obj -cg 2
+python chaikin3d.py -i data/cube.obj -cg 2
 ```
+
+<img src="pics/simple-cube-chaikin-cg-2.png"
+alt="1 chaikin iteration on cube"
+style="float: left; margin-left: 10px;" width="20%;" />
 
 One iteration on a tetrahedron, with a coefficient of 3
 ```
 python chaikin3d.py -i data/tetrahedron.obj -cg 1 -cc 3
 ```
+
+<img src="pics/simple-tetrahedron-chaikin-cc-3.png"
+alt="1 chaikin iteration on deer"
+style="float: left; margin-left: 10px;" width="20%;" />
 
 
 ### Graphical Options
@@ -163,16 +180,17 @@ Graphical options let you choose how you want to plot your mesh. You can customi
 
 #### Related Options
 
- * ```-p``` or ```--plot```
- * ```-a``` or ```--alpha```
- * ```-r``` or ```--renderer``` (DO NOT USE)
- * ```-smc``` or ```--show-main-connections```
- * ```-sgc``` or ```--show-graphical-connections```
- * ```-rm``` or ```--rotate-mesh``` (only with the ```-i``` option)
- * ```-nc``` or ```--node-color```
- * ```-pc``` or ```-polygon-color```
- * ```-mcc``` or ```--main-connection-color```
- * ```-gcc``` or ```--graphical-connection-color```
+ * ```-p```/```--plot```
+ * ```-a```/```--alpha```
+ * ```-r```/```--renderer``` (DO NOT USE)
+ * ```-sn```/```--show-nodes```
+ * ```-smc```/```--show-main-connections```
+ * ```-sgc```/```--show-graphical-connections```
+ * ```-rm```/```--rotate-mesh``` (only with the ```-i``` option)
+ * ```-nc```/```--node-color```
+ * ```-pc```/```-polygon-color```
+ * ```-mcc```/```--main-connection-color```
+ * ```-gcc```/```--graphical-connection-color```
 
 #### Plot Types
 
@@ -189,6 +207,8 @@ The ```-a```/```--alpha``` switch allows you to change the alpha/opacity value (
 
 You should not mess with the ```-r```option, but it exists (even I don't mess with -> the mpl renderer is BROKEN). Default value: "plotly"
 
+You can dis/en-able the rendering of nodes with the ```-sn```/```--show-nodes``` option. Default value: "true"
+
 The ```-smc``` switch allows to choose if you want to render the main connections for the "simple", "evolution" and "animation" plots. Default value: "true"
 
 The ```-sgc``` switch allows to choose if you want to render the graphical connections for the "simple", "evolution" and "animation" plots. Default value: "false"
@@ -200,7 +220,12 @@ The ```-nc```, ```-pc```, ```-mcc``` and ```-gcc``` options let you customize th
 #### Examples
 
 Show a cube with no transparency at all and only (yellow) graphical connections
-```python chaikin3d.py -i data/cube.obj -smc false -sgc true -gcc yellow```
+```
+python chaikin3d.py -i data/cube.obj -cg 3 -cc 5 -pc mediumaquamarine -smc false -sgc true -gcc yellow
+```
+<img src="pics/simple-cube-chaikin-cg-3-cc-5-colors.png"
+alt="special colors chaikin cube cg 3 cc 5"
+style="float: left; margin-left: 10px;" width="20%;" />
 
 
 
@@ -214,30 +239,53 @@ There is a ```-v```/```--verbose``` switch too. If you turn it on, you will get 
 
 ## Examples
 
-Here are some examples of what can be done:
+Here are some more examples of what can be done:
 
-CMD: ```python chaikin3d.py -i data/dog.obj -rm true -sgc true```
 
-![only loading the dog](pics/simple-dog.png)
+#### Dogs
 
-CMD: ```python chaikin3d.py -i data/dog.obj -rm true -sgc true -cg 1```
+```
+python chaikin3d.py -i data/dog.obj -rm true -sgc true
+```
+```
+python chaikin3d.py -i data/dog.obj -rm true -sgc true -cg 1
+```
 
-![loading the dog and running one itertion of chaikin](pics/simple-dog-chaikin.png)
+<img src="pics/simple-dog.png"
+alt="simple dog"
+style="float: left; margin-left: 10px;" width="48%;" /> <img src="pics/simple-dog-chaikin.png"
+alt="simple dog chaikin"
+style="float: right; margin-right: 10px;" width="48%;" />
 
-CMD: ```python chaikin3d.py -s cube -p evolution -cg 5```
+
+#### Cubic evolution
+
+```
+python chaikin3d.py -i data/cube.obj -p evolution -cg 5
+```
 
 ![cube evolution](pics/evolution-cube-chaikin.png)
 
-CMD: ```python chaikin3d.py -s triangle -p full -cg 1 -cc 3```
+
+#### Full of triangles
+
+```
+python chaikin3d.py -i data/tetrahedron.obj -p full -cg 1 -cc 3
+```
 
 ![full triangle chaikin with coeff 3](pics/full-triangle-chaikin-cc-3.png)
 
 *The "solid" statement means that the alpha value of the triangles has been set to 1.0 (no transparency)*
 
-CMD 1: ```python chaikin3d.py -i data/deer.obj -rm true -a 1.0```
 
-CMD 2: ```python chaikin3d.py -i data/deer.obj -rm true -a 1.0 -smc false```
+#### Bigger meshes
 
+```
+python chaikin3d.py -i data/deer.obj -rm true -a 1.0
+```
+```
+python chaikin3d.py -i data/deer.obj -rm true -a 1.0 -smc false
+```
 <img src="pics/simple-deer.png"
 alt="1 simple deer no main connections alpha 1"
 style="float: left; margin-left: 10px;" width="48%;" /> <img src="pics/simple-deer-no-smc.png"
