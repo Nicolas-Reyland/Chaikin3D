@@ -142,12 +142,15 @@ You might also want to control the *Chaikin coefficient*. This is done using the
 #### Examples
 
 One generation on a cube
+
 ```python chaikin3d.py -i data/cube.obj -cg 1```
 
 Two generations on a deeer (yes, a deer)
+
 ```python chaikin3d.py -i data/deer.obj -cg 2```
 
 One iteration on a tetrahedron, with a coefficient of 3
+
 ```python chaikin3d.py -i data/tetrahedron.obj -cg 1 -cc 3```
 
 
