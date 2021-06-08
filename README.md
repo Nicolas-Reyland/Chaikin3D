@@ -323,6 +323,7 @@ style="float: right; margin-right: 10px;" width="48%;" />
 
 
 # TODO
+
  * Fix issue where plotly would just freeze the program (Windows only & might be a plotly issue ?)
  * Add example pics after every example line in README (e.g. ```-e``` option examples)
  * Better memory optimization (should come with C/C++ FFI implementation)
@@ -335,7 +336,8 @@ style="float: right; margin-right: 10px;" width="48%;" />
  * Change scale when plotting (e.g. data/cat.obj)
 
 
-## Note
+# Note
+
 If you have any issues using this project or need any help, please feel free to tell me [on github](https://github.com/Nicolas-Reyland/Chaikin3D/issues) !
 If you want to help me developping this project, please tell me too !
 
