@@ -271,7 +271,7 @@ def main():
 
 	# switch the plot type
 	if plot == 'simple':
-		poly_dd = renderer.get_polyhedron_draw_data(poly, 'any', alpha)
+		poly_dd = renderer.get_polyhedron_draw_data(poly, type_ = 'any', alpha = alpha, color = polygon_color)
 		if smc: main_conn_dd = renderer.get_connections_draw_data(poly, type_ = 'main', line_color = main_conn_color, node_color = node_color)
 		else: main_conn_dd = []
 		if sgc: graphical_conn_dd = renderer.get_connections_draw_data(poly, type_ = 'graphical', line_color = graph_conn_color, node_color = node_color)
