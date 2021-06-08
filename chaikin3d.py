@@ -1,5 +1,6 @@
 #
 from math import sqrt
+from polyhedron import Polyhedron
 from wavefront_reader import WaveFrontReader
 
 from argparse import ArgumentParser
@@ -78,8 +79,6 @@ elif RENDERER == 'mpl':
 	from mpl_renderer import *
 else:
 	raise Exception('Unkown renderer:', RENDERER)
-
-FILE_MODE = None
 
 # functions
 def draw_full(renderer : Renderer, poly : Polyhedron) -> None:
@@ -251,7 +250,6 @@ def main():
 	# evaluate
 	if evaluation_string:
 		# evaluate the code
-		from polyhedron import Polyhedron
 		eval(evaluation_string)
 		# checks on the "poly" variable
 		if 'poly' not in vars():
