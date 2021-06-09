@@ -343,7 +343,7 @@ style="float: right; margin-right: 10px;" width="48%;" />
  * Add example pics after every example line in README (e.g. ```-e``` option examples)
  * Better memory optimization (should come with C/C++ FFI implementation)
  * Save result to .obj file (keeping original textures ??)
- * Finsh animation plot
+ * Finish animation plot
  * Optimization of the Chaikin3D algorithm
      - maybe parallelism ?
      - FFI with C++ or C (much more likely to happen than parallelism + much faster)
