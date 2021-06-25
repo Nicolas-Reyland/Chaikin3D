@@ -1,4 +1,4 @@
-# Chaikin3D
+# Chaikin 3D
 
 Expansion of the Chaikin Algorithm to the 3rd dimension.
 
