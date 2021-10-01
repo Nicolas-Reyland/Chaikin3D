@@ -1,3 +1,4 @@
+# Chaikin3D - Groups module
 from __future__ import annotations
 import connection as C
 from dataholders import VirtualSet

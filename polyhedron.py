@@ -1,4 +1,4 @@
-#
+# Chaikin3D - Polyhedron module
 from __future__ import annotations
 import node as N
 import connection as C
@@ -222,6 +222,27 @@ class Polyhedron:
         # a more algorithmic solution is more elegant and would eradicate the
         # errors that come with floating-point number precisions etc.
 
+        # Methodology:
+		# Foreach group of old_groups :
+        # 	Foreach couple of nodes in this group :
+        # 		search their equivalent new nodes :
+        # 			- based on distance :
+        # 				The two new nodes that should be connected are the ones that are the closest to
+        # 				the 'other' old node. Illustration :
+        # 					------C---------------------------G----H--
+        # 					------------------------------------------
+        # 					-----oA--B---------------------F---oE---I-
+        # 					-D-------------------------------K--------
+        #	 				--------------------------------------J---
+        # 				old nodes : oA and oE (old A & old E)
+        # 				new nodes that should be chosen for connection: B & F
+        # 					because :
+        # 						eucl_dist(B, oE) < eucl_dist(*\ {B} U nE, oE) (w/ nE = new nodes, sourcing from oE)
+        # 						 <=> eucl_dist(B, oE) < eucl_dist(C, oE) and eucl_dist(B, oE) < eucl_dist(D, oE)
+        # 						eucl_dist(F, oE) < eucl_dist(*\ {F} U nA, oE) (w/ nA = new nodes, sourcing from oA)
+        # 						 <=> eucl_dist(F, oE) < eucl_dist(K, oE) and eucl_dist(F, oE) < eucl_dist(I, oE) and ...
+
+        # TODO: UPDATE THIS LIST OF VARS
         # List of the existing variables that are used to reconnect the surfaces :
         # - final_group_set: (explained earlier)
         # - old_groups: groups of the Polyhedron we are trying to approximate using this algorithm
@@ -230,78 +251,69 @@ class Polyhedron:
         # - group_objects: list of all the surface-groups. only used to connect the groups
         # - total_old_groups: number of old groups
 
-        # Methodology:
-        # Foreach couple of old_nodes (that were connected) :
-        # 	search their equivalent new nodes :
-        # 		- based on distance :
-        # 			The two new nodes that should be connected are the ones that are the closest to
-        # 			the center of the line formed by the old nodes. Illustration :
-        # 				------C---------------------------G----H--
-        # 				------------------------------------------
-        # 				-----oA--B------------X--------F---oE---I-
-        # 				-D-------------------------------K--------
-        # 				--------------------------------------J---
-        # 			old nodes : oA and oE (old A & old E)
-        # 			center of segment [oA oE]: X
-        # 			new nodes that should be chosen for connection: B & F
-        # 				because :
-        # 					eucl_dist(B, X) < eucl_dist(*\ {B} U nE, X) (w/ nE = new nodes, sourcing from oE)
-        # 					 <=> eucl_dist(B, X) < eucl_dist(C, X) and eucl_dist(B, X) < eucl_dist(D, X)
-        # 					eucl_dist(F, X) < eucl_dist(*\ {F} U nA, X) (w/ nA = new nodes, sourcing from oA)
-        # 					 <=> eucl_dist(F, X) < eucl_dist(K, X) and eucl_dist(F, X) < eucl_dist(I, X) and ...
+        # set of new (ordered) groups, one per surface
+        new_group_set: VirtualSet[Group] = VirtualSet()
+        # one new group per old group (talking about old-surface-groups !)
+        for old_group in old_groups:
+            # an old_group should be ordered, but let's make sure of it
+            # if the group is already ordered, it will instantly return anyway
+            old_group.order()
+            new_group_node_list: list[N.Node] = list()
 
-        for old_node in old_nodes:
-            for partner_node in old_node.get_connections_by_type("main"):
-                pass
+            # iterate over the nodes
+            # we start at 1 bc we do them in pairs and we don't want
+            # a node to be in 2 pairs (first and last one for example)
+            for i in range(1, old_group.size):
+                # get two nodes in group that 'follow' each other
+                current_old_node = old_group.ogroup[i - 1]
+                partner_old_node = old_group.ogroup[i]
+                # get corresponding new node lists (one old node has multiple new nodes -> thx Chaikin)
+                # 'current_old_node' corresponding new nodes
+                current_old_node_corresp_new_nodes = node_virt_dict[current_old_node]
+                partner_old_node_corresp_new_nodes = node_virt_dict[partner_old_node]
+                # find the two nodes that are the closest to the 'other' old node
+                # for the 'current_old_node_corresp_new_nodes' :
+                min_dist_to_other_node: float = matrix.inf
+                closest_new_node_1: N.Node = None
+                for new_node in current_old_node_new_nodes:
+                    # calculate distance to partner_old_node (this new node is sourcing from current_old_node)
+                    dist_to_other_node: float = matrix.distance3d(new_node.coords, partner_old_node.coords)
+                    # new node is closer than previously found nodes
+                    if dist_to_other_node < min_dist_to_other_node:
+                        # update distance
+                        min_dist_to_other_node = dist_to_other_node
+                        # update closest node
+                        closest_new_node_1 = new_node
+                # for the 'current_old_node_corresp_new_nodes' :
+                min_dist_to_other_node: float = matrix.inf
+                closest_new_node_2: N.Node = None
+                for new_node in partner_old_node_new_nodes:
+                    # calculate distance to current_old_node (this new node is sourcing from partner_old_node)
+                    dist_to_other_node: float = matrix.distance3d(new_node.coords, current_old_node.coords)
+                    # new node is closer than previously found nodes
+                    if dist_to_other_node < min_dist_to_other_node:
+                        # update distance
+                        min_dist_to_other_node = dist_to_other_node
+                        # update closest node
+                        closest_new_node_2 = new_node
+                # assert that nodes were found (no empty group)
+                assert closest_new_node_1 and closest_new_node_2
 
-        group_objects: list[Group] = []
-        total_old_groups = len(old_groups)
-        vprint("Reconnect the new nodes (using the old nodes as starting point)")
-        for index, old_group in enumerate(old_groups):
-            if verbose and index % VERBOSE_STEP == 0:
-                print(
-                    "[{}/{}] new groups found ({:.2f}%)".format(
-                        index, total_old_groups, 100 * index / total_old_groups
-                    )
-                )
-            new_group: VirtualSet = VirtualSet()
-            for old_node in old_group:
-                new_nodes = node_virt_dict[old_node]
-                two_nodes = []
-                for new_node in new_nodes:
-                    for other_old_node in old_group:
-                        if (
-                            old_node != other_old_node
-                            and len(
-                                [
-                                    0
-                                    for other_new_node in node_virt_dict[other_old_node]
-                                    if C.Connection.are_connected(
-                                        new_node, other_new_node
-                                    )
-                                ]
-                            )
-                            > 0
-                        ):  # any([C.Connection.are_connected(new_node, other_new_node) for other_new_node in node_virt_dict[other_old_node]]): #
-                            break
-                    else:
-                        continue
-                    # found
-                    two_nodes.append(new_node)
-                    # don't break because there are two new nodes per old node
-                if len(two_nodes) == 2:
-                    new_group.add(two_nodes[0])
-                    new_group.add(two_nodes[1])
-                else:
-                    print("Bizarre group found.")
+                # add 'closest_new_node_1' & 'closest_new_node_1' to the new group node list
+                new_group_node_list.append(closest_new_node_1)
+                new_group_node_list.append(closest_new_node_2)
 
-            new_group = Group(new_group)
-            if new_group not in group_objects:
-                # group_objects.append(new_group)
-                final_group_set.add(new_group)
+            # create new (already ordered) group
+            new_group: Group = Group(new_group_node_list)
+            new_group.ordered = True
+            new_group.ogroup = new_group_node_list.copy()
 
-        total_groups = len(group_objects)
-        vprint("Ordering the groups ({})".format(total_groups))
+            # add group to new groups
+            new_group_set.add(new_group)
+
+        num_new_groups = len(num_new_groups)
+        '''
+        vprint("Ordering the groups ({})".format(num_new_groups))
         # print('num raw groups:', len(group_objects))
         i = 0
         total = len(group_objects)
@@ -313,13 +325,14 @@ class Polyhedron:
                     )
                 )
             group.order()
+        '''
 
         vprint("Connecting the groups ({})".format(total_groups))
-        for i, group in enumerate(group_objects):
+        for i, group in enumerate(new_groups):
             if verbose and i % VERBOSE_STEP == 0:
                 print(
                     "[{}/{}] connected ({:.2f}%)".format(
-                        i, total_groups, 100 * i / total_groups
+                        i, total_groups, 100 * i / num_new_groups
                     )
                 )
             group.inter_connect("graphical")
