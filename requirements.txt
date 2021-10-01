@@ -1,4 +1,5 @@
 # Important notice:
 # You need the https://github.com/Nicolas-Reyland/matrix module. You can add the matrix.py to the root dir of this repo
-
 plotly
+numpy
+noise
