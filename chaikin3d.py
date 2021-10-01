@@ -28,7 +28,7 @@ parser.add_argument('-gcc', '--graphical-connection-color', type=str, help='Grap
 # other
 parser.add_argument('-t', '--test', type=str, help='Only used with \'-i\'. The input file should be tested for many attributes (df. false)')
 
-#
+# parse the command line arguments
 args = vars(parser.parse_args())
 
 def parse_bool(s):
