@@ -125,6 +125,7 @@ class Polyhedron:
             n - 1
         )  # when the vector has already been trunced once
         node_virt_dict: VirtualDict = VirtualDict()
+        new_node_list: list[N.Node] = list()
         new_connections: list[C.Connection] = []
 
         vprint("Copying polyhedron data...")
@@ -205,6 +206,8 @@ class Polyhedron:
             # add those sub-nodes to the new nodes virtual dict
             node_virt_dict[old_nodes[node_index]] = group_set.copy()
             sub_node_count += group_set.size
+            # add new node to new nodes list
+            new_node_list.extend(group.group)
 
         # Now, the variable 'final_group_set' holds 'total_nodes' group objects.
         # Every node of the given Polyhedron has exactly one corresponding group
@@ -275,7 +278,7 @@ class Polyhedron:
                 # for the 'current_old_node_corresp_new_nodes' :
                 min_dist_to_other_node: float = matrix.inf
                 closest_new_node_1: N.Node = None
-                for new_node in current_old_node_new_nodes:
+                for new_node in current_old_node_corresp_new_nodes:
                     # calculate distance to partner_old_node (this new node is sourcing from current_old_node)
                     dist_to_other_node: float = matrix.distance3d(new_node.coords, partner_old_node.coords)
                     # new node is closer than previously found nodes
@@ -287,7 +290,7 @@ class Polyhedron:
                 # for the 'current_old_node_corresp_new_nodes' :
                 min_dist_to_other_node: float = matrix.inf
                 closest_new_node_2: N.Node = None
-                for new_node in partner_old_node_new_nodes:
+                for new_node in partner_old_node_corresp_new_nodes:
                     # calculate distance to current_old_node (this new node is sourcing from partner_old_node)
                     dist_to_other_node: float = matrix.distance3d(new_node.coords, current_old_node.coords)
                     # new node is closer than previously found nodes
@@ -307,11 +310,12 @@ class Polyhedron:
             new_group: Group = Group(new_group_node_list)
             new_group.ordered = True
             new_group.ogroup = new_group_node_list.copy()
+            new_group.order(force = True)
 
             # add group to new groups
             new_group_set.add(new_group)
 
-        num_new_groups = len(num_new_groups)
+        num_new_groups = len(new_group_set)
         '''
         vprint("Ordering the groups ({})".format(num_new_groups))
         # print('num raw groups:', len(group_objects))
@@ -327,22 +331,18 @@ class Polyhedron:
             group.order()
         '''
 
-        vprint("Connecting the groups ({})".format(total_groups))
-        for i, group in enumerate(new_groups):
+        vprint("Connecting the surface groups ({})".format(num_new_groups))
+        for i, group in enumerate(new_group_set):
             if verbose and i % VERBOSE_STEP == 0:
                 print(
                     "[{}/{}] connected ({:.2f}%)".format(
-                        i, total_groups, 100 * i / num_new_groups
+                        i, num_new_groups, 100 * i / num_new_groups
                     )
                 )
             group.inter_connect("graphical")
 
         # Merge groups together
         final_group_set.merge_with(new_group_set)
-
-        # construct new node list
-        vprint("Building the new nodes list...")
-        new_node_list: list[N.Node] = [sub_node for sub_nodes in node_virt_dict.values() for sub_node in sub_nodes]
 
         # return the final polyhedron
         vprint(
