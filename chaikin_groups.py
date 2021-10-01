@@ -1,13 +1,14 @@
 # Chaikin3D - Groups module
 from __future__ import annotations
 import connection as C
+import node as N
 from dataholders import VirtualSet
 import numpy, matrix
 
 
 class Group:
     def __init__(self, iterable, do_order: bool = False):
-        self.group = VirtualSet(iterable)
+        self.group: VirtualSet[N.Node] = VirtualSet(iterable)
         self.ogroup = None
         self.ordered = False
         self.size = self.group.size
