@@ -337,16 +337,17 @@ class Polyhedron:
                 )
             group.inter_connect("graphical")
 
+        # Merge groups together
+        final_group_set.merge_with(new_group_set)
+
         # construct new node list
         vprint("Building the new nodes list...")
-        new_node_list: list[N.Node] = []
-        for sub_nodes in node_virt_dict.values():
-            new_node_list.extend(sub_nodes)
+        new_node_list: list[N.Node] = [sub_node for sub_nodes in node_virt_dict.values() for sub_node in sub_nodes]
 
         # return the final polyhedron
         vprint(
             "Chaikin 3D iteration finished {} nodes in {:.3} sec".format(
-                total_nodes, time.perf_counter() - t1
+                num_new_groups, time.perf_counter() - t1
             )
         )
         return Polyhedron(new_node_list, final_group_set)
