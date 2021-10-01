@@ -95,6 +95,7 @@ class Polyhedron:
 		# connect later
 		for ogroup in to_connect:
 			# connect the graphical connections
+			# ogroup.order() -> order_first = True
 			ogroup.inter_connect('graphical', order_first = True)
 
 		# return polyhedron
@@ -104,6 +105,7 @@ class Polyhedron:
 	def Chaikin3D(polyhedron : Polyhedron, n : int = 4, verbose : bool = False) -> Polyhedron:
 		'''ratio could also be float ?
 		'''
+		vprint = (lambda *a, **k: print(*a, **k)) if verbose else (lambda *a, **k: None)
 		# change recursion limit
 		polyhedron._set_recursion_limit()
 		t1 = time.perf_counter()
@@ -113,17 +115,18 @@ class Polyhedron:
 		node_virt_dict : VirtualDict = VirtualDict()
 		new_connections : list[C.Connection] = []
 
-		if verbose: print('Copying polyhedron data...')
+		vprint('Copying polyhedron data...')
 		#old_polyhedron = deepcopy(polyhedron)
 		old_nodes = polyhedron.nodes#.copy()#old_polyhedron.nodes
 		old_groups = polyhedron.groups#.copy()	#old_polyhedron.groups # if we don't want to make the method static, but return a new polyhedron without modifying this one, should need this !
 		sub_node_count = 0
 
+		# set of groups all the groups, one group per 'old' node
 		final_group_set : VirtualSet = VirtualSet()
 
-		#
+		# count of the nodes
 		total_nodes = len(polyhedron.nodes)
-		if verbose: print('Calculating new node positions for {} verticies'.format(total_nodes))
+		vprint('Calculating new node positions for {} verticies'.format(total_nodes))
 		for node_index,current_node in enumerate(polyhedron.nodes):
 			if verbose and node_index % VERBOSE_STEP == 0: print('[{}/{}] calculated ({:.2f}%)'.format(node_index, total_nodes, 100 * node_index / total_nodes))
 			#print('\ncurrent node:', current_node)
@@ -172,29 +175,52 @@ class Polyhedron:
 			# connect all the sub-nodes together (might find something to avoid connection-crossing -> len(group_set) > 3)
 			#print('group set', group_set)
 			group = Group(group_set)
-			# connect
+			# connect main connections, in a cycle-like order
 			group.cycle_connect('main')
 			# connect graphical together
 			group.inter_connect('graphical', order_first = True)
 			final_group_set.add(group)
 
 			# add those sub-nodes to the new nodes virtual dict
-			node_virt_dict[old_nodes[node_index]] = group_set
+			node_virt_dict[old_nodes[node_index]] = group_set.copy()
 			sub_node_count += group_set.size
 
-		# connect all the groups together
+		# Now, the variable 'final_group_set' holds 'total_nodes' group objects.
+		# Every node of the given Polyhedron has exactly one corresponding group
+		# This group is already inter-connected, and ordered
+		# If we plot the mesh now, using the 'final_group_set' variable, we
+		# would get one polygon at the position of our old nodes. The
+		# surfaces of our base polyhedron would be missing.
+		#
+		# We are now going to add the missing graphical connections for these
+		# surfaces to be drawn.
+
+		# To re-construct the old surfaces, we need to find the new nodes that
+		# are connected to these. The thing is, we can try and find them using
+		# vector-space mathematics or with plane point-on-plane calculations, but
+		# a more algorithmic solution is more elegant and would eradicate the
+		# errors that come with floating-point number precisions etc.
+
+		# List of the existing variables that are used to reconnect the surfaces :
+		# - final_group_set: (explained earlier)
+		# - old_groups: groups of the Polyhedron we are trying to approximate using this algorithm
+		# List of the non-existing variables that are being built/extended/used to reconnect the surfaces :
+		# - final_group_set: the surface groups are going to be added to this set
+		# - group_objects: list of all the surface-groups. only used to connect the groups
+		# - total_old_groups: number of old groups
+
 		group_objects : list[Group] = []
-		total_groups = len(old_groups)
-		if verbose: print('Reconnect the new nodes (using the old nodes as starting point)')
+		total_old_groups = len(old_groups)
+		vprint('Reconnect the new nodes (using the old nodes as starting point)')
 		for index,old_group in enumerate(old_groups):
-			if verbose and index % VERBOSE_STEP == 0: print('[{}/{}] new groups found ({:.2f}%)'.format(index, total_groups, 100 * index / total_groups))
+			if verbose and index % VERBOSE_STEP == 0: print('[{}/{}] new groups found ({:.2f}%)'.format(index, total_old_groups, 100 * index / total_old_groups))
 			new_group : VirtualSet = VirtualSet()
 			for old_node in old_group:
 				new_nodes = node_virt_dict[old_node]
 				two_nodes = []
 				for new_node in new_nodes:
 					for other_old_node in old_group:
-						if old_node != other_old_node and len([0 for other_new_node in node_virt_dict[other_old_node] if C.Connection.are_connected(new_node, other_new_node)]) > 0: # any([C.Connection.are_connected(new_node, other_new_node) for other_new_node in node_virt_dict[other_old_node]]): # 
+						if old_node != other_old_node and len([0 for other_new_node in node_virt_dict[other_old_node] if C.Connection.are_connected(new_node, other_new_node)]) > 0: # any([C.Connection.are_connected(new_node, other_new_node) for other_new_node in node_virt_dict[other_old_node]]): #
 							break
 					else:
 						continue
@@ -209,11 +235,11 @@ class Polyhedron:
 
 			new_group = Group(new_group)
 			if new_group not in group_objects:
-				group_objects.append(new_group)
+				#group_objects.append(new_group)
 				final_group_set.add(new_group)
 
 		total_groups = len(group_objects)
-		if verbose: print('Ordering the groups ({})'.format(total_groups))
+		vprint('Ordering the groups ({})'.format(total_groups))
 		#print('num raw groups:', len(group_objects))
 		i = 0
 		total = len(group_objects)
@@ -221,19 +247,19 @@ class Polyhedron:
 			if verbose and i % VERBOSE_STEP == 0: print('[{}/{}] ordered ({:.2f}%)'.format(i, total_groups, 100 * i / total_groups))
 			group.order()
 
-		if verbose: print('Connecting the groups ({})'.format(total_groups))
+		vprint('Connecting the groups ({})'.format(total_groups))
 		for i,group in enumerate(group_objects):
 			if verbose and i % VERBOSE_STEP == 0: print('[{}/{}] connected ({:.2f}%)'.format(i, total_groups, 100 * i / total_groups))
 			group.inter_connect('graphical')
 
 		# construct new node list
-		if verbose: print('Building the new nodes list...')
+		vprint('Building the new nodes list...')
 		new_node_list : list[N.Node] = []
 		for sub_nodes in node_virt_dict.values():
 			new_node_list.extend(sub_nodes)
 
 		# return the final polyhedron
-		if verbose: print('Chaikin 3D iteration finished {} nodes in {:.3} sec'.format(total_nodes, time.perf_counter() - t1))
+		vprint('Chaikin 3D iteration finished {} nodes in {:.3} sec'.format(total_nodes, time.perf_counter() - t1))
 		return Polyhedron(new_node_list, final_group_set)
 
 	@staticmethod
@@ -378,7 +404,7 @@ class Group:
 				_debug_print_full_nodes(self.ogroup)
 				print('group')
 				_debug_print_full_nodes(self.group)
-				raise Exception('broken group')
+				#raise Exception('broken group')
 				print('Warning: broken group found. attaching remaning nodes: {}'.format(len(group_list)))
 				self.ogroup.extend(group_list)
 				break
