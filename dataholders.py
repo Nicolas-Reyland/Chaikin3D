@@ -83,6 +83,12 @@ class VirtualSet:
             self.data.append(value)
             self.size += 1
 
+    def merge_with(self, other_set: VirtualSet) -> VirtualSet:
+        # Why 'merge_with' and not 'merge' ? Because I do not need to separate A, B and A U B in the Chaikin3D project.
+        # Would hhave made a 'merge' function in that case
+        for element in other_set:
+            self.add(element)
+
     def pop(self):
         return self.data.pop(0)
 
