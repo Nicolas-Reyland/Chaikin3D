@@ -1,4 +1,4 @@
-#
+#!/usr/bin/env python3
 from math import sqrt
 from polyhedron import Polyhedron
 from wavefront_reader import WaveFrontReader
