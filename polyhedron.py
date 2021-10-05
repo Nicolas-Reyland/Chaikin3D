@@ -310,7 +310,6 @@ class Polyhedron:
             new_group: Group = Group(new_group_node_list)
             new_group.ordered = True
             new_group.ogroup = new_group_node_list.copy()
-            new_group.order(force = True) # TODO: remove this line (we force the ordering, but supposed to be ordered already)
 
             # add group to new groups
             new_group_set.add(new_group)
