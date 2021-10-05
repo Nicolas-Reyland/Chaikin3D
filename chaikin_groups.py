@@ -99,3 +99,24 @@ class Group:
                 prev_node = current_node
             # connect last one to first one
             self.ogroup[0].connect(prev_node, connection_type)
+
+
+def _debug_print_full_node(node, num_tabs=0):
+    prefix = "\t" * num_tabs
+    print(f"{prefix}{str(node)}:")
+    print(f"{prefix} main :")
+    for conn in node.get_connections_by_type("main"):
+        print(f"{prefix}\t - {str(conn)}")
+    print(f"{prefix} graphical :")
+    for conn in node.get_connections_by_type("graphical"):
+        print(f"{prefix}\t - {str(conn)}")
+
+
+def _debug_print_full_nodes(nodes, num_tabs=0):
+    prefix = "\t" * num_tabs
+    print(f"{prefix}Num nodes: {len(nodes)}")
+    for node in nodes:
+        _debug_print_full_node(node, num_tabs + 1)
+        print()
+
+#

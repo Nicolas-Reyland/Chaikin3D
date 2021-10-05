@@ -266,7 +266,7 @@ class Polyhedron:
             # iterate over the nodes
             # we start at 1 bc we do them in pairs and we don't want
             # a node to be in 2 pairs (first and last one for example)
-            for i in range(1, old_group.size):
+            for i in range(old_group.size):
                 # get two nodes in group that 'follow' each other
                 current_old_node = old_group.ogroup[i - 1]
                 partner_old_node = old_group.ogroup[i]
@@ -310,27 +310,12 @@ class Polyhedron:
             new_group: Group = Group(new_group_node_list)
             new_group.ordered = True
             new_group.ogroup = new_group_node_list.copy()
-            new_group.order(force = True)
+            new_group.order(force = True) # TODO: remove this line (we force the ordering, but supposed to be ordered already)
 
             # add group to new groups
             new_group_set.add(new_group)
 
         num_new_groups = len(new_group_set)
-        '''
-        vprint("Ordering the groups ({})".format(num_new_groups))
-        # print('num raw groups:', len(group_objects))
-        i = 0
-        total = len(group_objects)
-        for i, group in enumerate(group_objects):
-            if verbose and i % VERBOSE_STEP == 0:
-                print(
-                    "[{}/{}] ordered ({:.2f}%)".format(
-                        i, total_groups, 100 * i / total_groups
-                    )
-                )
-            group.order()
-        '''
-
         vprint("Connecting the surface groups ({})".format(num_new_groups))
         for i, group in enumerate(new_group_set):
             if verbose and i % VERBOSE_STEP == 0:
@@ -453,25 +438,4 @@ class Polyhedron:
                     local_group_set_list.append(group)
 
         return local_group_set_list
-
-
-def _debug_print_full_node(node, num_tabs=0):
-    prefix = "\t" * num_tabs
-    print(f"{prefix}{str(node)}:")
-    print(f"{prefix} main :")
-    for conn in node.get_connections_by_type("main"):
-        print(f"{prefix}\t - {str(conn)}")
-    print(f"{prefix} graphical :")
-    for conn in node.get_connections_by_type("graphical"):
-        print(f"{prefix}\t - {str(conn)}")
-
-
-def _debug_print_full_nodes(nodes, num_tabs=0):
-    prefix = "\t" * num_tabs
-    print(f"{prefix}Num nodes: {len(nodes)}")
-    for node in nodes:
-        _debug_print_full_node(node, num_tabs + 1)
-        print()
-
-
 #
