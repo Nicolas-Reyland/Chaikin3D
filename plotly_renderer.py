@@ -4,7 +4,7 @@ from __future__ import annotations
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 from polyhedron import Polyhedron
-import random
+import numpy as np
 
 DO_CHAIKIN = True
 
@@ -23,8 +23,8 @@ def gen_random_color() -> str:
 
     """
 
-    choices = "0123456789abcdef"
-    return "#" + "".join(random.choice(choices) for _ in range(6))
+    choices = list("0123456789abcdef")
+    return "#" + "".join(np.random.choice(choices) for _ in range(6))
 
 
 class Renderer:
@@ -161,12 +161,28 @@ class Renderer:
 
         X, Y, Z = list(zip(*vertex_list))
         I, J, K = list(zip(*vertex_index_list))
+        if color == "random":
+            num_colorscales = 4
+            return [
+                go.Mesh3d(
+                    x=X,
+                    y=Y,
+                    z=Z,
+                    colorscale=[[i/num_colorscales, gen_random_color()] for i in range(0, num_colorscales + 1)],
+                    intensity = np.linspace(0, 1, len(I), endpoint=True),
+                    intensitymode='cell',
+                    i=I,
+                    j=J,
+                    k=K,
+                    opacity=alpha,
+                )
+            ]
         return [
             go.Mesh3d(
                 x=X,
                 y=Y,
                 z=Z,
-                color=gen_random_color() if color == "random" else color,
+                color=color,
                 i=I,
                 j=J,
                 k=K,
