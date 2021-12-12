@@ -1,0 +1,18 @@
+{
+    "input": null,
+    "evaluate": null,
+    "rotate mesh": false,
+    "chaikin generations": 0,
+    "chaikin coef": 4,
+    "verbose": false,
+    "renderer": "plotly",
+    "plot": "simple",
+    "show main connections": true,
+    "show graphical connections": false,
+    "alpha": 0.8,
+    "polygon color": "lightblue",
+    "node color": "green",
+    "main connection color": "darkred",
+    "graphical connection color": "black",
+    "test": false
+}
