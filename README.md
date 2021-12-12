@@ -17,7 +17,7 @@ Expansion of the Chaikin Algorithm to the 3rd dimension.
 
 You need to have python (version 3+) and pip installed.
 
-Then, download the repo:
+Then, clone the repo:
 ```
 git clone https://github.com/Nicolas-Reyland/Chaikin3D
 ```
@@ -29,7 +29,7 @@ pip install -r requirements
 
 # Some explanations first
 
-This project supports more "exotic" polyhedron (a polyhedron is a polygon in space/3D) types. In fact, since we are going to change the polyhedron, raw data of the verticies isn't sufficient. We need info about which edges are important, and which are not. For example, in a cube, the diagonal edges (to split the square into two triangles) are not _important_: their sole purpose is to bind two vertices together so that triangles can be drawn to the screen (will get clearer in a minute). That's why we need to distinguish *main* and *graphical* edges between our nodes (vertices).
+This project supports more "exotic" polyhedron (a polyhedron is a polygon in space/3D) types. In fact, since we are going to change the polyhedron, raw data of the vertices isn't sufficient. We need info about which edges are important, and which are not. For example, in a cube, the diagonal edges (to split the square into two triangles) are not _important_: their sole purpose is to bind two vertices together so that triangles can be drawn to the screen (will get clearer in a minute). That's why we need to distinguish *main* and *graphical* edges between our nodes (vertices).
 
 That is why the polyhedral approximation of meshes that were loaded from (typically) *.obj* files are not always as wanted. Sometimes, there is no way to know if an edge between two nodes is really a part of the mesh or if its only purpose is to form triangles (you can normally only draw triangles). There is no distinction between _main_ and _graphical_ edges between two nodes in those meshes :(
 
@@ -62,7 +62,7 @@ And when you draw all this:
      style="float: left; margin-left: 10px;" />
 
 
-For examples of what I mean with "graphical" edges, try these commands: ```python chaikin3d.py -s cube -p full -cg 0``` and ```python chaikin3d.py -s cube -p full -cg 1```. The grapchical edges are the black lines, while the main edges are the red lines.
+To better understand what I mean with _graphical_ edges, try these commands: ```python chaikin3d.py -s cube -p full -cg 0``` and ```python chaikin3d.py -s cube -p full -cg 1```. The _graphical_ edges are the black lines, while the _main_ edges are the red lines.
 
 
 # Usage
@@ -135,11 +135,11 @@ To choose the number of Chaikin generations (or iterations) you want to run on t
 
 ### Chaikin Coeffiecient
 
-You might also want to control the *Chaikin coefficient*. This is done using the ```-cc``` option. This value is used to *cut* the edges at 1/coef and (coef-1)/coef. George Chaikin chose "4" as beeing the right coefficient. This cust the edges into three parts: first 25%, 50%, 25% ([2D Chaikin's Corner Cutting Algorithm](https://sighack.com/post/chaikin-curves)).
+You might also want to control the *Chaikin coefficient*. This is done using the ```-cc``` option. This value is used to *cut* the edges at 1/coef and (coef-1)/coef. George Chaikin chose "4" as the right coefficient. This cuts the edges into three parts: first 25%, 50%, 25% ([2D Chaikin's Corner Cutting Algorithm](https://sighack.com/post/chaikin-curves)).
 
 ### Examples
 
-One iteration on a deeer (yes, a deer)
+One iteration on a deer (yes, a deer)
 ```
 python chaikin3d.py -i data/deer.obj -cg 1
 ```
@@ -177,38 +177,38 @@ Graphical options let you choose how you want to plot your mesh. You can customi
  * ```-a```/```--alpha```
  * ```-r```/```--renderer```
  * ```-sn```/```--show-nodes```
- * ```-smc```/```--show-main-edges```
- * ```-sgc```/```--show-graphical-edges```
+ * ```-sme```/```--show-main-edges```
+ * ```-sge```/```--show-graphical-edges```
  * ```-rm```/```--rotate-mesh``` (only with the ```-i``` option)
  * ```-nc```/```--node-color```
  * ```-pc```/```-polygon-color```
- * ```-mcc```/```--main-edge-color```
- * ```-gcc```/```--graphical-edge-color```
+ * ```-mec```/```--main-edge-color```
+ * ```-gec```/```--graphical-edge-color```
 
 ### Plot Types
 
 There are 4 types of plots (see examples below):
  * "simple" plot : this plot only draws your polyhedron to the screen
  * "full" plot : this one draws a lot of data separately: your edges (by type, etc.), your vertices and different mesh representations. Useful for understanding how things work and debugging in general
- * "evolution" plot : the evolution plot takes into account the number of chaikin generations that you want (```-cg``` option). I will render one generation after another in a grid-format (like the "full" plot)
- * "animation" plot (DO NOT USE) : this plot should, in theory, create an animation, rendering all the chaikin generations from 0 to the value given in the ```-cg``` option
+ * "evolution" plot : the evolution plot takes into account the number of _chaikin generations_ that you want (```-cg``` option). I will render one generation after another in a grid-format (like the "full" plot)
+ * "animation" plot (DO NOT USE) : this plot should, in theory, create an animation, rendering all the _chaikin generations_ from 0 to the value given in the ```-cg``` option
 The default value is "simple"
 
 ### How to plot (colors, etc.)
 
 The ```-a```/```--alpha``` switch allows you to change the alpha/opacity value (ranging from 0.0 to 1.0) of the faces in the "simple", "evolution" and "animation" plots (every plot except the "full" plot <- there are already alpha changes). Default value: 0.8
 
-You should not mess with the ```-r```option, but it exists. The mpl renderer is not really made for big meshes. You shoud really use the plotly (default) renderer. Default value: "plotly"
+You should not mess with the ```-r```option, but it exists. The mpl renderer is not really made for big meshes. You should really use the plotly (default) renderer. Default value: "plotly"
 
 You can dis/en-able the rendering of nodes with the ```-sn```/```--show-nodes``` option. Default value: "true"
 
-The ```-smc``` switch allows to choose if you want to render the main edges for the "simple", "evolution" and "animation" plots. Default value: "true"
+The ```-sme``` switch allows to choose if you want to render the main edges for the "simple", "evolution" and "animation" plots. Default value: "true"
 
-The ```-sgc``` switch allows to choose if you want to render the graphical edges for the "simple", "evolution" and "animation" plots. Default value: "false"
+The ```-sge``` switch allows to choose if you want to render the graphical edges for the "simple", "evolution" and "animation" plots. Default value: "false"
 
 Use the ```-rm```/```--rotate-mesh``` to rotate meshes that look ... rotated **on load** (therefore, you can only use this option with the ```-i```/```--input``` option).
 
-The ```-nc```, ```-pc```, ```-mcc``` and ```-gcc``` options let you customize the colors for the nodes (df. green), polygons (df. lightblue), main edges (df. darkred) and graphical edges (df. black). You can give color-names or colors with this format: *#12ab34*. The value *random* is valid and will generate a new random color for each node/polygon/main edge/graphical edge.
+The ```-nc```, ```-pc```, ```-mec``` and ```-gec``` options let you customize the colors for the nodes (df. green), polygons (df. lightblue), main edges (df. darkred) and graphical edges (df. black). You can give color-names or colors with this format: *#12ab34*. The value *random* is valid and will generate a new random color for each node/polygon/main edge/graphical edge.
 
 ### Examples
 
@@ -338,7 +338,7 @@ style="float: right; margin-right: 10px;" width="48%;" />
 
 If you have any issues using this project or need any help, please feel free to tell me [on github](https://github.com/Nicolas-Reyland/Chaikin3D/issues) !
 
-If you want to help me developping this project, please tell me too !
+Feel free to do Pull Requests !
 
 
 *Author: Nicolas Reyland*
