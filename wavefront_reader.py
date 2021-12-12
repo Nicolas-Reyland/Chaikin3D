@@ -5,6 +5,11 @@ import os
 
 
 class WaveFrontReader:
+    """
+    Read WaveFront a file (.obj). And parse it into a Polyhedron instance.
+
+    """
+
     def __init__(
         self,
         path: str,
@@ -22,6 +27,18 @@ class WaveFrontReader:
             self.parse(rotate)
 
     def parse(self, rotate: bool = False, verbose: bool = False):
+        """
+        Parse the input file.
+
+        Args:
+            rotate  (bool): Invert the y and z axes.
+            verbose (bool): Verbose mode.
+
+        Raises:
+            AssertionError: Invalid number of vertices in a face.
+
+        """
+
         lines = open(self.path, "r").readlines()
         vertices_str = []
         vertex_indices_str = []
@@ -51,12 +68,19 @@ class WaveFrontReader:
                 map(lambda s: int(s.split("/")[0]) - 1, raw_vert_index)
             )  # - 1 because indexes are starting at 1 in .obj files
             num_vertices = len(raw_vert_index)
-            assert num_vertices > 2  # >= 3
+            assert num_vertices > 2, f"Number of vertices are less than two: {num_vertices} > 2" # >= 3
             vertex_index_group = []
             for i in range(num_vertices):
                 vertex_index_group.append(vertex_list[i])
             self.vertex_indices.append(vertex_index_group)
 
     def to_polyhedron(self) -> Polyhedron:
-        """ """
+        """
+        Returns a Polyhedron instance based on the input file vertices and vertex-indices.
+
+        Returns:
+            Polyhedron: Generated Polyhedron instance.
+
+        """
+
         return Polyhedron.from_standard_vertex_lists(self.vertices, self.vertex_indices)
