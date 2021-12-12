@@ -81,9 +81,9 @@ Loading a polyhedron is the only thing you must do. You will get an error if you
 
 ### Input option
 
-You will first have to select a polyhedron/mesh to render or use. You can load a *.obj* (only supported extension, for now) file using the ```-i``` (```--input```) option like this: ```python chaikin3d.py -i data/dog.obj``` (if you try this and the mesh is somehow rotated, please add this to your command line: ```-rm true```).
+You will first have to select a polyhedron/mesh to render or use. You can load a *.obj* (only supported extension, for now) file using the ```-i``` (```--input```) option like this: ```python chaikin3d.py -i example-meshes/dog.obj``` (if you try this and the mesh is somehow rotated, please add this to your command line: ```-rm true```).
 
-[Here](https://people.sc.fsu.edu/~jburkardt/data/obj/obj.html) is a link to lots of *.obj* files which you can download and test. You only need the *.obj* file. Only vertices and faces are read by the program.
+[Here](https://people.sc.fsu.edu/~jburkardt/example-meshes/obj/obj.html) is a link to lots of *.obj* files which you can download and test. You only need the *.obj* file. Only vertices and faces are read by the program.
 
 ### Evaluate option (deprecated)
 
@@ -102,18 +102,18 @@ The loaded polyhedron object is named ```poly```. If you did not load a file, th
 
 Load a a cube, then apply the chaikin algorithm on it:
 ```
-python chaikin3d.py -i data/cube.obj -e "poly = poly.Chaikin3D()"
+python chaikin3d.py -i example-meshes/cube.obj -e "poly = poly.Chaikin3D()"
 ```
 
 <img src="pics/simple-cube-chaikin.png"
 alt="1 chaikin iteration on cube"
 style="float: left; margin-left: 10px;" width="20%;" />
 
-*Note: this is equivalent to ```python chaikin3d.py -i data/cube.obj -cg 1```*
+*Note: this is equivalent to ```python chaikin3d.py -i example-meshes/cube.obj -cg 1```*
 
 Load a tetrahedron, then rotate it by 45° with code you potentially wrote in a file named "my_own_code.py":
 ```
-python chaikin3d.py -i data/tetrahedron.obj -e "poly = __import__('my_own_code').rotate_tetrahedron(poly, x_rot = 12, y_rot = 45, z_rot = 0)"
+python chaikin3d.py -i example-meshes/tetrahedron.obj -e "poly = __import__('my_own_code').rotate_tetrahedron(poly, x_rot = 12, y_rot = 45, z_rot = 0)"
 ```
 
 Generate a new polyhedron
@@ -141,7 +141,7 @@ You might also want to control the *Chaikin coefficient*. This is done using the
 
 One iteration on a deer (yes, a deer)
 ```
-python chaikin3d.py -i data/deer.obj -cg 1
+python chaikin3d.py -i example-meshes/deer.obj -cg 1
 ```
 
 <img src="pics/simple-deer-chaikin.png"
@@ -150,7 +150,7 @@ style="float: left; margin-left: 10px;" width="20%;" />
 
 Two iterations on a cube
 ```
-python chaikin3d.py -i data/cube.obj -cg 2
+python chaikin3d.py -i example-meshes/cube.obj -cg 2
 ```
 
 <img src="pics/simple-cube-chaikin-cg-2.png"
@@ -159,7 +159,7 @@ style="float: left; margin-left: 10px;" width="20%;" />
 
 One iteration on a tetrahedron, with a coefficient of 3
 ```
-python chaikin3d.py -i data/tetrahedron.obj -cg 1 -cc 3
+python chaikin3d.py -i example-meshes/tetrahedron.obj -cg 1 -cc 3
 ```
 
 <img src="pics/simple-tetrahedron-chaikin-cc-3.png"
@@ -214,7 +214,7 @@ The ```-nc```, ```-pc```, ```-mec``` and ```-gec``` options let you customize th
 
 Show a cube with no transparency at all and only (yellow) graphical edges
 ```
-python chaikin3d.py -i data/cube.obj -cg 3 -cc 5 -pc mediumaquamarine -smc false -sgc true -gcc yellow
+python chaikin3d.py -i example-meshes/cube.obj -cg 3 -cc 5 -pc mediumaquamarine -smc false -sgc true -gcc yellow
 ```
 <img src="pics/simple-cube-chaikin-cg-3-cc-5-colors.png"
 alt="special colors chaikin cube cg 3 cc 5"
@@ -253,10 +253,10 @@ Here are some more examples of what can be done:
 ### Dogs
 
 ```
-python chaikin3d.py -i data/dog.obj -rm true -sgc true
+python chaikin3d.py -i example-meshes/dog.obj -rm true -sgc true
 ```
 ```
-python chaikin3d.py -i data/dog.obj -rm true -sgc true -cg 1
+python chaikin3d.py -i example-meshes/dog.obj -rm true -sgc true -cg 1
 ```
 
 <img src="pics/simple-dog.png"
@@ -269,7 +269,7 @@ style="float: right; margin-right: 10px;" width="48%;" />
 ### Cubic evolution
 
 ```
-python chaikin3d.py -i data/cube.obj -p evolution -cg 5
+python chaikin3d.py -i example-meshes/cube.obj -p evolution -cg 5
 ```
 
 ![cube evolution](pics/evolution-cube-chaikin.png)
@@ -278,7 +278,7 @@ python chaikin3d.py -i data/cube.obj -p evolution -cg 5
 ### Full of triangles
 
 ```
-python chaikin3d.py -i data/tetrahedron.obj -p full -cg 1 -cc 3
+python chaikin3d.py -i example-meshes/tetrahedron.obj -p full -cg 1 -cc 3
 ```
 
 ![full triangle chaikin with coeff 3](pics/full-triangle-chaikin-cc-3.png)
@@ -289,10 +289,10 @@ python chaikin3d.py -i data/tetrahedron.obj -p full -cg 1 -cc 3
 ### Bigger meshes
 
 ```
-python chaikin3d.py -i data/deer.obj -rm true -a 1.0
+python chaikin3d.py -i example-meshes/deer.obj -rm true -a 1.0
 ```
 ```
-python chaikin3d.py -i data/deer.obj -rm true -a 1.0 -smc false
+python chaikin3d.py -i example-meshes/deer.obj -rm true -a 1.0 -smc false
 ```
 <img src="pics/simple-deer.png"
 alt="1 simple deer no main edges alpha 1"
@@ -301,10 +301,10 @@ alt="2 simple deer no main edges alpha 1"
 style="float: right; margin-right: 10px;" width="48%;" />
 
 ```
-python chaikin3d.py -i data/deer.obj -rm true -a 1.0 -smc true -cg 1 -v 1
+python chaikin3d.py -i example-meshes/deer.obj -rm true -a 1.0 -smc true -cg 1 -v 1
 ```
 ```
-python chaikin3d.py -i data/deer.obj -rm true -a 1.0 -smc true -cg 1 -v 1
+python chaikin3d.py -i example-meshes/deer.obj -rm true -a 1.0 -smc true -cg 1 -v 1
 ```
 
 <img src="pics/simple-deer-chaikin.png"
@@ -330,7 +330,7 @@ style="float: right; margin-right: 10px;" width="48%;" />
      - [ ] threading and parallelism
 - [ ] Fix the issues that show up when applying the algorithm on A LOT of nodes.
 - [x] Ability to rotate y/z axes when loading a .obj file
-- [ ] Ability to scale up/down a single axis when plotting (e.g. data/cat.obj)
+- [ ] Ability to scale up/down a single axis when plotting (e.g. example-meshes/cat.obj)
 - [ ] Support for more mesh file formats
 
 
