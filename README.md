@@ -29,18 +29,21 @@ pip install -r requirements
 
 # Some explanations first
 
-This project supports more "exotic" polyhedron (a polyhedron is a polygon in space/3D) types. In fact, since we are going to change the polyhedron, raw data of the verticies isn't sufficient. We need info about which edges are important, and which are not. For example, in a cube, the diagonal edge (to split the square into two triangles) is not "important": its purpose is only to bind two vertices so that triangle can be drawn to the screen. That's why we need to distinguish *main* and *graphical* connections between our nodes (vertices).
+This project supports more "exotic" polyhedron (a polyhedron is a polygon in space/3D) types. In fact, since we are going to change the polyhedron, raw data of the verticies isn't sufficient. We need info about which edges are important, and which are not. For example, in a cube, the diagonal edges (to split the square into two triangles) are not _important_: their sole purpose is to bind two vertices together so that triangles can be drawn to the screen (will get clearer in a minute). That's why we need to distinguish *main* and *graphical* edges between our nodes (vertices).
 
-That is why the polyhedral approximation of meshes that were loaded from *.obj* files are not always as wanted. There is no way to know if a connection between two nodes is really a part of the mesh or if its only purpose is to form triangles (you can normally only draw triangles). There are no "graphical" connections in those meshes :(
-Every time a vertex list has more than 3 vertices in a mesh file, they are binded with graphical connections to form triangles (there are no other polygons than triangles that are drawn in this project)
+That is why the polyhedral approximation of meshes that were loaded from (typically) *.obj* files are not always as wanted. Sometimes, there is no way to know if an edge between two nodes is really a part of the mesh or if its only purpose is to form triangles (you can normally only draw triangles). There is no distinction between _main_ and _graphical_ edges between two nodes in those meshes :(
 
-Here are the main connections of a cube:
+But normally there are ways to go around that, no worries!
+
+#### To make things clearer, look at the following examples :
+
+Here are the **main** connections of a cube:
 
 <img src="pics/cube-main-connections.png"
      alt="Cube main connections"
      style="float: left; margin-left: 10px;" />
 
-Here are the graphical connections of a cube:
+Here are the **graphical** connections of the same cube:
 
 <img src="pics/cube-graphical-connections.png"
      alt="Cube graphical connections"
