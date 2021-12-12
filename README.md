@@ -2,10 +2,6 @@
 
 Expansion of the Chaikin Algorithm to the 3rd dimension.
 
-(Polyhedral Approximation / Polyhedron Subdivisions / Subdivision Surface).
-
-**_IMPORTANT NOTE_**: Some features are currently broken. Will fix them after my finals :)
-
 # Contents
 
  - [Contents](#contents)
@@ -78,7 +74,7 @@ Loading a polyhedron is the only thing you must do. You will get an error if you
 ### Related Options:
 
  * ```-i```/```--input```
- * ```-e```/```--evaluate```
+ * ```-e```/```--evaluate``` (deprecated)
 
 ### Input option
 
@@ -86,7 +82,7 @@ You will first have to select a polyhedron/mesh to render or use. You can load a
 
 [Here](https://people.sc.fsu.edu/~jburkardt/data/obj/obj.html) is a link to lots of *.obj* files which you can download and test. You only need the *.obj* file. Only vertices and faces are read by the program.
 
-### Evaluate option
+### Evaluate option (deprecated)
 
 The ```-e```/```--evaluate``` option can be used in two ways (or more):
 
@@ -319,23 +315,26 @@ style="float: right; margin-right: 10px;" width="48%;" />
 
 # TODO
 
- * Fix issue where plotly would just freeze the program (Windows only & might be a plotly issue ?)
- * Add example pics after every example line in README (e.g. ```-e``` option examples)
- * Better memory optimization (should come with C/C++ FFI implementation)
- * Save result to .obj file (keeping original textures ??)
- * Finish animation plot
- * Optimization of the Chaikin3D algorithm
-     - maybe parallelism ?
-     - FFI with C++ or C (much more likely to happen than parallelism + much faster)
- * Fix issue of python crashing (no errors, just crashing) when trying to apply chaikin3D on a large number of nodes & connections
- * Change scale when plotting (e.g. data/cat.obj)
+- [ ] Fix issue where plotly would just freeze the program (Windows only & might be a plotly issue ?)
+- [x] Load wavefront .obj files
+- [ ] Save resulting polyhedron to .obj file (keeping original textures ?)
+- [x] Progress verbosity
+- [x] Code documentation (majority done)
+- [x] Get rid of the matrix module (now included in project)
+- [ ] Finish animation plot
+- [ ] Optimization of the Chaikin3D algorithm
+     - [ ] port the still native-python parts of the calculations to numpy
+     - [ ] threading and parallelism
+- [ ] Fix the issues that show up when applying the algorithm on A LOT of nodes.
+- [x] Ability to rotate y/z axes when loading a .obj file
+- [ ] Ability to scale up/down a single axis when plotting (e.g. data/cat.obj)
 
 
 # Note
 
 If you have any issues using this project or need any help, please feel free to tell me [on github](https://github.com/Nicolas-Reyland/Chaikin3D/issues) !
-If you want to help me developping this project, please tell me too !
 
+If you want to help me developping this project, please tell me too !
 
 
 *Author: Nicolas Reyland*
