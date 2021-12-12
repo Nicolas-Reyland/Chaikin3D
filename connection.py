@@ -4,6 +4,11 @@ import node as N
 
 
 class Connection:
+    """
+    Connection between two Nodes.
+
+    """
+
     def __init__(self, A: N.Node, B: N.Node, type_: str):
         self.A: N.Node = A
         self.B: N.Node = B
@@ -108,6 +113,18 @@ class Connection:
     def connection_list_contains_connection(
         connection_list: list[Connection], connection: Connection
     ) -> bool:
+        """
+        Does the list of connections contains the 'connection' ?
+
+        Args:
+            connection_list (list[Connection]): List of connections.
+            connection      (Connection)      : Connection to llok for.
+
+        Returns:
+            bool: The list of connections contains the 'connection'.
+
+        """
+
         return any(
             [
                 conn.A == connection.A
@@ -120,6 +137,19 @@ class Connection:
 
     @staticmethod
     def are_connected(node1: N.Node, node2: N.Node, type_: str = "main") -> bool:
+        """
+        Is 'node1' connected to 'node2' with a connection of type 'tpye_' ?
+
+        Args:
+            node1 (Node): First Node.
+            node2 (Node): Second Node.
+            type_ (str) : Type of connections to look into.
+
+        Returns:
+            bool: Are the two nodes 'type_'-connected ?
+
+        """
+
         return Connection.connection_list_contains_node(
             node1.connection_list, node2, type_
         )
@@ -128,9 +158,24 @@ class Connection:
     def get_connection_with_node(
         connection_list: list[Connection], node: N.Node
     ) -> Connection:
+        """
+        Find any connection that contains 'node' and return it.
+
+        Args:
+            connection_list (list[Connection]): List of connections.
+            node            (Node)            : Node to look for in the list.
+
+        Returns:
+            Connection: The connection that binds 'node' and another node (first found).
+
+        Raises:
+            Exception: No connection with node 'node' in the given list 'connection_list'
+
+        """
+
         for conn in connection_list:
             if conn.contains_node(node):
                 return conn
         raise Exception(
-            f"No connection with node: {node} in the given list: {connection_list}"
+            f"No connection with node {node} in the given list: {connection_list}"
         )
