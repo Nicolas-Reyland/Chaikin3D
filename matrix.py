@@ -88,9 +88,7 @@ class Plane:
         return np.sqrt(self.a ** 2 + self.b ** 2 + self.c ** 2)
 
     @staticmethod
-    def from_vectors(
-        u: np.array, v: np.array, point: np.array = (0, 0, 0)
-    ) -> Plane:
+    def from_vectors(u: np.array, v: np.array, point: np.array = (0, 0, 0)) -> Plane:
         """
         Returns the Plane defined with the two given vectors, starting from the 'point'.
 

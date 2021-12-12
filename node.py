@@ -42,7 +42,9 @@ class Node:
         # check connection validity
         if C.Connection.are_connected(self, other, "any"):
             return
-        assert type_ == "main" or type_ == "graphical", f"Invalid connection type: {type_}"
+        assert (
+            type_ == "main" or type_ == "graphical"
+        ), f"Invalid connection type: {type_}"
         # create connection
         conn = C.Connection(self, other, type_)
         # add to self
@@ -116,7 +118,9 @@ class Node:
 
         """
 
-        assert len(point) == 3, f"The number of scalar values in the vector are not 3 ({len(point)} != 3)"
+        assert (
+            len(point) == 3
+        ), f"The number of scalar values in the vector are not 3 ({len(point)} != 3)"
         return Node(point[0], point[1], point[2])
 
 

@@ -1,6 +1,7 @@
 #
 from __future__ import annotations
 from polyhedron import Polyhedron
+import numpy as np
 import os
 
 
@@ -20,8 +21,8 @@ class WaveFrontReader:
         # attributes
         self.path: str = os.path.abspath(path)
         assert os.path.isfile(self.path)
-        self.vertices: list[list[float]] = []
-        self.vertex_indices: list[list[int]] = []
+        self.vertices: list[np.array] = []
+        self.vertex_indices: list[np.array] = []
         # parse
         if parse_on_load:
             self.parse(rotate)
@@ -60,7 +61,7 @@ class WaveFrontReader:
                 (x, z, y) if rotate else (x, y, z)
             )  # needed, because there is some sort of rotatiton ?
             # assert len(raw_vert) == 3 # could be 4 bc of w ( = 1.0)
-            self.vertices.append(list(map(float, raw_vert)))
+            self.vertices.append(np.fromiter(map(float, raw_vert), dtype=np.float32))
 
         for vertex_index_str in vertex_indices_str:
             raw_vert_index = list(filter(None, vertex_index_str.split()))
@@ -68,11 +69,12 @@ class WaveFrontReader:
                 map(lambda s: int(s.split("/")[0]) - 1, raw_vert_index)
             )  # - 1 because indexes are starting at 1 in .obj files
             num_vertices = len(raw_vert_index)
-            assert num_vertices > 2, f"Number of vertices are less than two: {num_vertices} > 2" # >= 3
-            vertex_index_group = []
-            for i in range(num_vertices):
-                vertex_index_group.append(vertex_list[i])
-            self.vertex_indices.append(vertex_index_group)
+            assert (
+                num_vertices > 2
+            ), f"Number of vertices are less than two: {num_vertices} > 2"  # >= 3
+            self.vertex_indices.append(
+                np.fromiter((vertex_list[i] for i in range(num_vertices)), dtype=np.uint16)
+            )
 
     def to_polyhedron(self) -> Polyhedron:
         """

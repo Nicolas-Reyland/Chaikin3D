@@ -175,7 +175,7 @@ def draw_chaikin_evolution(renderer: Renderer, poly: Polyhedron, a: A) -> None:
         # go to next plot
         renderer.next_subplot()
         # Chaikin
-        poly = poly.Chaikin3D(poly, a.chaikin_coef, a.verbose)
+        poly = poly.Chaikin3D(a.chaikin_coef, a.verbose)
 
     renderer.draw_subplots()
 
@@ -217,7 +217,7 @@ def chaikin_animation(
             )
         )
         if gen < n:
-            poly = Polyhedron.Chaikin3D(poly, coef, verbose, FILE_MODE)
+            poly = poly.Chaikin3D(coef, verbose, FILE_MODE)
     fig = go.Figure(frames=frames)
     # add first frame
     alpha_poly_dd = renderer.get_polyhedron_draw_data(
