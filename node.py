@@ -6,6 +6,11 @@ import numpy as np
 
 
 class Node:
+    """
+    A Node is a point in space, at the corner of a mesh.
+
+    """
+
     def __init__(self, x: float, y: float, z: float):
         self.x, self.y, self.z = x, y, z
         self.num_connections: int = 0
@@ -21,7 +26,19 @@ class Node:
     def __repr__(self):
         return str(self)
 
-    def connect(self, other: Node, type_: str):
+    def connect(self, other: Node, type_: str) -> None:
+        """
+        Connect this Node with the 'other' node.
+
+        Args:
+            other (Node): Node to connect with.
+            type_  (str): Type of the connection.
+
+        Raises:
+            AssertionError: Invalid connection type.
+
+        """
+
         # check connection validity
         if C.Connection.are_connected(self, other, "any"):
             return
@@ -35,12 +52,38 @@ class Node:
         other.connection_list.append(conn)
         other.num_connections += 1
 
-    def get_connections_by_type(self, type_: str):
+    def get_connections_by_type(self, type_: str) -> list[Connection]:
+        """
+        Returns the connection list of this Node, filtered by type.
+
+        If the type_ is "any", return all the connections of this Node.
+
+        Args:
+            type_ (str): Type of connection.
+
+        Returns:
+            list[Connection]: List of connections that have the specified type.
+
+        """
+
         if type_ == "any":
             return self.connection_list
         return list(filter(lambda conn: conn.type_ == type_, self.connection_list))
 
-    def get_triangles(self, type_: str = "any") -> VirtualSet:
+    def get_triangles(self, type_: str = "any") -> VirtualSet[Triangle]:
+        """
+        Returns the set of triangles that this Node is part of.
+
+        Args:
+            type_ (str): Type of the connections that should form the triangles.
+
+        Returns:
+            VirtualSet[Triangle]:
+                VirtualSet of triangles that this Node is part of.
+                The triangles are made of connections with type 'type_'.
+
+        """
+
         triangles = VirtualSet()
         for conn in self.get_connections_by_type(type_):
             # find the other, "partner", node in the connection
@@ -57,30 +100,32 @@ class Node:
                     )
         return triangles
 
-    def get_node_triplets(self, type_: str = "any") -> list[list[Node]]:
-        triangles = []
-        for conn in self.get_connections_by_type(type_):
-            # find the other, "partner", node in the connection
-            conn_node = conn.get_partner_node(self)
-            # find triangular connection_list
-            for sub_conn in filter(
-                lambda sub_conn: not sub_conn.contains_node(self),
-                conn_node.get_connections_by_type(type_),
-            ):
-                sub_conn_node = sub_conn.get_partner_node(conn_node)
-                if C.Connection.are_connected(sub_conn_node, self, type_):
-                    triangles.append(
-                        [self, conn_node, sub_conn_node]  #! CHANGE TO SET ?
-                    )
-        return triangles
-
     @staticmethod
-    def from_point(point: list[float]) -> Node:
-        assert len(point) == 3
+    def from_point(point: np.array) -> Node:
+        """
+        Return the Node at 'point'.
+
+        Args:
+            point (np.array): Point in space.
+
+        Returns:
+            Node: Node instance.
+
+        Raises:
+            AssertionError: The number of scalar values in the vector are not 3
+
+        """
+
+        assert len(point) == 3, f"The number of scalar values in the vector are not 3 ({len(point)} != 3)"
         return Node(point[0], point[1], point[2])
 
 
 class Triangle:
+    """
+    Triangle/Face class. Formed by three Node coordinates.
+
+    """
+
     def __init__(self, A: np.array[float], B: np.array[float], C: np.array[float]):
         self.data = [A.tolist(), B.tolist(), C.tolist()]
 
