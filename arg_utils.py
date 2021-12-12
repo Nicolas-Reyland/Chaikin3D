@@ -159,7 +159,6 @@ def read_args(arg_parser: ArgumentParser) -> dict[str, str | bool]:
             args[key] = parse_bool_expr(args[key])
 
     # polyhedron
-    print(args)
     read_arg("input")
     read_arg("evaluate")
     read_arg("rotate mesh", True)
