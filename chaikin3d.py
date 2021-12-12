@@ -24,9 +24,10 @@ def main():
 
     # evaluate
     if a.evaluate:
+        raise NotImplementedError("You should not use this option. It has been disabled.")
         # evaluate the code
         compiled_evaluation_string = compile(
-            a.evaluate, "evaluation_string", mode="single"
+            a.evaluate, "evaluation_string", mode="exec"
         )
         exec(compiled_evaluation_string)
         del compiled_evaluation_string
