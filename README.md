@@ -172,7 +172,7 @@ Graphical options let you choose how you want to plot your mesh. You can customi
 
  * ```-p```/```--plot```
  * ```-a```/```--alpha```
- * ```-r```/```--renderer``` (DO NOT USE)
+ * ```-r```/```--renderer```
  * ```-sn```/```--show-nodes```
  * ```-smc```/```--show-main-connections```
  * ```-sgc```/```--show-graphical-connections```
@@ -195,7 +195,7 @@ The default value is "simple"
 
 The ```-a```/```--alpha``` switch allows you to change the alpha/opacity value (ranging from 0.0 to 1.0) of the faces in the "simple", "evolution" and "animation" plots (every plot except the "full" plot <- there are already alpha changes). Default value: 0.8
 
-You should not mess with the ```-r```option, but it exists (even I don't mess with -> the mpl renderer is BROKEN). Default value: "plotly"
+You should not mess with the ```-r```option, but it exists. The mpl renderer is not really made for big meshes. You shoud really use the plotly (default) renderer. Default value: "plotly"
 
 You can dis/en-able the rendering of nodes with the ```-sn```/```--show-nodes``` option. Default value: "true"
 
