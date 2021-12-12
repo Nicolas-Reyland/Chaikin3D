@@ -33,9 +33,9 @@ def draw_full(renderer: Renderer, poly: Polyhedron, a: A) -> None:
     They are drawn left to right, top to bottom.
 
     Args:
-        renderer (Renderer): renderer for the mesh
-        poly   (Polyhedron): polyhedron (mesh) to draw
-        a               (A): this variable contains all the cmd-line arguments
+        renderer (Renderer)  : renderer for the mesh
+        poly     (Polyhedron): polyhedron (mesh) to draw
+        a        (A)         : this variable contains all the cmd-line arguments
 
     """
 
@@ -119,9 +119,9 @@ def draw_chaikin_evolution(renderer: Renderer, poly: Polyhedron, a: A) -> None:
     end at generation 5.
 
     Args:
-        renderer   (Renderer): renderer for the mesh
+        renderer (Renderer)  : renderer for the mesh
         poly     (Polyhedron): polyhedron (mesh) to draw
-        a                 (A): this variable contains all the cmd-line arguments
+        a        (A)         : this variable contains all the cmd-line arguments
 
     Raises:
         AssertionError: Invalid number of Chaikin generations

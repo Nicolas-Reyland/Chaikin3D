@@ -56,18 +56,16 @@ class Connection:
 
     def update_node(self, old_partner: N.Node, new_partner: N.Node) -> None:
         """
-        A short description.
+        The 'old_partner' becomes the 'new_partner' in this Connection.
 
-        A bit longer description.
+        If A (resp. B) is 'old_partner', A (resp. B) will become 'new_partner'.
 
         Args:
-            variable (type): description
-
-        Returns:
-            type: description
+            old_partner (Node): Node existing in this connection.
+            new_partner (Node): Node that will be part of this connection.
 
         Raises:
-            Exception: description
+            AssertionError: The 'old_partner' is not part of this Connection.
 
         """
 
@@ -81,6 +79,22 @@ class Connection:
     def connection_list_contains_node(
         connection_list: list[Connection], node: N.Node, type_: str = "main"
     ) -> bool:
+        """
+        The given list of connections contains (A or B) the given node.
+
+        The by-connection-type-filtered list of connections does contains, should
+        it be the A-Node or B-Node, ths given Node 'node'.
+
+        Args:
+            connection_list (list[Connection]): List of connections to look through.
+            node            (Node)            : The node to look for.
+            type_           (str)             : The type of connections to look into.
+
+        Returns:
+            bool: The given list of connections contains (A or B) the given node.
+
+        """
+
         if type_ == "any":
             return any([conn.A == node or conn.B == node for conn in connection_list])
         return any(

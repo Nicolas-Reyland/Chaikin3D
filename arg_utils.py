@@ -117,17 +117,19 @@ def gen_arg_parser() -> ArgumentParser:
     return parser
 
 
-def read_args(arg_parser: ArgumentParser) -> dict[str, str]:
+def read_args(arg_parser: ArgumentParser) -> dict[str, str | bool]:
     """
-    A short description.
-
-    A bit longer description.
+    Read and parse the command-line arguments.
 
     Args:
-        variable (type): description
+        arg_parser (ArgumentParser): Argument parser.
 
     Returns:
-        type: description
+        A:
+            Instance of class 'A', created inside this function.
+            You can access the elements of this class by variable name or by using
+            bracket notation (value = a["key"]).
+            The keys are the command line arguments (spaces are used instead of '-'/'_').
 
     Raises:
         ArgumentError: The specified option is not compatible with the '-t'/'--test' option

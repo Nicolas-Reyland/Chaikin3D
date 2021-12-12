@@ -143,8 +143,8 @@ class Group:
         that the smallest amount of connections is created.
 
         Args:
-            connection_type (str): Connection type: "main" or "graphical".
-            order_first    (bool): Call the 'order' method first ?
+            connection_type (str) : Connection type: "main" or "graphical".
+            order_first     (bool): Call the 'order' method first ?
 
         Raises:
             AssertionError: The Group is NOT ordered (maybe set 'order_first' to True).
