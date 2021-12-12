@@ -2,6 +2,7 @@
 from __future__ import annotations
 import connection as C
 from dataholders import VirtualSet
+import numpy as np
 
 
 class Node:
@@ -9,7 +10,7 @@ class Node:
         self.x, self.y, self.z = x, y, z
         self.num_connections: int = 0
         self.connection_list: list[C.Connection] = []
-        self.coords = [self.x, self.y, self.z]
+        self.coords = np.array([self.x, self.y, self.z])
 
     def __eq__(self, other: Node) -> bool:
         return self.x == other.x and self.y == other.y and self.z == other.z
@@ -24,7 +25,7 @@ class Node:
         # check connection validity
         if C.Connection.are_connected(self, other, "any"):
             return
-        assert type_ == "main" or type_ == "graphical"
+        assert type_ == "main" or type_ == "graphical", f"Invalid connection type: {type_}"
         # create connection
         conn = C.Connection(self, other, type_)
         # add to self
@@ -80,8 +81,8 @@ class Node:
 
 
 class Triangle:
-    def __init__(self, A: list[float], B: list[float], C: list[float]):
-        self.data = [A, B, C]
+    def __init__(self, A: np.array[float], B: np.array[float], C: np.array[float]):
+        self.data = [A.tolist(), B.tolist(), C.tolist()]
 
     def __str__(self) -> str:
         return (

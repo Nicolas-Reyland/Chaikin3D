@@ -3,6 +3,7 @@ from __future__ import annotations
 import node as N
 import connection as C
 import matrix
+import numpy as np
 import sys, time
 from chaikin_groups import Group
 from dataholders import VirtualDict, VirtualSet
@@ -160,7 +161,9 @@ class Polyhedron:
                     # print('\n - partner', partner_node)
 
                     # calculate new pos (calculations done from num_connections to current node)
-                    u = matrix.vector.vector(partner_node.coords, current_node.coords)
+                    u = matrix.vector_from_points(
+                        partner_node.coords, current_node.coords
+                    )
                     # get the right coefficient
                     if (
                         partner_node not in polyhedron.nodes
@@ -170,8 +173,8 @@ class Polyhedron:
                     else:
                         ratio = base_ratio
                     # new vector
-                    v: list[float] = matrix.vector.multiplication_k(u, ratio)
-                    w = matrix.vector.add(partner_node.coords, v)
+                    v: list[float] = u * ratio
+                    w = partner_node.coords + v
 
                     # create new N.Node & new Connection
                     sub_node = N.Node.from_point(w)
@@ -226,7 +229,7 @@ class Polyhedron:
         # errors that come with floating-point number precisions etc.
 
         # Methodology:
-		# Foreach group of old_groups :
+        # Foreach group of old_groups :
         # 	Foreach couple of nodes in this group :
         # 		search their equivalent new nodes :
         # 			- based on distance :
@@ -236,7 +239,7 @@ class Polyhedron:
         # 					------------------------------------------
         # 					-----oA--B---------------------F---oE---I-
         # 					-D-------------------------------K--------
-        #	 				--------------------------------------J---
+        # 	 				--------------------------------------J---
         # 				old nodes : oA and oE (old A & old E)
         # 				new nodes that should be chosen for connection: B & F
         # 					because :
@@ -276,11 +279,14 @@ class Polyhedron:
                 partner_old_node_corresp_new_nodes = node_virt_dict[partner_old_node]
                 # find the two nodes that are the closest to the 'other' old node
                 # for the 'current_old_node_corresp_new_nodes' :
-                min_dist_to_other_node: float = matrix.inf
+                min_dist_to_other_node: float = np.inf
                 closest_new_node_1: N.Node = None
                 for new_node in current_old_node_corresp_new_nodes:
                     # calculate distance to partner_old_node (this new node is sourcing from current_old_node)
-                    dist_to_other_node: float = matrix.distance3d(new_node.coords, partner_old_node.coords)
+                    # dist(a - b) == dist(b - a)
+                    dist_to_other_node: float = np.linalg.norm(
+                        new_node.coords - partner_old_node.coords
+                    )
                     # new node is closer than previously found nodes
                     if dist_to_other_node < min_dist_to_other_node:
                         # update distance
@@ -288,11 +294,13 @@ class Polyhedron:
                         # update closest node
                         closest_new_node_1 = new_node
                 # for the 'current_old_node_corresp_new_nodes' :
-                min_dist_to_other_node: float = matrix.inf
+                min_dist_to_other_node: float = np.inf
                 closest_new_node_2: N.Node = None
                 for new_node in partner_old_node_corresp_new_nodes:
                     # calculate distance to current_old_node (this new node is sourcing from partner_old_node)
-                    dist_to_other_node: float = matrix.distance3d(new_node.coords, current_old_node.coords)
+                    dist_to_other_node: float = np.linalg.norm(
+                        new_node.coords - current_old_node.coords
+                    )
                     # new node is closer than previously found nodes
                     if dist_to_other_node < min_dist_to_other_node:
                         # update distance
@@ -437,4 +445,6 @@ class Polyhedron:
                     local_group_set_list.append(group)
 
         return local_group_set_list
+
+
 #

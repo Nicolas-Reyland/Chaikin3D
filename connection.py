@@ -16,17 +16,61 @@ class Connection:
         return f"A: {self.A} -> B: {self.B} type: {self.type_}"
 
     def contains_node(self, node: N.Node) -> bool:
+        """
+        Is the node 'node' part of this connection ?
+
+        Args:
+            node (Node): Node which can be part of this connection.
+
+        Returns:
+            bool: The node is part of this connection.
+
+        """
+
         return self.A == node or self.B == node
 
     def get_partner_node(self, node: N.Node) -> N.Node:
-        """return the other node (different from 'node') in the [self.A, self.B] list"""
+        """
+        Return the partner node.
+
+        A Connection being made of two nodes, return the node that is NOT 'node'.
+
+        Args:
+            node (Node): Node we know of (we don't want this one back).
+
+        Returns:
+            Node: The partner node.
+
+        Raises:
+            AssertionError: The node 'node' is not part of this connection
+
+        """
+
+        # partner is B
         if self.A == node:
             assert self.B != node
             return self.B
+        # partner is A
         assert self.B == node
         return self.A
 
     def update_node(self, old_partner: N.Node, new_partner: N.Node) -> None:
+        """
+        A short description.
+
+        A bit longer description.
+
+        Args:
+            variable (type): description
+
+        Returns:
+            type: description
+
+        Raises:
+            Exception: description
+
+        """
+
         if self.A == old_partner:
             self.A = new_partner
         else:

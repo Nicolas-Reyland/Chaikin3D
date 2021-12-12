@@ -1,5 +1,6 @@
 # Chaikin3D - Groups module
 from __future__ import annotations
+from collections.abc import Iterable
 import connection as C
 import node as N
 from dataholders import VirtualSet
@@ -7,7 +8,24 @@ import numpy, matrix
 
 
 class Group:
-    def __init__(self, iterable, do_order: bool = False):
+    """
+    A Chaikin Group is a collection of nodes that make up a face in a mesh.
+
+    A Chaikin Group is a collection of nodes that make up a face in a polyhedron.
+    All the nodes in a group share the same 2D plane. When ordered in a circle-like
+    list, the group is called an Ordered Group (OGroup). When applying the Chaikin3D
+    algorithm to a mesh, new Groups appear. Each node of the the mesh is the
+    source of one new Group in the final mesh. All existing Groups see their size
+    (number of nodes) double. When a node gives birth to a Chaikin Group, its size
+    is equal to the number of (main-)connections of that node (at least 3).
+
+    Once ordered, a the graphical connections can easily be made (see 'inter_connect').
+    To order a group, once must be sure of having added all the nodes that correspond
+    to the specific face.
+
+    """
+
+    def __init__(self, iterable: Iterable, do_order: bool = False):
         self.group: VirtualSet[N.Node] = VirtualSet(iterable)
         self.ogroup = None
         self.ordered = False
@@ -36,6 +54,25 @@ class Group:
         return self.group[index]
 
     def order(self, force: bool = False) -> None:
+        """
+        Order a Group.
+
+        Order a Group based on node inter-connectivity. We start be taking a
+        node (any node), and looking for nodes in this Group in its main connections.
+        Once such a node/connection is found, we can propagate to this node, until
+        we meet the starting node.
+        Sets the 'ordered' attribtue to True.
+
+        Args:
+            force (bool):
+                force the ordering algorithm, even tho the 'ordered'
+                attribute is set to True.
+
+        Raises:
+            Exception: Broken Group (the nodes do not form a face).
+
+        """
+
         if not force and self.ordered:
             return
         # trivial case
@@ -66,17 +103,32 @@ class Group:
                 _debug_print_full_nodes(self.group)
                 # raise Exception('broken group')
                 print(
-                    "Warning: broken group found. attaching remaning nodes: {}".format(
-                        len(group_list)
-                    )
+                    f"Warning: broken group found. attaching remaning nodes: {len(group_list)}"
                 )
                 self.ogroup.extend(group_list)
-                break
+                raise Exception("Broken group (see stdout for more info)")
 
         self.ordered = True
 
     def cycle_connect(self, connection_type: str = "main") -> None:
-        assert not self.ordered
+        """
+        Connect the nodes the Group in a circular manner.
+
+        The Group must an OGroup (ordered Group). Because of this, we can simply
+        navigate through the ordered list of nodes (which is ordered by
+        node-connections) and connect the nodes with their neighbours in the
+        OGroup.
+
+        Args:
+            connection_type (str): Connection type: "main" or "graphical".
+
+        Raises:
+            AssertionError: The Group is NOT ordered (call 'order' first).
+
+        """
+
+        assert not self.ordered, f"Group is not ordered: {self}"
+
         for i in range(self.size - 1):
             self.group[i].connect(self.group[i + 1], connection_type)
         self.group[-1].connect(self.group[0], connection_type)
@@ -84,6 +136,21 @@ class Group:
     def inter_connect(
         self, connection_type: str = "graphical", order_first: bool = False
     ) -> None:
+        """
+        Create the required graphical connections between the nodes.
+
+        Create the required graphical connections between the nodes in a way
+        that the smallest amount of connections is created.
+
+        Args:
+            connection_type (str): Connection type: "main" or "graphical".
+            order_first    (bool): Call the 'order' method first ?
+
+        Raises:
+            AssertionError: The Group is NOT ordered (maybe set 'order_first' to True).
+
+        """
+
         if order_first:
             self.order(True)
         assert self.ordered
@@ -118,5 +185,6 @@ def _debug_print_full_nodes(nodes, num_tabs=0):
     for node in nodes:
         _debug_print_full_node(node, num_tabs + 1)
         print()
+
 
 #
