@@ -1,23 +1,38 @@
 # Polyhedron rendering
 from __future__ import annotations
+
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 from polyhedron import Polyhedron
+import random
 
 DO_CHAIKIN = True
 
 
-def gen_random_color():
-    s = "#"
-    import random
+def gen_random_color() -> str:
+    """
+    A short description.
+
+    A bit longer description.
+
+    Args:
+        variable (type): description
+
+    Returns:
+        str: Random color in the form of "#??????".
+
+    """
 
     choices = "0123456789abcdef"
-    for _ in range(6):
-        s += random.choice(choices)
-    return s
+    return "#" + "".join(random.choice(choices) for _ in range(6))
 
 
 class Renderer:
+    """
+    Renderer for meshes.
+
+    """
+
     def __init__(self, *args, **kwargs):
         self.args = args
         self.kwargs = kwargs
@@ -29,7 +44,15 @@ class Renderer:
         self.subplot_col_index = 0
         self.subplot_col_limit = 0
 
-    def draw(self, data: list):
+    def draw(self, data: list) -> None:
+        """
+        Draw the data.
+
+        Args:
+            data (list): Data to draw.
+
+        """
+
         fig = go.Figure(
             data, *self.args, **self.kwargs
         )  # , layout = go.Layout(scene=dict(aspectratio=dict(x=1,y=1,z=1))), *self.args, **self.kwargs)
