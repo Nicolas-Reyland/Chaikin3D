@@ -179,7 +179,7 @@ class Renderer:
     ) -> None:
         self.draw(data=self.get_polyhedron_draw_data(polyhedron, alpha, draw_text))
 
-    def get_connections_draw_data(
+    def get_edges_draw_data(
         self,
         polyhedron: Polyhedron,
         type_: str = "any",
@@ -188,8 +188,8 @@ class Renderer:
         width: int = 2,
     ) -> list[go.Scatter3d]:
         figure_data: list[go.Scatter3d] = []
-        for connection in polyhedron.get_connections(type_):
-            A, B = connection.A.coords, connection.B.coords
+        for edge in polyhedron.get_edges(type_):
+            A, B = edge.A.coords, edge.B.coords
             figure_data.append(
                 go.Scatter3d(
                     x=[A[0], B[0]],
@@ -212,11 +212,11 @@ class Renderer:
             )
         return figure_data
 
-    def draw_connections(
+    def draw_edges(
         self,
         polyhedron: Polyhedron,
         type_: str = "any",
         color: str = "lightblue",
         width: int = 2,
     ) -> None:
-        self.draw(data=self.get_connections_draw_data(polyhedron, type_, color, width))
+        self.draw(data=self.get_edges_draw_data(polyhedron, type_, color, width))

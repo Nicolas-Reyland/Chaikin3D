@@ -1,7 +1,7 @@
 # Chaikin3D - Groups module
 from __future__ import annotations
 from collections.abc import Iterable
-import connection as C
+import edge as C
 import node as N
 from dataholders import VirtualSet
 import numpy, matrix
@@ -17,9 +17,9 @@ class Group:
     algorithm to a mesh, new Groups appear. Each node of the the mesh is the
     source of one new Group in the final mesh. All existing Groups see their size
     (number of nodes) double. When a node gives birth to a Chaikin Group, its size
-    is equal to the number of (main-)connections of that node (at least 3).
+    is equal to the number of (main-)edges of that node (at least 3).
 
-    Once ordered, a the graphical connections can easily be made (see 'inter_connect').
+    Once ordered, a the graphical edges can easily be made (see 'inter_connect').
     To order a group, once must be sure of having added all the nodes that correspond
     to the specific face.
 
@@ -58,8 +58,8 @@ class Group:
         Order a Group.
 
         Order a Group based on node inter-connectivity. We start be taking a
-        node (any node), and looking for nodes in this Group in its main connections.
-        Once such a node/connection is found, we can propagate to this node, until
+        node (any node), and looking for nodes in this Group in its main edges.
+        Once such a node/edge is found, we can propagate to this node, until
         we meet the starting node.
         Sets the 'ordered' attribtue to True.
 
@@ -87,7 +87,7 @@ class Group:
         # connect the next ones (don't care if we go 'left' or 'right')
         while group_list:
             for remaining_node in group_list:
-                if C.Connection.are_connected(current_node, remaining_node, "main"):
+                if C.Edge.are_connected(current_node, remaining_node, "main"):
                     self.ogroup.append(remaining_node)
                     group_list.remove(remaining_node)
                     current_node = remaining_node
@@ -110,17 +110,17 @@ class Group:
 
         self.ordered = True
 
-    def cycle_connect(self, connection_type: str = "main") -> None:
+    def cycle_connect(self, edge_type: str = "main") -> None:
         """
         Connect the nodes the Group in a circular manner.
 
         The Group must an OGroup (ordered Group). Because of this, we can simply
         navigate through the ordered list of nodes (which is ordered by
-        node-connections) and connect the nodes with their neighbours in the
+        node-edges) and connect the nodes with their neighbours in the
         OGroup.
 
         Args:
-            connection_type (str): Connection type: "main" or "graphical".
+            edge_type (str): Edge type: "main" or "graphical".
 
         Raises:
             AssertionError: The Group is NOT ordered (call 'order' first).
@@ -130,20 +130,20 @@ class Group:
         assert not self.ordered, f"Group is not ordered: {self}"
 
         for i in range(self.size - 1):
-            self.group[i].connect(self.group[i + 1], connection_type)
-        self.group[-1].connect(self.group[0], connection_type)
+            self.group[i].connect(self.group[i + 1], edge_type)
+        self.group[-1].connect(self.group[0], edge_type)
 
     def inter_connect(
-        self, connection_type: str = "graphical", order_first: bool = False
+        self, edge_type: str = "graphical", order_first: bool = False
     ) -> None:
         """
-        Create the required graphical connections between the nodes.
+        Create the required graphical edges between the nodes.
 
-        Create the required graphical connections between the nodes in a way
-        that the smallest amount of connections is created.
+        Create the required graphical edges between the nodes in a way
+        that the smallest amount of edges is created.
 
         Args:
-            connection_type (str) : Connection type: "main" or "graphical".
+            edge_type (str) : Edge type: "main" or "graphical".
             order_first     (bool): Call the 'order' method first ?
 
         Raises:
@@ -162,20 +162,20 @@ class Group:
             prev_node = self.ogroup[0]
             for i in range(step, self.size, step):
                 current_node = self.ogroup[i]
-                prev_node.connect(current_node, connection_type)
+                prev_node.connect(current_node, edge_type)
                 prev_node = current_node
             # connect last one to first one
-            self.ogroup[0].connect(prev_node, connection_type)
+            self.ogroup[0].connect(prev_node, edge_type)
 
 
 def _debug_print_full_node(node, num_tabs=0):
     prefix = "\t" * num_tabs
     print(f"{prefix}{str(node)}:")
     print(f"{prefix} main :")
-    for conn in node.get_connections_by_type("main"):
+    for conn in node.get_edges_by_type("main"):
         print(f"{prefix}\t - {str(conn)}")
     print(f"{prefix} graphical :")
-    for conn in node.get_connections_by_type("graphical"):
+    for conn in node.get_edges_by_type("graphical"):
         print(f"{prefix}\t - {str(conn)}")
 
 

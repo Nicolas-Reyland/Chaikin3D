@@ -8,27 +8,27 @@ def draw_full(renderer: Renderer, poly: Polyhedron, a: A) -> None:
 
     Draw nine representations of the same mesh. Their attributes are as follows (in order) :
      * (1, 1)
-       - main connections
+       - main edges
      * (1, 2)
-       - graphical connections
+       - graphical edges
      * (1, 3)
-       - main connections
-       - graphical connections
+       - main edges
+       - graphical edges
      * (2, 1)
-       - main connections
+       - main edges
        - only main faces (translucent)
      * (2, 2)
-       - graphical connections
+       - graphical edges
        - only graphical faces (translucent)
      * (2, 3)
        - all faces (solid)
      * (3, 1)
        - all faces (translucent)
      * (3, 2)
-       - main connections
+       - main edges
        - all faces (translucent)
      * (3, 3)
-       - all connections
+       - all edges
        - all faces (translucent)
     They are drawn left to right, top to bottom.
 
@@ -39,13 +39,13 @@ def draw_full(renderer: Renderer, poly: Polyhedron, a: A) -> None:
 
     """
 
-    main_conn_dd = renderer.get_connections_draw_data(
-        poly, type_="main", line_color=a.main_connection_color, node_color=a.node_color
+    main_conn_dd = renderer.get_edges_draw_data(
+        poly, type_="main", line_color=a.main_edge_color, node_color=a.node_color
     )
-    graphical_conn_dd = renderer.get_connections_draw_data(
+    graphical_conn_dd = renderer.get_edges_draw_data(
         poly,
         type_="graphical",
-        line_color=a.graphical_connection_color,
+        line_color=a.graphical_edge_color,
         node_color=a.node_color,
     )
     main_poly_dd = renderer.get_polyhedron_draw_data(
@@ -60,21 +60,21 @@ def draw_full(renderer: Renderer, poly: Polyhedron, a: A) -> None:
     solid_poly_dd = renderer.get_polyhedron_draw_data(
         poly, alpha=1, color=a.polygon_color
     )
-    all_connection_dd = graphical_conn_dd + main_conn_dd
+    all_edge_dd = graphical_conn_dd + main_conn_dd
 
     renderer.init_subplots(
         3,
         3,
         subplot_titles=[
-            "Main connections",
-            "Graphical connections",
-            "All connections",
-            "Faces using main connections",
-            "Faces using graphical connections",
+            "Main edges",
+            "Graphical edges",
+            "All edges",
+            "Faces using main edges",
+            "Faces using graphical edges",
             "All faces (solid)",
             "All faces",
-            "All faces + main connections",
-            "All faces + all connections",
+            "All faces + main edges",
+            "All faces + all edges",
         ],
     )
 
@@ -93,13 +93,13 @@ def draw_full(renderer: Renderer, poly: Polyhedron, a: A) -> None:
         renderer.add_to_subplot(sub_apoly_dd, custom_row=3, custom_col=1)
         renderer.add_to_subplot(sub_apoly_dd, custom_row=3, custom_col=2)
         renderer.add_to_subplot(sub_apoly_dd, custom_row=3, custom_col=3)
-    # draw graphical connections
+    # draw graphical edges
     for gconn_dd in graphical_conn_dd:
         renderer.add_to_subplot(gconn_dd, custom_row=1, custom_col=3)
         renderer.add_to_subplot(gconn_dd, custom_row=1, custom_col=2)
         renderer.add_to_subplot(gconn_dd, custom_row=3, custom_col=3)
         renderer.add_to_subplot(gconn_dd, custom_row=2, custom_col=2)
-    # draw main connections
+    # draw main edges
     for mconn_dd in main_conn_dd:
         renderer.add_to_subplot(mconn_dd, custom_row=1, custom_col=1)
         renderer.add_to_subplot(mconn_dd, custom_row=1, custom_col=3)
@@ -149,27 +149,27 @@ def draw_chaikin_evolution(renderer: Renderer, poly: Polyhedron, a: A) -> None:
         alpha_poly_dd = renderer.get_polyhedron_draw_data(
             poly, alpha=a.alpha, color=a.polygon_color
         )
-        if a.show_main_connections:
-            main_conn_dd = renderer.get_connections_draw_data(
+        if a.show_main_edges:
+            main_conn_dd = renderer.get_edges_draw_data(
                 poly,
                 type_="main",
-                line_color=a.main_connection_color,
+                line_color=a.main_edge_color,
                 node_color=a.node_color,
             )
-        if a.show_graphical_connections:
-            graphical_conn_dd = renderer.get_connections_draw_data(
+        if a.show_graphical_edges:
+            graphical_conn_dd = renderer.get_edges_draw_data(
                 poly,
                 type_="graphical",
-                line_color=a.graphical_connection_color,
+                line_color=a.graphical_edge_color,
                 node_color=a.node_color,
             )
         # add to subplot
         for sub_apoly_dd in alpha_poly_dd:
             renderer.add_to_subplot(sub_apoly_dd)
-        if a.show_main_connections:
+        if a.show_main_edges:
             for mconn_dd in main_conn_dd:
                 renderer.add_to_subplot(mconn_dd)
-        if a.show_graphical_connections:
+        if a.show_graphical_edges:
             for gconn_dd in graphical_conn_dd:
                 renderer.add_to_subplot(gconn_dd)
         # go to next plot
@@ -196,13 +196,13 @@ def chaikin_animation(
             poly, alpha=alpha, color=polygon_color
         )
         if smc:
-            main_conn_dd = renderer.get_connections_draw_data(
+            main_conn_dd = renderer.get_edges_draw_data(
                 poly, type_="main", line_color=main_conn_color, node_color=node_color
             )
         else:
             main_conn_dd = []
         if sgc:
-            graphical_conn_dd = renderer.get_connections_draw_data(
+            graphical_conn_dd = renderer.get_edges_draw_data(
                 poly,
                 type_="graphical",
                 line_color=graph_conn_color,
@@ -224,13 +224,13 @@ def chaikin_animation(
         poly, alpha=alpha, color=polygon_color
     )
     if smc:
-        main_conn_dd = renderer.get_connections_draw_data(
+        main_conn_dd = renderer.get_edges_draw_data(
             poly, type_="main", line_color=main_conn_color, node_color=node_color
         )
     else:
         main_conn_dd = []
     if sgc:
-        graphical_conn_dd = renderer.get_connections_draw_data(
+        graphical_conn_dd = renderer.get_edges_draw_data(
             poly, type_="graphical", line_color=graph_conn_color, node_color=node_color
         )
     else:

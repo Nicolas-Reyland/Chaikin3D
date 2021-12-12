@@ -60,20 +60,20 @@ def main():
         poly_dd = renderer.get_polyhedron_draw_data(
             poly, type_="any", alpha=a.alpha, color=a.polygon_color
         )
-        if a.show_main_connections:
-            main_conn_dd = renderer.get_connections_draw_data(
+        if a.show_main_edges:
+            main_conn_dd = renderer.get_edges_draw_data(
                 poly,
                 type_="main",
-                line_color=a.main_connection_color,
+                line_color=a.main_edge_color,
                 node_color=a.node_color,
             )
         else:
             main_conn_dd = list()
-        if a.show_graphical_connections:
-            graphical_conn_dd = renderer.get_connections_draw_data(
+        if a.show_graphical_edges:
+            graphical_conn_dd = renderer.get_edges_draw_data(
                 poly,
                 type_="graphical",
-                line_color=a.graphical_connection_color,
+                line_color=a.graphical_edge_color,
                 node_color=a.node_color,
             )
         else:

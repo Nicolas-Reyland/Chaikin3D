@@ -7,12 +7,12 @@
     "verbose": false,
     "renderer": "plotly",
     "plot": "simple",
-    "show main connections": true,
-    "show graphical connections": false,
+    "show main edges": true,
+    "show graphical edges": false,
     "alpha": 0.8,
     "polygon color": "lightblue",
     "node color": "green",
-    "main connection color": "darkred",
-    "graphical connection color": "black",
+    "main edge color": "darkred",
+    "graphical edge color": "black",
     "test": false
 }

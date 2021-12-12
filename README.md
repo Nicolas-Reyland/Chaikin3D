@@ -37,22 +37,22 @@ But normally there are ways to go around that, no worries!
 
 #### To make things clearer, look at the following examples :
 
-Here are the **main** connections of a cube:
+Here are the **main** edges of a cube:
 
-<img src="pics/cube-main-connections.png"
-     alt="Cube main connections"
+<img src="pics/cube-main-edges.png"
+     alt="Cube main edges"
      style="float: left; margin-left: 10px;" />
 
-Here are the **graphical** connections of the same cube:
+Here are the **graphical** edges of the same cube:
 
-<img src="pics/cube-graphical-connections.png"
-     alt="Cube graphical connections"
+<img src="pics/cube-graphical-edges.png"
+     alt="Cube graphical edges"
      style="float: left; margin-left: 10px;" />
 
-Here are all the connections of a cube:
+Here are all the edges of a cube:
 
-<img src="pics/cube-all-connections.png"
-     alt="Cube all connections"
+<img src="pics/cube-all-edges.png"
+     alt="Cube all edges"
      style="float: left; margin-left: 10px;" />
 
 And when you draw all this:
@@ -62,7 +62,7 @@ And when you draw all this:
      style="float: left; margin-left: 10px;" />
 
 
-For examples of what I mean with "graphical" connections, try these commands: ```python chaikin3d.py -s cube -p full -cg 0``` and ```python chaikin3d.py -s cube -p full -cg 1```. The grapchical connections are the black lines, while the main connections are the red lines.
+For examples of what I mean with "graphical" edges, try these commands: ```python chaikin3d.py -s cube -p full -cg 0``` and ```python chaikin3d.py -s cube -p full -cg 1```. The grapchical edges are the black lines, while the main edges are the red lines.
 
 
 # Usage
@@ -177,19 +177,19 @@ Graphical options let you choose how you want to plot your mesh. You can customi
  * ```-a```/```--alpha```
  * ```-r```/```--renderer```
  * ```-sn```/```--show-nodes```
- * ```-smc```/```--show-main-connections```
- * ```-sgc```/```--show-graphical-connections```
+ * ```-smc```/```--show-main-edges```
+ * ```-sgc```/```--show-graphical-edges```
  * ```-rm```/```--rotate-mesh``` (only with the ```-i``` option)
  * ```-nc```/```--node-color```
  * ```-pc```/```-polygon-color```
- * ```-mcc```/```--main-connection-color```
- * ```-gcc```/```--graphical-connection-color```
+ * ```-mcc```/```--main-edge-color```
+ * ```-gcc```/```--graphical-edge-color```
 
 ### Plot Types
 
 There are 4 types of plots (see examples below):
  * "simple" plot : this plot only draws your polyhedron to the screen
- * "full" plot : this one draws a lot of data separately: your connections (by type, etc.), your vertices and different mesh representations. Useful for understanding how things work and debugging in general
+ * "full" plot : this one draws a lot of data separately: your edges (by type, etc.), your vertices and different mesh representations. Useful for understanding how things work and debugging in general
  * "evolution" plot : the evolution plot takes into account the number of chaikin generations that you want (```-cg``` option). I will render one generation after another in a grid-format (like the "full" plot)
  * "animation" plot (DO NOT USE) : this plot should, in theory, create an animation, rendering all the chaikin generations from 0 to the value given in the ```-cg``` option
 The default value is "simple"
@@ -202,17 +202,17 @@ You should not mess with the ```-r```option, but it exists. The mpl renderer is 
 
 You can dis/en-able the rendering of nodes with the ```-sn```/```--show-nodes``` option. Default value: "true"
 
-The ```-smc``` switch allows to choose if you want to render the main connections for the "simple", "evolution" and "animation" plots. Default value: "true"
+The ```-smc``` switch allows to choose if you want to render the main edges for the "simple", "evolution" and "animation" plots. Default value: "true"
 
-The ```-sgc``` switch allows to choose if you want to render the graphical connections for the "simple", "evolution" and "animation" plots. Default value: "false"
+The ```-sgc``` switch allows to choose if you want to render the graphical edges for the "simple", "evolution" and "animation" plots. Default value: "false"
 
 Use the ```-rm```/```--rotate-mesh``` to rotate meshes that look ... rotated **on load** (therefore, you can only use this option with the ```-i```/```--input``` option).
 
-The ```-nc```, ```-pc```, ```-mcc``` and ```-gcc``` options let you customize the colors for the nodes (df. green), polygons (df. lightblue), main connections (df. darkred) and graphical connections (df. black). You can give color-names or colors with this format: *#12ab34*. The value *random* is valid and will generate a new random color for each node/polygon/main connection/graphical connection.
+The ```-nc```, ```-pc```, ```-mcc``` and ```-gcc``` options let you customize the colors for the nodes (df. green), polygons (df. lightblue), main edges (df. darkred) and graphical edges (df. black). You can give color-names or colors with this format: *#12ab34*. The value *random* is valid and will generate a new random color for each node/polygon/main edge/graphical edge.
 
 ### Examples
 
-Show a cube with no transparency at all and only (yellow) graphical connections
+Show a cube with no transparency at all and only (yellow) graphical edges
 ```
 python chaikin3d.py -i data/cube.obj -cg 3 -cc 5 -pc mediumaquamarine -smc false -sgc true -gcc yellow
 ```
@@ -295,9 +295,9 @@ python chaikin3d.py -i data/deer.obj -rm true -a 1.0
 python chaikin3d.py -i data/deer.obj -rm true -a 1.0 -smc false
 ```
 <img src="pics/simple-deer.png"
-alt="1 simple deer no main connections alpha 1"
+alt="1 simple deer no main edges alpha 1"
 style="float: left; margin-left: 10px;" width="48%;" /> <img src="pics/simple-deer-no-smc.png"
-alt="2 simple deer no main connections alpha 1"
+alt="2 simple deer no main edges alpha 1"
 style="float: right; margin-right: 10px;" width="48%;" />
 
 ```
@@ -308,9 +308,9 @@ python chaikin3d.py -i data/deer.obj -rm true -a 1.0 -smc true -cg 1 -v 1
 ```
 
 <img src="pics/simple-deer-chaikin.png"
-alt="1 simple deer no main connections alpha 1"
+alt="1 simple deer no main edges alpha 1"
 style="float: left; margin-left: 10px;" width="48%;" /> <img src="pics/simple-deer-chaikin-no-smc.png"
-alt="2 simple deer no main connections alpha 1"
+alt="2 simple deer no main edges alpha 1"
 style="float: right; margin-right: 10px;" width="48%;" />
 
 *Verbose switch (```-v true```) not mandatory. There are 25486 nodes in the last deer mesh. Loading thoses meshes should take at least a few minutes.*

@@ -71,15 +71,15 @@ def gen_arg_parser() -> ArgumentParser:
     )
     parser.add_argument(
         "-smc",
-        "--show-main-connections",
+        "--show-main-edges",
         type=str,
-        help='Show the main connections (for plots: "simple", "full" and "evolution") (df. true)',
+        help='Show the main edges (for plots: "simple", "full" and "evolution") (df. true)',
     )
     parser.add_argument(
         "-sgc",
-        "--show-graphical-connections",
+        "--show-graphical-edges",
         type=str,
-        help='Show the graphical connections (for plots: "simple", "full" and "evolution") (df. false)',
+        help='Show the graphical edges (for plots: "simple", "full" and "evolution") (df. false)',
     )
     # how to plot
     parser.add_argument(
@@ -96,15 +96,15 @@ def gen_arg_parser() -> ArgumentParser:
     )
     parser.add_argument(
         "-mcc",
-        "--main-connection-color",
+        "--main-edge-color",
         type=str,
-        help='Main connection color (df. "darkred")',
+        help='Main edge color (df. "darkred")',
     )
     parser.add_argument(
         "-gcc",
-        "--graphical-connection-color",
+        "--graphical-edge-color",
         type=str,
-        help='Graphical connection (df. "black")',
+        help='Graphical edge (df. "black")',
     )
     # other
     parser.add_argument(
@@ -169,14 +169,14 @@ def read_args(arg_parser: ArgumentParser) -> dict[str, str | bool]:
     # what to plot
     read_arg("renderer")
     read_arg("plot")
-    read_arg("show main connections", True)
-    read_arg("show graphical connections", True)
+    read_arg("show main edges", True)
+    read_arg("show graphical edges", True)
     # how to plot
     read_arg("alpha")
     read_arg("polygon color")
     read_arg("node color")
-    read_arg("main connection color")
-    read_arg("graphical connection color")
+    read_arg("main edge color")
+    read_arg("graphical edge color")
 
     # Test Mode
     read_arg("test", True)

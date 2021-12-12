@@ -1,7 +1,7 @@
 # Chaikin3D - Polyhedron module
 from __future__ import annotations
 import node as N
-import connection as C
+import edge as C
 import matrix
 import numpy as np
 import sys, time
@@ -48,25 +48,25 @@ class Polyhedron:
     def _set_recursion_limit(self):
         sys.setrecursionlimit(10 ** 6)
 
-    def get_connections(self, type_: str = "any") -> list[C.Connection]:
+    def get_edges(self, type_: str = "any") -> list[C.Edge]:
         """
-        Returns the list of connections in the polyhedron.
+        Returns the list of edges in the polyhedron.
 
         Args:
-            type_ (str): Type of the connections ("main", "graphical", "any").
+            type_ (str): Type of the edges ("main", "graphical", "any").
 
         Returns:
-            list[Connection]: List of connections in the polyhedron.
+            list[Edge]: List of edges in the polyhedron.
 
         """
 
-        connection_list = []
+        edge_list = []
         for node in self.nodes:
-            for conn in node.get_connections_by_type(type_):
-                if conn not in connection_list:
-                    connection_list.append(conn)
-        print("num connections (" + type_ + ")", len(connection_list))
-        return connection_list
+            for conn in node.get_edges_by_type(type_):
+                if conn not in edge_list:
+                    edge_list.append(conn)
+        print("num edges (" + type_ + ")", len(edge_list))
+        return edge_list
 
     @staticmethod
     def from_standard_vertex_lists(
@@ -95,9 +95,9 @@ class Polyhedron:
             node_groupe_index_list = vertex_index_list[i]
             # get the corresponding (ordered) group
             group = Group([nodes[index] for index in node_groupe_index_list])
-            # connect the main connections (circular connection)
+            # connect the main edges (circular edge)
             group.cycle_connect("main")
-            # order the group (should already be orderer tho -> else the cycle connection would fuck everything up)
+            # order the group (should already be orderer tho -> else the cycle edge would fuck everything up)
             group.order()
             # connect later
             if group.size > 3:
@@ -107,7 +107,7 @@ class Polyhedron:
 
         # connect later
         for ogroup in to_connect:
-            # connect the graphical connections
+            # connect the graphical edges
             # ogroup.order() -> order_first = True
             ogroup.inter_connect("graphical", order_first=True)
 
@@ -140,7 +140,7 @@ class Polyhedron:
         )  # when the vector has already been trunced once
         node_virt_dict: VirtualDict = VirtualDict()
         new_node_list: list[N.Node] = list()
-        new_connections: list[C.Connection] = []
+        new_edges: list[C.Edge] = []
 
         vprint("Copying polyhedron data...")
         # old_polyhedron = deepcopy(self)
@@ -166,15 +166,15 @@ class Polyhedron:
                 )
             # print('\ncurrent node:', current_node)
             # create sub-nodes
-            num_new_connections = num_graphical_nodes = 0
+            num_new_edges = num_graphical_nodes = 0
             group_set: VirtualSet = VirtualSet()
-            for conn in current_node.connection_list:
+            for conn in current_node.edge_list:
                 if conn.type_ == "main":
                     #
                     partner_node = conn.get_partner_node(current_node)
                     # print('\n - partner', partner_node)
 
-                    # calculate new pos (calculations done from num_connections to current node)
+                    # calculate new pos (calculations done from num_edges to current node)
                     u = matrix.vector_from_points(
                         partner_node.coords, current_node.coords
                     )
@@ -190,31 +190,31 @@ class Polyhedron:
                     v: list[float] = u * ratio
                     w = partner_node.coords + v
 
-                    # create new N.Node & new Connection
+                    # create new N.Node & new Edge
                     sub_node = N.Node.from_point(w)
-                    sub_conn = C.Connection(sub_node, partner_node, "main")
+                    sub_conn = C.Edge(sub_node, partner_node, "main")
 
-                    # re-connect connection to new node & vice-versa
-                    # print(' * test\n  ->', '\n  -> '.join(map(str, partner_node.connection_list)))
+                    # re-connect edge to new node & vice-versa
+                    # print(' * test\n  ->', '\n  -> '.join(map(str, partner_node.edge_list)))
                     conn.update_node(current_node, sub_node)
-                    sub_node.connection_list = [conn]
-                    sub_node.num_connections = 1
-                    # print(' * test\n  ->', '\n  -> '.join(map(str, partner_node.connection_list)))
+                    sub_node.edge_list = [conn]
+                    sub_node.num_edges = 1
+                    # print(' * test\n  ->', '\n  -> '.join(map(str, partner_node.edge_list)))
                     # print(' - sub_node:', sub_node)
-                    # print(' - sub_node connection:', ' ; '.join(map(str, sub_node.connection_list)))
+                    # print(' - sub_node edge:', ' ; '.join(map(str, sub_node.edge_list)))
 
-                    # add to list & increment num_new_connections
+                    # add to list & increment num_new_edges
                     # print(' - adding', sub_node)
                     group_set.add(sub_node)
-                    num_new_connections += 1
+                    num_new_edges += 1
                 elif conn.type_ == "graphical":
                     continue
                 else:
-                    raise Exception("Unknown connection type:", conn.type_)
-            # connect all the sub-nodes together (might find something to avoid connection-crossing -> len(group_set) > 3)
+                    raise Exception("Unknown edge type:", conn.type_)
+            # connect all the sub-nodes together (might find something to avoid edge-crossing -> len(group_set) > 3)
             # print('group set', group_set)
             group = Group(group_set)
-            # connect main connections, in a cycle-like order
+            # connect main edges, in a cycle-like order
             group.cycle_connect("main")
             # connect graphical together
             group.inter_connect("graphical", order_first=True)
@@ -233,7 +233,7 @@ class Polyhedron:
         # would get one polygon at the position of our old nodes. The
         # surfaces of our base polyhedron would be missing.
         #
-        # We are now going to add the missing graphical connections for these
+        # We are now going to add the missing graphical edges for these
         # surfaces to be drawn.
 
         # To re-construct the old surfaces, we need to find the new nodes that
@@ -255,7 +255,7 @@ class Polyhedron:
         # 					-D-------------------------------K--------
         # 	 				--------------------------------------J---
         # 				old nodes : oA and oE (old A & old E)
-        # 				new nodes that should be chosen for connection: B & F
+        # 				new nodes that should be chosen for edge: B & F
         # 					because :
         # 						eucl_dist(B, oE) < eucl_dist(*\ {B} U nE, oE) (w/ nE = new nodes, sourcing from oE)
         # 						 <=> eucl_dist(B, oE) < eucl_dist(C, oE) and eucl_dist(B, oE) < eucl_dist(D, oE)
@@ -360,29 +360,29 @@ class Polyhedron:
         num_elements = group.size
         for i in range(num_elements):
             for j in range(i + 1, num_elements):
-                if not C.Connection.are_connected(group[i], group[j], "main"):
+                if not C.Edge.are_connected(group[i], group[j], "main"):
                     return False
         return True
 
     @staticmethod
     def _find_chaikin_groups_for_node(chaikin_node: N.Node) -> list[VirtualSet]:
         chaikin_group_set_list: list[VirtualSet] = []
-        main_connections = chaikin_node.get_connections_by_type("main")
-        num_main_connections = len(main_connections)
+        main_edges = chaikin_node.get_edges_by_type("main")
+        num_main_edges = len(main_edges)
 
-        for i in range(num_main_connections):
+        for i in range(num_main_edges):
             #
-            second_node = main_connections[i].get_partner_node(chaikin_node)
-            for j in range(num_main_connections):
+            second_node = main_edges[i].get_partner_node(chaikin_node)
+            for j in range(num_main_edges):
                 if i == j:
                     continue
                 #
-                end_node = main_connections[j].get_partner_node(chaikin_node)
+                end_node = main_edges[j].get_partner_node(chaikin_node)
                 plane = matrix.Plane.from_points(
                     chaikin_node.coords, second_node.coords, end_node.coords
                 )
                 #
-                for sub_conn in second_node.get_connections_by_type("main"):
+                for sub_conn in second_node.get_edges_by_type("main"):
                     partner_node = sub_conn.get_partner_node(second_node)
                     local_group_set_list: list[
                         VirtualSet
@@ -422,7 +422,7 @@ class Polyhedron:
         """
 		else:
 			for i in range(len(current_group) - 1):
-				if not C.Connection.are_connected(current_group[i], current_group[i + 1], 'main'):
+				if not C.Edge.are_connected(current_group[i], current_group[i + 1], 'main'):
 					raise Exception('hm')
 				if i > 2:
 					if current_group[i].coords in map(lambda n: n.coords, list(current_group[:i]) + list(current_group[i+1:])):
@@ -437,7 +437,7 @@ class Polyhedron:
 
         # continue search
         local_group_set_list: list[VirtualSet] = []
-        for conn in current_node.get_connections_by_type("main"):
+        for conn in current_node.get_edges_by_type("main"):
             partner_node = conn.get_partner_node(current_node)
             # sub_local_group_set_list are the chaikin groups that go through the partner_node (long & complicated name for something very simple)
             sub_local_group_set_list = Polyhedron._rec_find_chaikin_group_with_plane(

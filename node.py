@@ -1,6 +1,6 @@
 #
 from __future__ import annotations
-import connection as C
+import edge as C
 from dataholders import VirtualSet
 import numpy as np
 
@@ -13,15 +13,15 @@ class Node:
 
     def __init__(self, x: float, y: float, z: float):
         self.x, self.y, self.z = x, y, z
-        self.num_connections: int = 0
-        self.connection_list: list[C.Connection] = []
+        self.num_edges: int = 0
+        self.edge_list: list[C.Edge] = []
         self.coords = np.array([self.x, self.y, self.z])
 
     def __eq__(self, other: Node) -> bool:
         return self.x == other.x and self.y == other.y and self.z == other.z
 
     def __str__(self) -> str:
-        return f"[({self.x:.2f},{self.y:.2f},{self.z:.2f}); num_connections = {self.num_connections}]"
+        return f"[({self.x:.2f},{self.y:.2f},{self.z:.2f}); num_edges = {self.num_edges}]"
 
     def __repr__(self):
         return str(self)
@@ -32,71 +32,71 @@ class Node:
 
         Args:
             other (Node): Node to connect with.
-            type_  (str): Type of the connection.
+            type_  (str): Type of the edge.
 
         Raises:
-            AssertionError: Invalid connection type.
+            AssertionError: Invalid edge type.
 
         """
 
-        # check connection validity
-        if C.Connection.are_connected(self, other, "any"):
+        # check edge validity
+        if C.Edge.are_connected(self, other, "any"):
             return
         assert (
             type_ == "main" or type_ == "graphical"
-        ), f"Invalid connection type: {type_}"
-        # create connection
-        conn = C.Connection(self, other, type_)
+        ), f"Invalid edge type: {type_}"
+        # create edge
+        conn = C.Edge(self, other, type_)
         # add to self
-        self.connection_list.append(conn)
-        self.num_connections += 1
+        self.edge_list.append(conn)
+        self.num_edges += 1
         # add to other
-        other.connection_list.append(conn)
-        other.num_connections += 1
+        other.edge_list.append(conn)
+        other.num_edges += 1
 
-    def get_connections_by_type(self, type_: str) -> list[Connection]:
+    def get_edges_by_type(self, type_: str) -> list[Edge]:
         """
-        Returns the connection list of this Node, filtered by type.
+        Returns the edge list of this Node, filtered by type.
 
-        If the type_ is "any", return all the connections of this Node.
+        If the type_ is "any", return all the edges of this Node.
 
         Args:
-            type_ (str): Type of connection.
+            type_ (str): Type of edge.
 
         Returns:
-            list[Connection]: List of connections that have the specified type.
+            list[Edge]: List of edges that have the specified type.
 
         """
 
         if type_ == "any":
-            return self.connection_list
-        return list(filter(lambda conn: conn.type_ == type_, self.connection_list))
+            return self.edge_list
+        return list(filter(lambda conn: conn.type_ == type_, self.edge_list))
 
     def get_triangles(self, type_: str = "any") -> VirtualSet[Triangle]:
         """
         Returns the set of triangles that this Node is part of.
 
         Args:
-            type_ (str): Type of the connections that should form the triangles.
+            type_ (str): Type of the edges that should form the triangles.
 
         Returns:
             VirtualSet[Triangle]:
                 VirtualSet of triangles that this Node is part of.
-                The triangles are made of connections with type 'type_'.
+                The triangles are made of edges with type 'type_'.
 
         """
 
         triangles = VirtualSet()
-        for conn in self.get_connections_by_type(type_):
-            # find the other, "partner", node in the connection
+        for conn in self.get_edges_by_type(type_):
+            # find the other, "partner", node in the edge
             conn_node = conn.get_partner_node(self)
-            # find triangular connection_list
+            # find triangular edge_list
             for sub_conn in filter(
                 lambda sub_conn: not sub_conn.contains_node(self),
-                conn_node.get_connections_by_type(type_),
+                conn_node.get_edges_by_type(type_),
             ):
                 sub_conn_node = sub_conn.get_partner_node(conn_node)
-                if C.Connection.are_connected(sub_conn_node, self, type_):
+                if C.Edge.are_connected(sub_conn_node, self, type_):
                     triangles.add(
                         Triangle(self.coords, conn_node.coords, sub_conn_node.coords)
                     )
