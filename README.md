@@ -328,6 +328,7 @@ style="float: right; margin-right: 10px;" width="48%;" />
 - [ ] Fix the issues that show up when applying the algorithm on A LOT of nodes.
 - [x] Ability to rotate y/z axes when loading a .obj file
 - [ ] Ability to scale up/down a single axis when plotting (e.g. data/cat.obj)
+- [ ] Support for more mesh file formats
 
 
 # Note
