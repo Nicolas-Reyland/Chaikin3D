@@ -156,13 +156,11 @@ class Polyhedron:
         # count of the nodes
         total_nodes = len(self.nodes)
         # new nodes & groups
-        vprint("Calculating new node positions for {} verticies".format(total_nodes))
+        vprint(f"Calculating new node positions for {total_nodes} verticies")
         for node_index, current_node in enumerate(self.nodes):
             if verbose and node_index % VERBOSE_STEP == 0:
                 print(
-                    "[{}/{}] calculated ({:.2f}%)".format(
-                        node_index, total_nodes, 100 * node_index / total_nodes
-                    )
+                    f"[{node_index}/{total_nodes}] calculated ({100 * node_index / total_nodes:.2f}%)"
                 )
             # print('\ncurrent node:', current_node)
             # create sub-nodes
@@ -210,7 +208,7 @@ class Polyhedron:
                 elif conn.type_ == "graphical":
                     continue
                 else:
-                    raise Exception("Unknown edge type:", conn.type_)
+                    raise Exception(f"Unknown edge type: {conn.type_}")
             # connect all the sub-nodes together (might find something to avoid edge-crossing -> len(group_set) > 3)
             # print('group set', group_set)
             group = Group(group_set)
@@ -337,7 +335,7 @@ class Polyhedron:
             new_group_set.add(new_group)
 
         num_new_groups = len(new_group_set)
-        vprint("Connecting the surface groups ({})".format(num_new_groups))
+        vprint(f"Connecting the surface groups ({num_new_groups})")
         for i, group in enumerate(new_group_set):
             if verbose and i % VERBOSE_STEP == 0:
                 print(f"[{i}/{num_new_groups}] connected ({100*i/num_new_groups:.2f}%)")
@@ -348,9 +346,7 @@ class Polyhedron:
 
         # return the final polyhedron
         vprint(
-            "Chaikin 3D iteration finished {} nodes in {:.3} sec".format(
-                num_new_groups, time.perf_counter() - t1
-            )
+            f"Chaikin 3D iteration finished {num_new_groups} nodes in {time.perf_counter() - t1:.3} sec"
         )
         return Polyhedron(new_node_list, final_group_set)
 
