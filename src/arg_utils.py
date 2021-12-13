@@ -70,13 +70,13 @@ def gen_arg_parser() -> ArgumentParser:
         help='plot type ["simple", "full", "evolution", "animation"] (df. simple)',
     )
     parser.add_argument(
-        "-smc",
+        "-sme",
         "--show-main-edges",
         type=str,
         help='Show the main edges (for plots: "simple", "full" and "evolution") (df. true)',
     )
     parser.add_argument(
-        "-sgc",
+        "-sge",
         "--show-graphical-edges",
         type=str,
         help='Show the graphical edges (for plots: "simple", "full" and "evolution") (df. false)',
@@ -95,13 +95,13 @@ def gen_arg_parser() -> ArgumentParser:
         "-nc", "--node-color", type=str, help='Node color (df. "green")'
     )
     parser.add_argument(
-        "-mcc",
+        "-mec",
         "--main-edge-color",
         type=str,
         help='Main edge color (df. "darkred")',
     )
     parser.add_argument(
-        "-gcc",
+        "-gec",
         "--graphical-edge-color",
         type=str,
         help='Graphical edge (df. "black")',
