@@ -104,7 +104,8 @@ class VirtualSet:
                     if value not in self.data:
                         self.data.append(value)
                     else:
-                        print("Warning: doublon in VirtualSet initial-data iterable")
+                        # print("Warning: doublon in VirtualSet initial-data iterable")
+                        pass
         self.size = len(self.data)
 
     def __str__(self):
