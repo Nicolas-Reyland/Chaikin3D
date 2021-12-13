@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+import sys
+sys.path.insert(0, "src/")
 from polyhedron import Polyhedron
 from wavefront_reader import WaveFrontReader
 from arg_utils import gen_arg_parser, read_args
@@ -41,9 +43,10 @@ def main():
 
     # do we have a polyhedron
     if not a.input and not a.evaluate:
-        raise Exception(
-            'You have to give a polyhedron! Either through the "-i", "-e" or both options! (see README)'
+        sys.stderr.write(
+            'You have to give a polyhedron! Either through the "-i", "-e" or both options! (see README).\nSee the -h option for help.\n'
         )
+        exit(1)
 
     # do chaikin generations before any graphics ?
     if a.plot != "evolution" and a.plot != "animation":
