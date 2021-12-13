@@ -32,8 +32,12 @@ pip install -r requirements
 
 # Usage
 
-To get help, use the ```python chaikin3d.py -h``` command.
+To get help, use the ```./chaikin3d.py -h``` command.
 See the [additional info tab](#additional-info) to get info about how exactly to enter your values.
+
+⚠️ **On Windows**, working with huge polyhedrons (say more than 10k vertices) can lead unwanted behaviour such as program crashes or freezes ⚠️
+
+For the rest of this README, let's consider the following words as synonyms: _polyhedron_, _mesh_, _model_. They might not mean the same thing, but repeating _polyhedron_ 10 tousand times is not cool either.
 
 ## Loading the polyhedron
 
@@ -67,7 +71,7 @@ The loaded polyhedron object is named ```poly```. If you did not load a file, th
 
 Load a a cube, then apply the chaikin algorithm on it:
 ```
-python chaikin3d.py -i example-meshes/cube.obj -e "poly = poly.Chaikin3D()"
+python chaikin3d.py -i example-meshes/cube.obj -e "poly = poly.Chaikin3D()" # -e is deprecated, you can continue to the next section
 ```
 
 <img src="pics/simple-cube-chaikin.png"
@@ -87,7 +91,7 @@ python chaikin3d.py -e "poly = __import__('evaluations').generate_diamond(num_po
 ```
 
 
-## Chaikin Algorithm
+## Chaikin3D Algorithm
 
 ### Related Options:
 
@@ -153,10 +157,10 @@ Graphical options let you choose how you want to plot your mesh. You can customi
 ### Plot Types
 
 There are 4 types of plots (see examples below):
- * "simple" plot : this plot only draws your polyhedron to the screen
- * "full" plot : this one draws a lot of data separately: your edges (by type, etc.), your vertices and different mesh representations. Useful for understanding how things work and debugging in general
- * "evolution" plot : the evolution plot takes into account the number of _chaikin generations_ that you want (```-cg``` option). I will render one generation after another in a grid-format (like the "full" plot)
- * "animation" plot (DO NOT USE) : this plot should, in theory, create an animation, rendering all the _chaikin generations_ from 0 to the value given in the ```-cg``` option
+ * **simple** plot : this plot only draws your polyhedron to the screen
+ * **full** plot : this one draws a lot of data separately: your edges (by type, etc.), your vertices and different mesh representations. Useful for understanding how things work and debugging in general
+ * **evolution** plot : the evolution plot takes into account the number of _chaikin generations_ that you want (```-cg``` option). I will render one generation after another in a grid-format (like the "full" plot)
+ * **animation** plot (NOT DONE YET) : this plot should create an animation, rendering all the _chaikin generations_ from 0 to the value given in the ```-cg``` option
 The default value is "simple"
 
 ### How to plot (colors, etc.)
@@ -177,7 +181,7 @@ The ```-nc```, ```-pc```, ```-mec``` and ```-gec``` options let you customize th
 
 ### Examples
 
-Show a cube with no transparency at all and only (yellow) graphical edges
+Show a cube with default alpha value and only (yellow) graphical edges.
 ```
 python chaikin3d.py -i example-meshes/cube.obj -cg 3 -cc 5 -pc mediumaquamarine -smc false -sgc true -gcc yellow
 ```
@@ -193,12 +197,6 @@ style="float: left; margin-left: 10px;" width="20%;" />
 ```-t```/```--test```
 
 There is a ```-v```/```--verbose``` switch too. If you turn it on, you will get info about the chaikin algorithm progress. This might be useful for meshes with a lot of vertices or when having a lot of iterations. The default value is "false".
-
-## Additional info
-
-### Global option rule
-
-Every option takes either a **bool** (see below), **string**, **int** & **float**. There are no *standalone* options (which take no argument).
 
 
 ### Colors
@@ -248,7 +246,7 @@ python chaikin3d.py -i example-meshes/tetrahedron.obj -p full -cg 1 -cc 3
 
 ![full triangle chaikin with coeff 3](pics/full-triangle-chaikin-cc-3.png)
 
-*The "solid" statement means that the alpha value of the triangles has been set to 1.0 (no transparency)*
+*The "solid" statement means that the alpha value of the triangles has been set to 1.0 (no transparency).*
 
 
 ### Bigger meshes
