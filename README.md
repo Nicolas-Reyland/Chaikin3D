@@ -37,7 +37,7 @@ See the [additional info tab](#additional-info) to get info about how exactly to
 
 ⚠️ **On Windows**, working with huge polyhedrons (say more than 10k vertices) can lead unwanted behaviour such as program crashes or freezes ⚠️
 
-For the rest of this README, let's consider the following words as synonyms: _polyhedron_, _mesh_, _model_. They might not mean the same thing, but repeating _polyhedron_ 10 tousand times is not cool either.
+For the rest of this README, let's consider the following words as synonyms: _polyhedron_, _mesh_, _model_. They might not mean the same thing, but repeating _polyhedron_ 10 thousand times is not cool either.
 
 ## Loading the polyhedron
 
@@ -104,7 +104,7 @@ To choose the number of Chaikin generations (or iterations) you want to run on t
 
 ### Chaikin Coeffiecient
 
-You might also want to control the *Chaikin coefficient*. This is done using the ```-cc``` option. This value is used to *cut* the edges at 1/coef and (coef-1)/coef. George Chaikin chose "4" as the right coefficient. This cuts the edges into three parts: first 25%, 50%, 25% ([2D Chaikin's Corner Cutting Algorithm](https://sighack.com/post/chaikin-curves)).
+You might also want to control the *Chaikin coefficient*. This is done using the ```-cc``` option. This value is used to *cut* the edges at _1/coef_ and _(coef-1)/coef_. George Chaikin chose "4" as the right coefficient. This cuts the edges into three parts: first 25%, 50%, 25% ([2D Chaikin's Corner Cutting Algorithm](https://sighack.com/post/chaikin-curves)).
 
 ### Examples
 
