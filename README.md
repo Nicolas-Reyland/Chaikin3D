@@ -6,7 +6,7 @@ Expansion of the Chaikin Algorithm to the 3rd dimension.
 
  - [Contents](#contents)
  - [Installation](#installation)
- - [Some explanations first](#some-explanations-first)
+ - [Some explanations](#some-explanations)
  - [Usage](#usage)
  - [Examples](#examples)
  - [Todo](#todo)
@@ -27,7 +27,7 @@ Then you will need some python packages :
 pip install -r requirements
 ```
 
-# Some explanations first
+# Some explanations
 
 This project supports more "exotic" polyhedron (a polyhedron is a polygon in space/3D) types. In fact, since we are going to change the polyhedron, raw data of the vertices isn't sufficient. We need info about which edges are important, and which are not. For example, in a cube, the diagonal edges (to split the square into two triangles) are not _important_: their sole purpose is to bind two vertices together so that triangles can be drawn to the screen (will get clearer in a minute). That's why we need to distinguish *main* and *graphical* edges between our nodes (vertices).
 
