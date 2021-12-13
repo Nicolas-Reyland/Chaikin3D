@@ -2,7 +2,7 @@
 
 Expansion of the Chaikin Algorithm to (3D) polyhedrons.
 
-The idea behind this project is to expand Chaikin's corner cutting algorithm to 3d polyhedrons. Now you could argue (and you would be right) and tell me that Chaikin's algorithm is made for splines and lines, not for polygons directly. That might be true, but the algorithm implemented in this project is aimed at reproducing _the corner cutting algorithm's effect on polygons__ ... on polyhedrons. The corners should be _cut_. Sadly, this is not as easy in 3D space than it is on a 2D plane. In a polyhedron, the vertices can have a potentially infinite number of edges connected to them, whereas in a polygon on a 2D plane, a vertex would only have 2 edges connected to it.
+The idea behind this project is to expand Chaikin's corner cutting algorithm to 3d polyhedrons. Now you could argue (and you would be right) and tell me that Chaikin's algorithm is made for splines and lines, not for polygons directly. That might be true, but the algorithm implemented in this project is aimed at reproducing _the effect the corner cutting algorithm has on polygons_ ... on polyhedrons. The corners should be _cut_. Sadly, this is not as easy in 3D space than it is on a 2D plane. In a polyhedron, the vertices can have a potentially infinite number of edges connected to them, whereas in a polygon on a 2D plane, a vertex would only have 2 edges connected to it.
 
 
 # Contents
