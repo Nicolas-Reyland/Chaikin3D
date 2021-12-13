@@ -6,9 +6,9 @@ Expansion of the Chaikin Algorithm to the 3rd dimension.
 
  - [Contents](#contents)
  - [Installation](#installation)
- - [Some explanations](#some-explanations)
  - [Usage](#usage)
  - [Examples](#examples)
+ - [Some explanations](#some-explanations)
  - [Todo](#todo)
  - [Note](#note)
 
@@ -26,44 +26,6 @@ Then you will need some python packages :
 ```
 pip install -r requirements
 ```
-
-# Some explanations
-
-This project supports more "exotic" polyhedron (a polyhedron is a polygon in space/3D) types. In fact, since we are going to change the polyhedron, raw data of the vertices isn't sufficient. We need info about which edges are important, and which are not. For example, in a cube, the diagonal edges (to split the square into two triangles) are not _important_: their sole purpose is to bind two vertices together so that triangles can be drawn to the screen (will get clearer in a minute). That's why we need to distinguish *main* and *graphical* edges between our nodes (vertices).
-
-That is why the polyhedral approximation of meshes that were loaded from (typically) *.obj* files are not always as wanted. Sometimes, there is no way to know if an edge between two nodes is really a part of the mesh or if its only purpose is to form triangles (you can normally only draw triangles). There is no distinction between _main_ and _graphical_ edges between two nodes in those meshes :(
-
-But normally there are ways to go around that, no worries!
-
-#### To make things clearer, look at the following examples :
-
-Here are the **main** edges of a cube:
-
-<img src="pics/cube-main-edges.png"
-     alt="Cube main edges"
-     style="float: left; margin-left: 10px;" />
-
-Here are the **graphical** edges of the same cube:
-
-<img src="pics/cube-graphical-edges.png"
-     alt="Cube graphical edges"
-     style="float: left; margin-left: 10px;" />
-
-Here are all the edges of a cube:
-
-<img src="pics/cube-all-edges.png"
-     alt="Cube all edges"
-     style="float: left; margin-left: 10px;" />
-
-And when you draw all this:
-
-<img src="pics/simple-cube.png"
-     alt="Simple cube rendering"
-     style="float: left; margin-left: 10px;" />
-
-
-To better understand what I mean with _graphical_ edges, try these commands: ```python chaikin3d.py -s cube -p full -cg 0``` and ```python chaikin3d.py -s cube -p full -cg 1```. The _graphical_ edges are the black lines, while the _main_ edges are the red lines.
-
 
 # Usage
 
@@ -314,6 +276,44 @@ alt="2 simple deer no main edges alpha 1"
 style="float: right; margin-right: 10px;" width="48%;" />
 
 *Verbose switch (```-v true```) not mandatory. There are 25486 nodes in the last deer mesh. Loading thoses meshes should take at least a few minutes.*
+
+
+# Some explanations
+
+This project supports more "exotic" polyhedron (a polyhedron is a polygon in space/3D) types. In fact, since we are going to change the polyhedron, raw data of the vertices isn't sufficient. We need info about which edges are important, and which are not. For example, in a cube, the diagonal edges (to split the square into two triangles) are not _important_: their sole purpose is to bind two vertices together so that triangles can be drawn to the screen (will get clearer in a minute). That's why we need to distinguish *main* and *graphical* edges between our nodes (vertices).
+
+That is why the polyhedral approximation of meshes that were loaded from (typically) *.obj* files are not always as wanted. Sometimes, there is no way to know if an edge between two nodes is really a part of the mesh or if its only purpose is to form triangles (you can normally only draw triangles). There is no distinction between _main_ and _graphical_ edges between two nodes in those meshes :(
+
+But normally there are ways to go around that, no worries!
+
+#### To make things clearer, look at the following examples :
+
+Here are the **main** edges of a cube:
+
+<img src="pics/cube-main-edges.png"
+     alt="Cube main edges"
+     style="float: left; margin-left: 10px;" />
+
+Here are the **graphical** edges of the same cube:
+
+<img src="pics/cube-graphical-edges.png"
+     alt="Cube graphical edges"
+     style="float: left; margin-left: 10px;" />
+
+Here are all the edges of a cube:
+
+<img src="pics/cube-all-edges.png"
+     alt="Cube all edges"
+     style="float: left; margin-left: 10px;" />
+
+And when you draw all this:
+
+<img src="pics/simple-cube.png"
+     alt="Simple cube rendering"
+     style="float: left; margin-left: 10px;" />
+
+
+To better understand what I mean with _graphical_ edges, try these commands: ```python chaikin3d.py -s cube -p full -cg 0``` and ```python chaikin3d.py -s cube -p full -cg 1```. The _graphical_ edges are the black lines, while the _main_ edges are the red lines.
 
 
 # TODO
