@@ -146,9 +146,9 @@ Graphical options let you choose how you want to plot your mesh. You can customi
  * ```-a```/```--alpha```
  * ```-r```/```--renderer```
  * ```-sn```/```--show-nodes```
- * ```-sme```/```--show-main-edges```
+ * ```-hme```/```--hide-main-edges```
  * ```-sge```/```--show-graphical-edges```
- * ```-rm```/```--rotate-mesh``` (only with the ```-i``` option)
+ * ```-rm```/```--rotate-mesh```
  * ```-nc```/```--node-color```
  * ```-pc```/```-polygon-color```
  * ```-mec```/```--main-edge-color```
@@ -171,9 +171,9 @@ You should not mess with the ```-r```option, but it exists. The mpl renderer is 
 
 You can dis/en-able the rendering of nodes with the ```-sn```/```--show-nodes``` option. Default value: "true"
 
-The ```-sme``` switch allows to choose if you want to render the main edges for the "simple", "evolution" and "animation" plots. Default value: "true"
+The ```-hme``` disables the rendering of the main edges for the "simple", "evolution" and "animation" plots.
 
-The ```-sge``` switch allows to choose if you want to render the graphical edges for the "simple", "evolution" and "animation" plots. Default value: "false"
+The ```-sge``` enables the rendering of the graphical edges for the "simple", "evolution" and "animation" plots.
 
 Use the ```-rm```/```--rotate-mesh``` to rotate meshes that look ... rotated **on load** (therefore, you can only use this option with the ```-i```/```--input``` option).
 
@@ -183,7 +183,7 @@ The ```-nc```, ```-pc```, ```-mec``` and ```-gec``` options let you customize th
 
 Show a cube with default alpha value and only (yellow) graphical edges.
 ```
-python chaikin3d.py -i example-meshes/cube.obj -cg 3 -cc 5 -pc mediumaquamarine -smc false -sgc true -gcc yellow
+python chaikin3d.py -i example-meshes/cube.obj -cg 3 -cc 5 -pc mediumaquamarine -hmc -sgc -gcc yellow
 ```
 <img src="pics/simple-cube-chaikin-cg-3-cc-5-colors.png"
 alt="special colors chaikin cube cg 3 cc 5"
@@ -194,18 +194,14 @@ style="float: left; margin-left: 10px;" width="20%;" />
 ## Other Options
 
 ```-v```/```--verbose```
-```-t```/```--test```
+```-vv```/```--vverbose```
 
-There is a ```-v```/```--verbose``` switch too. If you turn it on, you will get info about the chaikin algorithm progress. This might be useful for meshes with a lot of vertices or when having a lot of iterations. The default value is "false".
+The `-v` *verbose* shows info about the algorithm progress in the terminal. This might be useful for meshes with a lot of vertices or when having a lot of iterations. The `-vv` *vverbose* (very verbose) helps for debugging the algorithm.
 
 
 ### Colors
 
 You can use the [CSS color code](https://www.w3.org/wiki/CSS/Properties/color/keywords) (extended colors too) to specify a color. An rgb value can be passed through the format *#rrggbb*, or any valid VSS color value.
-
-### Boolean values
-
-For boolean values, *1*, *t* and *true* (case insensitive) will mean "true". And *0*, *f*, *false* (case insensitive) will mean "false".
 
 
 # Examples
@@ -216,10 +212,10 @@ Here are some more examples of what can be done:
 ### Dogs
 
 ```
-python chaikin3d.py -i example-meshes/dog.obj -rm true -sgc true
+python chaikin3d.py -i example-meshes/dog.obj -rm -sgc
 ```
 ```
-python chaikin3d.py -i example-meshes/dog.obj -rm true -sgc true -cg 1
+python chaikin3d.py -i example-meshes/dog.obj -rm -sgc -cg 1
 ```
 
 <img src="pics/simple-dog.png"
@@ -252,10 +248,10 @@ python chaikin3d.py -i example-meshes/tetrahedron.obj -p full -cg 1 -cc 3
 ### Bigger meshes
 
 ```
-python chaikin3d.py -i example-meshes/deer.obj -rm true -a 1.0
+python chaikin3d.py -i example-meshes/deer.obj -rm -a 1.0
 ```
 ```
-python chaikin3d.py -i example-meshes/deer.obj -rm true -a 1.0 -smc false
+python chaikin3d.py -i example-meshes/deer.obj -rm -a 1.0 -hmc
 ```
 <img src="pics/simple-deer.png"
 alt="1 simple deer no main edges alpha 1"
@@ -264,10 +260,10 @@ alt="2 simple deer no main edges alpha 1"
 style="float: right; margin-right: 10px;" width="48%;" />
 
 ```
-python chaikin3d.py -i example-meshes/deer.obj -rm true -a 1.0 -smc true -cg 1 -v 1
+python chaikin3d.py -i example-meshes/deer.obj -rm -a 1.0 -cg 1 -v 1
 ```
 ```
-python chaikin3d.py -i example-meshes/deer.obj -rm true -a 1.0 -smc true -cg 1 -v 1
+python chaikin3d.py -i example-meshes/deer.obj -rm -a 1.0 -cg 1 -v 1
 ```
 
 <img src="pics/simple-deer-chaikin.png"
@@ -276,7 +272,7 @@ style="float: left; margin-left: 10px;" width="48%;" /> <img src="pics/simple-de
 alt="2 simple deer no main edges alpha 1"
 style="float: right; margin-right: 10px;" width="48%;" />
 
-*Verbose switch (```-v true```) not mandatory. There are 25486 nodes in the last deer mesh. Loading thoses meshes should take at least a few minutes.*
+*Verbose switch (`-v`) not mandatory. There are 25486 nodes in the last deer mesh. Loading thoses meshes should take at least a few minutes.*
 
 
 # Some explanations
