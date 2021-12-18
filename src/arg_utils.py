@@ -1,6 +1,5 @@
 from __future__ import annotations
 from argparse import ArgumentParser
-import json
 import os
 
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -38,80 +37,89 @@ def gen_arg_parser() -> ArgumentParser:
         "-e",
         "--evaluate",
         type=str,
-        help='python str to evaluate right after the loading phase (df. "")',
+        default=str(),
+        help='python str to evaluate right after the loading phase',
     )
     parser.add_argument(
         "-rm",
         "--rotate-mesh",
-        type=str,
-        help="Rotate the mesh when loading a file (df. false)",
+        help="Rotate the mesh when loading a file",
+        action="store_true"
     )
     # chaikin algorithm
     parser.add_argument(
         "-cg",
         "--chaikin-generations",
         type=int,
-        help="number of chaikin generations (df. 0)",
+        default=0,
+        help="number of chaikin generations",
     )
     parser.add_argument(
-        "-cc", "--chaikin-coef", type=float, help="Chaikin coefficient (df. 4)"
+        "-cc", "--chaikin-coef", type=float, default=4.0, help="Chaikin coefficient"
     )
     parser.add_argument(
-        "-v", "--verbose", type=str, help="verbose (boolean) (df. false)"
+        "-v", "--verbose", help="verbose mode", action="store_true"
+    )
+    parser.add_argument(
+        "-vv", "--vverbose", help="very-verbose", action="store_true"
     )
     # what to plot
     parser.add_argument(
-        "-r", "--renderer", type=str, help='renderer ["plotly", "mpl"] (df. plotly)'
+        "-r", "--renderer", type=str, default="plotly", help='renderer ["plotly", "mpl"]'
     )
     parser.add_argument(
         "-p",
         "--plot",
         type=str,
-        help='plot type ["simple", "full", "evolution", "animation"] (df. simple)',
+        default="simple",
+        help='plot type ["simple", "full", "evolution", "animation"]',
     )
     parser.add_argument(
-        "-sme",
-        "--show-main-edges",
-        type=str,
-        help='Show the main edges (for plots: "simple", "full" and "evolution") (df. true)',
+        "-hme",
+        "--hide-main-edges",
+        help='Hide the main edges (for plots: "simple", "full" and "evolution")',
+        action="store_true"
     )
     parser.add_argument(
         "-sge",
         "--show-graphical-edges",
-        type=str,
-        help='Show the graphical edges (for plots: "simple", "full" and "evolution") (df. false)',
+        help='Show the graphical edges (for plots: "simple", "full" and "evolution")',
+        action="store_true"
     )
     # how to plot
     parser.add_argument(
         "-a",
         "--alpha",
         type=float,
-        help="Alpha/Opacity value for mesh rendering (df. 0.8)",
+        default=0.8,
+        help="Alpha/Opacity value for mesh rendering",
     )
     parser.add_argument(
-        "-pc", "--polygon-color", type=str, help='Polygon color (df. "lightblue")'
+        "-pc", "--polygon-color", type=str, default="lightblue", help='Polygon color'
     )
     parser.add_argument(
-        "-nc", "--node-color", type=str, help='Node color (df. "green")'
+        "-nc", "--node-color", type=str, default="green", help='Node color'
     )
     parser.add_argument(
         "-mec",
         "--main-edge-color",
         type=str,
-        help='Main edge color (df. "darkred")',
+        default="darkred",
+        help='Main edge color',
     )
     parser.add_argument(
         "-gec",
         "--graphical-edge-color",
         type=str,
-        help='Graphical edge (df. "black")',
+        default="black",
+        help='Graphical edge',
     )
     # other
     parser.add_argument(
         "-t",
         "--test",
-        type=str,
-        help="Only used with '-i'. The input file should be tested for many attributes (df. false)",
+        action="store_true",
+        help="Only used with '-i'. The input file should be tested for many attributes"
     )
 
     return parser
@@ -146,47 +154,8 @@ def read_args(arg_parser: ArgumentParser) -> dict[str, str | bool]:
         )
     )
 
-    with open(os.path.join(ROOT_DIR, DEFAULT_ARGS_JSON_FILE_PATH), "r") as f:
-        default_args = json.load(f)
-
-    # - Arguments -
-    def read_arg(key: str, boolexpr: bool = False):
-        if not args[key]:
-            args[key] = default_args[key]
-        elif (
-            boolexpr
-        ):  # elif: in the default_args dict, the values are already 'pythonic' values; no need to parse
-            args[key] = parse_bool_expr(args[key])
-
-    # polyhedron
-    read_arg("input")
-    read_arg("evaluate")
-    read_arg("rotate mesh", True)
-    # chaikin
-    read_arg("chaikin generations")
-    read_arg("verbose", True)
-    read_arg("chaikin coef")
-    # what to plot
-    read_arg("renderer")
-    read_arg("plot")
-    read_arg("show main edges", True)
-    read_arg("show graphical edges", True)
-    # how to plot
-    read_arg("alpha")
-    read_arg("polygon color")
-    read_arg("node color")
-    read_arg("main edge color")
-    read_arg("graphical edge color")
-
-    # Test Mode
-    read_arg("test", True)
-    if args["test"]:
-        invalid_option = [""]
-        for invalid_option in invalid_options:
-            if args[invalid_option] is not None:
-                raise ArgumentError(
-                    f"Cannot use this option with '-t'/'--test': {invalid_option}"
-                )
+    # add 'show-main-edges' value, based on 'hide-main-edges'
+    args["show main edges"] = not args["hide main edges"]
 
     # renderer
     if args["renderer"] == "plotly":
