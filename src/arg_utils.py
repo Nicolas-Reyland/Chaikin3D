@@ -139,6 +139,14 @@ def read_args(arg_parser: ArgumentParser) -> dict[str, str | bool]:
         )
     )
 
+    # verbosity level
+    if args["vverbose"]:
+        args["verbosity"] = 2
+    elif args["verbose"]:
+        args["verbosity"] = 1
+    else:
+        args["verbosity"] = 0
+
     # add 'show-main-edges' value, based on 'hide-main-edges'
     args["show main edges"] = not args["hide main edges"]
     # manual verbosity inheritance

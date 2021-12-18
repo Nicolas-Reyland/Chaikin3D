@@ -27,13 +27,13 @@ class WaveFrontReader:
         if parse_on_load:
             self.parse(rotate)
 
-    def parse(self, rotate: bool = False, verbose: bool = False):
+    def parse(self, rotate: bool = False, verbosity: int = 0):
         """
         Parse the input file.
 
         Args:
-            rotate  (bool): Invert the y and z axes.
-            verbose (bool): Verbose mode.
+            rotate    (bool): Invert the y and z axes.
+            verbosity (bool): Verbosity level (0-2).
 
         Raises:
             AssertionError: Invalid number of vertices in a face.
@@ -50,7 +50,7 @@ class WaveFrontReader:
             elif line.startswith("f "):
                 vertex_indices_str.append(line[2:])
 
-        if verbose:
+        if verbosity:
             print("obj file -> num vertices:", len(vertices_str))
             print("obj file -> num groups:", len(vertex_indices_str))
 

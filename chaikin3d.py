@@ -21,7 +21,7 @@ def main():
     renderer = Renderer()
 
     # input file
-    reader = WaveFrontReader(a.input, True, a.rotate_mesh, a.verbose)
+    reader = WaveFrontReader(a.input, True, a.rotate_mesh, a.verbosity)
     poly = reader.to_polyhedron()
 
     # do chaikin generations before any graphics ?
@@ -31,7 +31,7 @@ def main():
         ), f"Number of generations must be positive ({a.chaikin_generations} >= 0)"
         for _ in range(a.chaikin_generations):
             print(" - 3D Chaikin -")
-            poly = poly.Chaikin3D(a.chaikin_coef, a.verbose)
+            poly = poly.Chaikin3D(a.chaikin_coef, a.verbosity)
             print("Chaikin done")
 
     # switch the plot type
