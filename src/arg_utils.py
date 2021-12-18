@@ -114,13 +114,6 @@ def gen_arg_parser() -> ArgumentParser:
         default="black",
         help='Graphical edge',
     )
-    # other
-    parser.add_argument(
-        "-t",
-        "--test",
-        action="store_true",
-        help="Only used with '-i'. The input file should be tested for many attributes"
-    )
 
     return parser
 
@@ -140,7 +133,6 @@ def read_args(arg_parser: ArgumentParser) -> dict[str, str | bool]:
             The keys are the command line arguments (spaces are used instead of '-'/'_').
 
     Raises:
-        ArgumentError: The specified option is not compatible with the '-t'/'--test' option
         ArgumentError: The specified renderer is not known
 
     """
@@ -173,27 +165,3 @@ def read_args(arg_parser: ArgumentParser) -> dict[str, str | bool]:
         | {"__getitem__": lambda self, value: args[value]},
     )
     return A()
-
-
-def parse_bool_expr(bexpr: str) -> bool:
-    """
-    Converts a string to a bool
-
-    Parses an string expression containing representing a boolean value into a real python boolean value.
-
-    Args:
-        bexpr (str): string representation of a boolean value
-
-    Returns:
-        bool: boolean value of its string representation 'bexpr'
-
-    Raises:
-        ValueError: given string is not a known/supported boolean expression
-
-    """
-
-    if bexpr.lower() in ["1", "t", "true"]:
-        return True
-    if bexpr.lower() in ["0", "f", "false"]:
-        return False
-    raise ValueError(f"Unrecognized value for supposed boolean: {bexpr}")
