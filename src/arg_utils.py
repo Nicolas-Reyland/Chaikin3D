@@ -141,6 +141,9 @@ def read_args(arg_parser: ArgumentParser) -> dict[str, str | bool]:
 
     # add 'show-main-edges' value, based on 'hide-main-edges'
     args["show main edges"] = not args["hide main edges"]
+    # manual verbosity inheritance
+    if args["vverbose"]:
+        args["verbose"] = True
 
     # renderer
     if args["renderer"] == "plotly":
