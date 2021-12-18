@@ -172,7 +172,7 @@ class VirtualSet:
 
         """
 
-        return self.data.pop(0)
+        return self.data.pop()
 
     def copy(self):
         """
