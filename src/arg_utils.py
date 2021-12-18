@@ -28,7 +28,7 @@ def gen_arg_parser() -> ArgumentParser:
     """
 
     parser = ArgumentParser(
-        description="Apply the Chaikin algorithm, expanded for the 3D space"
+        description="Apply the Chaikin algorithm, expanded to the 3D space"
     )
 
     # polyhedron
