@@ -62,9 +62,9 @@ class Polyhedron:
 
         edge_list = []
         for node in self.nodes:
-            for conn in node.get_edges_by_type(type_):
-                if conn not in edge_list:
-                    edge_list.append(conn)
+            for edge in node.get_edges_by_type(type_):
+                if edge not in edge_list:
+                    edge_list.append(edge)
         print("num edges (" + type_ + ")", len(edge_list))
         return edge_list
 
@@ -165,12 +165,12 @@ class Polyhedron:
                 )
             vvprint(f"{current_node = }")
             # create sub-nodes
-            num_new_edges = num_graphical_nodes = 0
+            num_new_edges = 0
             group_set: VirtualSet = VirtualSet()
-            for conn in current_node.edge_list:
-                vvprint(f"  {conn = }")
-                if conn.type_ == "main":
-                    partner_node = conn.get_partner_node(current_node)
+            for edge in current_node.edge_list:
+                if edge.type_ == "main":
+                    vvprint(f"  {edge = }")
+                    partner_node = edge.get_partner_node(current_node)
                     vvprint(f"    {partner_node = }")
 
                     # calculate new pos (calculations done from num_edges to current node)
@@ -191,12 +191,12 @@ class Polyhedron:
 
                     # create new N.Node & new Edge
                     sub_node = N.Node.from_point(w)
-                    sub_conn = C.Edge(sub_node, partner_node, "main")
+                    sub_edge = C.Edge(sub_node, partner_node, "main")
 
                     # re-connect edge to new node & vice-versa
                     # print(' * test\n  ->', '\n  -> '.join(map(str, partner_node.edge_list)))
-                    conn.update_node(current_node, sub_node)
-                    sub_node.edge_list = [conn]
+                    edge.update_node(current_node, sub_node)
+                    sub_node.edge_list = [edge]
                     sub_node.num_edges = 1
                     # print(' * test\n  ->', '\n  -> '.join(map(str, partner_node.edge_list)))
                     # print(' - sub_node:', sub_node)
@@ -206,12 +206,11 @@ class Polyhedron:
                     # print(' - adding', sub_node)
                     group_set.add(sub_node)
                     num_new_edges += 1
-                elif conn.type_ == "graphical":
+                elif edge.type_ == "graphical":
                     continue
                 else:
-                    raise Exception(f"Unknown edge type: {conn.type_}")
+                    raise Exception(f"Unknown edge type: {edge.type_}")
             # connect all the sub-nodes together (might find something to avoid edge-crossing -> len(group_set) > 3)
-            # print('group set', group_set)
             group = Group(group_set)
             # connect main edges, in a cycle-like order
             group.cycle_connect("main")
@@ -381,8 +380,8 @@ class Polyhedron:
                     chaikin_node.coords, second_node.coords, end_node.coords
                 )
                 #
-                for sub_conn in second_node.get_edges_by_type("main"):
-                    partner_node = sub_conn.get_partner_node(second_node)
+                for sub_edge in second_node.get_edges_by_type("main"):
+                    partner_node = sub_edge.get_partner_node(second_node)
                     local_group_set_list: list[
                         VirtualSet
                     ] = Polyhedron._rec_find_chaikin_group_with_plane(
@@ -436,8 +435,8 @@ class Polyhedron:
 
         # continue search
         local_group_set_list: list[VirtualSet] = []
-        for conn in current_node.get_edges_by_type("main"):
-            partner_node = conn.get_partner_node(current_node)
+        for edge in current_node.get_edges_by_type("main"):
+            partner_node = edge.get_partner_node(current_node)
             # sub_local_group_set_list are the chaikin groups that go through the partner_node (long & complicated name for something very simple)
             sub_local_group_set_list = Polyhedron._rec_find_chaikin_group_with_plane(
                 start_node,
