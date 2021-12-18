@@ -61,7 +61,7 @@ class Group:
         node (any node), and looking for nodes in this Group in its main edges.
         Once such a node/edge is found, we can propagate to this node, until
         we meet the starting node.
-        Sets the 'ordered' attribtue to True.
+        Sets the 'ordered' attribute to True.
 
         Args:
             force (bool):
@@ -82,15 +82,15 @@ class Group:
             return
         # initialize variables
         group_list: list[N.Node] = list(self.group)
-        current_node = group_list.pop(0)
+        current_node = group_list.pop()
         self.ogroup = [current_node]
         # connect the next ones (don't care if we go 'left' or 'right')
         while group_list:
-            for remaining_node in group_list:
+            for index,remaining_node in enumerate(group_list):
                 if C.Edge.are_connected(current_node, remaining_node, "main"):
                     self.ogroup.append(remaining_node)
-                    group_list.remove(remaining_node)
                     current_node = remaining_node
+                    group_list.pop(index)
                     break
             else:
                 print("current_node")
@@ -114,20 +114,10 @@ class Group:
         """
         Connect the nodes the Group in a circular manner.
 
-        The Group must an OGroup (ordered Group). Because of this, we can simply
-        navigate through the ordered list of nodes (which is ordered by
-        node-edges) and connect the nodes with their neighbours in the
-        OGroup.
-
         Args:
             edge_type (str): Edge type: "main" or "graphical".
 
-        Raises:
-            AssertionError: The Group is NOT ordered (call 'order' first).
-
         """
-
-        assert not self.ordered, f"Group is not ordered: {self}"
 
         for i in range(self.size - 1):
             self.group[i].connect(self.group[i + 1], edge_type)
