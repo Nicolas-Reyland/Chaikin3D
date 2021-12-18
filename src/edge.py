@@ -110,9 +110,7 @@ class Edge:
         )
 
     @staticmethod
-    def edge_list_contains_edge(
-        edge_list: list[Edge], edge: Edge
-    ) -> bool:
+    def edge_list_contains_edge(edge_list: list[Edge], edge: Edge) -> bool:
         """
         Does the list of edges contains the 'edge' ?
 
@@ -150,14 +148,10 @@ class Edge:
 
         """
 
-        return Edge.edge_list_contains_node(
-            node1.edge_list, node2, type_
-        )
+        return Edge.edge_list_contains_node(node1.edge_list, node2, type_)
 
     @staticmethod
-    def get_edge_with_node(
-        edge_list: list[Edge], node: N.Node
-    ) -> Edge:
+    def get_edge_with_node(edge_list: list[Edge], node: N.Node) -> Edge:
         """
         Find any edge that contains 'node' and return it.
 
@@ -176,6 +170,4 @@ class Edge:
         for conn in edge_list:
             if conn.contains_node(node):
                 return conn
-        raise Exception(
-            f"No edge with node {node} in the given list: {edge_list}"
-        )
+        raise Exception(f"No edge with node {node} in the given list: {edge_list}")

@@ -168,9 +168,12 @@ class Renderer:
                     x=X,
                     y=Y,
                     z=Z,
-                    colorscale=[[i/num_colorscales, gen_random_color()] for i in range(0, num_colorscales + 1)],
-                    intensity = np.linspace(0, 1, len(I), endpoint=True),
-                    intensitymode='cell',
+                    colorscale=[
+                        [i / num_colorscales, gen_random_color()]
+                        for i in range(0, num_colorscales + 1)
+                    ],
+                    intensity=np.linspace(0, 1, len(I), endpoint=True),
+                    intensitymode="cell",
                     i=I,
                     j=J,
                     k=K,

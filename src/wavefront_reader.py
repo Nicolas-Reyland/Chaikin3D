@@ -73,7 +73,9 @@ class WaveFrontReader:
                 num_vertices > 2
             ), f"Number of vertices are less than two: {num_vertices} > 2"  # >= 3
             self.vertex_indices.append(
-                np.fromiter((vertex_list[i] for i in range(num_vertices)), dtype=np.uint16)
+                np.fromiter(
+                    (vertex_list[i] for i in range(num_vertices)), dtype=np.uint16
+                )
             )
 
     def to_polyhedron(self) -> Polyhedron:

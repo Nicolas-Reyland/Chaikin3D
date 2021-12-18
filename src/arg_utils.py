@@ -32,19 +32,12 @@ def gen_arg_parser() -> ArgumentParser:
     )
 
     # polyhedron
-    parser.add_argument("-i", "--input", type=str, help="input file (df. None)")
-    parser.add_argument(
-        "-e",
-        "--evaluate",
-        type=str,
-        default=str(),
-        help='python str to evaluate right after the loading phase',
-    )
+    parser.add_argument("-i", "--input", type=str, help="input file", required=True)
     parser.add_argument(
         "-rm",
         "--rotate-mesh",
         help="Rotate the mesh when loading a file",
-        action="store_true"
+        action="store_true",
     )
     # chaikin algorithm
     parser.add_argument(
@@ -57,15 +50,15 @@ def gen_arg_parser() -> ArgumentParser:
     parser.add_argument(
         "-cc", "--chaikin-coef", type=float, default=4.0, help="Chaikin coefficient"
     )
-    parser.add_argument(
-        "-v", "--verbose", help="verbose mode", action="store_true"
-    )
-    parser.add_argument(
-        "-vv", "--vverbose", help="very-verbose", action="store_true"
-    )
+    parser.add_argument("-v", "--verbose", help="verbose mode", action="store_true")
+    parser.add_argument("-vv", "--vverbose", help="very-verbose", action="store_true")
     # what to plot
     parser.add_argument(
-        "-r", "--renderer", type=str, default="plotly", help='renderer ["plotly", "mpl"]'
+        "-r",
+        "--renderer",
+        type=str,
+        default="plotly",
+        help='renderer ["plotly", "mpl"]',
     )
     parser.add_argument(
         "-p",
@@ -78,13 +71,13 @@ def gen_arg_parser() -> ArgumentParser:
         "-hme",
         "--hide-main-edges",
         help='Hide the main edges (for plots: "simple", "full" and "evolution")',
-        action="store_true"
+        action="store_true",
     )
     parser.add_argument(
         "-sge",
         "--show-graphical-edges",
         help='Show the graphical edges (for plots: "simple", "full" and "evolution")',
-        action="store_true"
+        action="store_true",
     )
     # how to plot
     parser.add_argument(
@@ -95,24 +88,24 @@ def gen_arg_parser() -> ArgumentParser:
         help="Alpha/Opacity value for mesh rendering",
     )
     parser.add_argument(
-        "-pc", "--polygon-color", type=str, default="lightblue", help='Polygon color'
+        "-pc", "--polygon-color", type=str, default="lightblue", help="Polygon color"
     )
     parser.add_argument(
-        "-nc", "--node-color", type=str, default="green", help='Node color'
+        "-nc", "--node-color", type=str, default="green", help="Node color"
     )
     parser.add_argument(
         "-mec",
         "--main-edge-color",
         type=str,
         default="darkred",
-        help='Main edge color',
+        help="Main edge color",
     )
     parser.add_argument(
         "-gec",
         "--graphical-edge-color",
         type=str,
         default="black",
-        help='Graphical edge',
+        help="Graphical edge",
     )
 
     return parser

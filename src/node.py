@@ -21,7 +21,9 @@ class Node:
         return self.x == other.x and self.y == other.y and self.z == other.z
 
     def __str__(self) -> str:
-        return f"[({self.x:.2f},{self.y:.2f},{self.z:.2f}); num_edges = {self.num_edges}]"
+        return (
+            f"[({self.x:.2f},{self.y:.2f},{self.z:.2f}); num_edges = {self.num_edges}]"
+        )
 
     def __repr__(self):
         return str(self)
@@ -42,9 +44,7 @@ class Node:
         # check edge validity
         if C.Edge.are_connected(self, other, "any"):
             return
-        assert (
-            type_ == "main" or type_ == "graphical"
-        ), f"Invalid edge type: {type_}"
+        assert type_ == "main" or type_ == "graphical", f"Invalid edge type: {type_}"
         # create edge
         conn = C.Edge(self, other, type_)
         # add to self

@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import sys
+
 sys.path.insert(0, "src/")
 from polyhedron import Polyhedron
 from wavefront_reader import WaveFrontReader
@@ -20,33 +21,8 @@ def main():
     renderer = Renderer()
 
     # input file
-    if a.input:
-        reader = WaveFrontReader(a.input, True, a.rotate_mesh, a.verbose)
-        poly = reader.to_polyhedron()
-
-    # evaluate
-    if a.evaluate:
-        raise NotImplementedError("You should not use this option. It has been disabled.")
-        # evaluate the code
-        compiled_evaluation_string = compile(
-            a.evaluate, "evaluation_string", mode="exec"
-        )
-        exec(compiled_evaluation_string)
-        del compiled_evaluation_string
-        # checks on the "poly" variable
-        if "poly" not in vars():
-            raise Exception(
-                'You have to define a variable named "poly" in your evaluation string, when not giving an input file'
-            )
-        if type(poly) != Polyhedron:
-            raise TypeError('The "poly" variable does not have the type "Polyhedron"')
-
-    # do we have a polyhedron
-    if not a.input and not a.evaluate:
-        sys.stderr.write(
-            'You have to give a polyhedron! Either through the "-i", "-e" or both options! (see README).\nSee the -h option for help.\n'
-        )
-        exit(1)
+    reader = WaveFrontReader(a.input, True, a.rotate_mesh, a.verbose)
+    poly = reader.to_polyhedron()
 
     # do chaikin generations before any graphics ?
     if a.plot != "evolution" and a.plot != "animation":
