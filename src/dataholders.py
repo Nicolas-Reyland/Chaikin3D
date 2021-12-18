@@ -168,7 +168,7 @@ class VirtualSet:
         Pop any item out of this VirtualSet.
 
         Returns:
-            _: Any value inside of the VirtualSet.
+            _: The popped item.
 
         """
 
