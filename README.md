@@ -44,7 +44,6 @@ Loading a polyhedron is the only thing you must do. You will get an error if you
 ### Related Options:
 
  * ```-i```/```--input```
- * ```-e```/```--evaluate``` (deprecated)
 
 ### Input option
 
@@ -52,41 +51,7 @@ You will first have to select a polyhedron/mesh to render or use. You can load a
 
 [Here](https://people.sc.fsu.edu/~jburkardt/example-meshes/obj/obj.html) is a link to lots of *.obj* files which you can download and test. You only need the *.obj* file. Only vertices and faces are read by the program.
 
-### Evaluate option (deprecated)
-
-The ```-e```/```--evaluate``` option can be used in two ways (or more):
-
-The evaluation options takes a string as input, which will be run as python code right after the loading of the polyhedron mesh file (if any has been given). You should use this option to generate your own polyhedrons or to customize the one that has been loaded. There are a few things you should know:
-
-You have access, in the local variables to the following python objects:
- * ```Polyhedron``` (*polyhedron.py*)
- * ```WaveFrontReader``` (*wavefront_reader.py*)
- * ```Renderer``` (*plotly_renderer.py* / *mpl_renderer.py*)
-
-The loaded polyhedron object is named ```poly```. If you did not load a file, there is no such variable. You then have to create it. When you create the ```poly``` variable, it must be of type ```Polhyhedron```.
-
-### Examples
-
-Load a a cube, then apply the chaikin algorithm on it:
-```
-python chaikin3d.py -i example-meshes/cube.obj -e "poly = poly.Chaikin3D()" # -e is deprecated, you can continue to the next section
-```
-
-<img src="pics/simple-cube-chaikin.png"
-alt="1 chaikin iteration on cube"
-style="float: left; margin-left: 10px;" width="20%;" />
-
-*Note: this is equivalent to ```python chaikin3d.py -i example-meshes/cube.obj -cg 1```*
-
-Load a tetrahedron, then rotate it by 45° with code you potentially wrote in a file named "my_own_code.py":
-```
-python chaikin3d.py -i example-meshes/tetrahedron.obj -e "poly = __import__('my_own_code').rotate_tetrahedron(poly, x_rot = 12, y_rot = 45, z_rot = 0)"
-```
-
-Generate a new polyhedron
-```
-python chaikin3d.py -e "poly = __import__('evaluations').generate_diamond(num_points = 25)"
-```
+**Note**: A `-e` argument was previously available, but was removed because of python compilations issues ([see python compilation docs](https://docs.python.org/3/library/functions.html#compile)).
 
 
 ## Chaikin3D Algorithm
