@@ -113,6 +113,7 @@ class Group:
     def cycle_connect(self, edge_type: str = "main") -> None:
         """
         Connect the nodes the Group in a circular manner.
+        The nodes are supposed to be already-ordered in a non-ordered Group.
 
         Args:
             edge_type (str): Edge type: "main" or "graphical".
