@@ -35,8 +35,6 @@ pip install -r requirements
 To get help, use the ```./chaikin3d.py -h``` command.
 See the [additional info tab](#additional-info) to get info about how exactly to enter your values.
 
-⚠️ **On Windows**, working with huge polyhedrons (say more than 10k vertices) can lead unwanted behaviour such as program crashes or freezes ⚠️
-
 For the rest of this README, let's consider the following words as synonyms: _polyhedron_, _mesh_, _model_. They might not mean the same thing, but repeating _polyhedron_ 10 thousand times is not cool either.
 
 ## Loading the polyhedron
