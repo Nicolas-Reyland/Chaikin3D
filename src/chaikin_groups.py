@@ -1,7 +1,7 @@
 # Chaikin3D - Groups module
 from __future__ import annotations
 from collections.abc import Iterable
-import edge as C
+import edge as E
 import node as N
 from dataholders import VirtualSet
 import numpy, matrix
@@ -86,8 +86,8 @@ class Group:
         self.ogroup = [current_node]
         # connect the next ones (don't care if we go 'left' or 'right')
         while group_list:
-            for index,remaining_node in enumerate(group_list):
-                if C.Edge.are_connected(current_node, remaining_node, "main"):
+            for index, remaining_node in enumerate(group_list):
+                if E.Edge.are_connected(current_node, remaining_node, "main"):
                     self.ogroup.append(remaining_node)
                     current_node = remaining_node
                     group_list.pop(index)

@@ -94,7 +94,7 @@ class VirtualSet:
 
     """
 
-    def __init__(self, iterable=[]):
+    def __init__(self, iterable=None):
         self.data = []
         if iterable:
             if type(iterable) == VirtualSet or type(iterable) == set:
@@ -129,6 +129,39 @@ class VirtualSet:
                 return False
         return True
 
+    def __and__(self, other_set: VirtualSet) -> VirtualSet:
+        """
+        Intersection for VirtualSet.
+
+        Args:
+            other_set (VirtualSet): Other virtual set.
+
+        """
+
+        return VirtualSet(element for element in other_set if element in self)
+
+    def __or__(self, other_set: VirtualSet) -> VirtualSet:
+        """
+        Union for VirtualSet.
+
+        Args:
+            other_set (VirtualSet): Other virtual set.
+
+        """
+
+        return VirtualSet(self.data + other_set.data)
+
+    def __sub__(self, other_set: VirtualSet) -> VirtualSet:
+        """
+        Subtraction for VirtualSet.
+
+        Args:
+            other_set (VirtualSet): Other virtual set.
+
+        """
+
+        return VirtualSet(element for element in self if element not in other_set)
+
     def add(self, value, verify: bool = True) -> None:
         """
         Add the 'value' to the VirtualSet.
@@ -147,21 +180,6 @@ class VirtualSet:
         if not verify or value not in self.data:
             self.data.append(value)
             self.size += 1
-
-    def merge_with(self, other_set: VirtualSet) -> None:
-        """
-        Merge with another VirtualSet. All the other set's items are added to
-        this one.
-
-        Args:
-            other_set (VirtualSet): The other VirtualSet this one should merge with.
-
-        """
-
-        # Why 'merge_with' and not 'merge' ? Because I do not need to separate A, B and A U B in the Chaikin3D project.
-        # Would hhave made a 'merge' function in that case
-        for element in other_set:
-            self.add(element)
 
     def pop(self):
         """
@@ -184,7 +202,10 @@ class VirtualSet:
 
         """
 
-        return VirtualSet(self)
+        virtual_set_copy = VirtualSet()
+        virtual_set_copy.data = self.data.copy()
+        virtual_set_copy.size = self.size
+        return virtual_set_copy
 
 
 #

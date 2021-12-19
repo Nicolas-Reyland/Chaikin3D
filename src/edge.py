@@ -14,11 +14,17 @@ class Edge:
         self.B: N.Node = B
         self.type_: str = type_  # 'main', 'graphical'
 
-    def __eq__2(self, other: Edge) -> bool:
-        return self.A == other.A and self.B == other.B and self.type_ == other.type_
+    def __eq__(self, other: Edge) -> bool:
+        return self.type_ == other.type_ and (self.A, self.B) in [
+            (other.A, other.B),
+            (other.B, other.A),
+        ]
 
     def __str__(self) -> str:
         return f"A: {self.A} -> B: {self.B} type: {self.type_}"
+
+    def __repr__(self) -> str:
+        return str(self)
 
     def contains_node(self, node: N.Node) -> bool:
         """
@@ -101,12 +107,10 @@ class Edge:
         """
 
         if type_ == "any":
-            return any([conn.A == node or conn.B == node for conn in edge_list])
+            return any(edge.A == node or edge.B == node for edge in edge_list)
         return any(
-            [
-                conn.type_ == type_ and (conn.A == node or conn.B == node)
-                for conn in edge_list
-            ]
+            edge.type_ == type_ and (edge.A == node or edge.B == node)
+            for edge in edge_list
         )
 
     @staticmethod
@@ -123,14 +127,14 @@ class Edge:
 
         """
 
+        return edge in edge_list
+
         return any(
-            [
-                conn.A == edge.A
-                and conn.B == edge.B
-                or conn.B == edge.A
-                and conn.A == edge.B
-                for conn in edge_list
-            ]
+            conn.A == edge.A
+            and conn.B == edge.B
+            or conn.B == edge.A
+            and conn.A == edge.B
+            for conn in edge_list
         )
 
     @staticmethod

@@ -1,7 +1,7 @@
 # Chaikin3D - Polyhedron module
 from __future__ import annotations
 import node as N
-import edge as C
+import edge as E
 import matrix
 import numpy as np
 import sys, time
@@ -48,7 +48,7 @@ class Polyhedron:
     def _set_recursion_limit(self):
         sys.setrecursionlimit(10 ** 6)
 
-    def get_edges(self, type_: str = "any") -> list[C.Edge]:
+    def get_edges(self, type_: str = "any") -> list[E.Edge]:
         """
         Returns the list of edges in the polyhedron.
 
@@ -129,8 +129,16 @@ class Polyhedron:
 
         """
 
-        vprint = (lambda *a, **k: print(*a, **k)) if 1 <= verbosity <= 2 else (lambda *a, **k: None)
-        vvprint = (lambda *a, **k: print(*a, **k)) if verbosity == 2 else (lambda *a, **k: None)
+        vprint = (
+            (lambda *a, **k: print(*a, **k))
+            if 1 <= verbosity <= 2
+            else (lambda *a, **k: None)
+        )
+        vvprint = (
+            (lambda *a, **k: print(*a, **k))
+            if verbosity == 2
+            else (lambda *a, **k: None)
+        )
         # change recursion limit
         self._set_recursion_limit()
         t1 = time.perf_counter()
@@ -141,7 +149,7 @@ class Polyhedron:
         )  # when the vector has already been trunced once
         node_virt_dict: VirtualDict = VirtualDict()
         new_node_list: list[N.Node] = list()
-        new_edges: list[C.Edge] = []
+        new_edges: list[E.Edge] = []
 
         vprint("Copying polyhedron data...")
         # old_polyhedron = deepcopy(self)
@@ -154,6 +162,13 @@ class Polyhedron:
         # set of groups all the groups, one group per 'old' node
         final_group_set: VirtualSet = VirtualSet()
 
+        # First, order all the edge-lists in the nodes
+        vprint("Ordering the edge-lists")
+        duplicate_triangles = VirtualSet()
+        for node in self.nodes:
+            # order edges
+            duplicate_triangles &= node.order_edges(duplicate_triangles)
+
         # count of the nodes
         total_nodes = len(self.nodes)
         # new nodes & groups
@@ -165,7 +180,6 @@ class Polyhedron:
                 )
             vvprint(f"{current_node = }")
             # create sub-nodes
-            num_new_edges = 0
             group_set: VirtualSet = VirtualSet()
             for edge in current_node.edge_list:
                 if edge.type_ == "main":
@@ -181,7 +195,6 @@ class Polyhedron:
                     if (
                         partner_node not in self.nodes
                     ):  # partner is one of the new nodes (already has been truncated once)
-                        # print(' - special ratio')
                         ratio = special_ratio
                     else:
                         ratio = base_ratio
@@ -189,12 +202,11 @@ class Polyhedron:
                     v: list[float] = u * ratio
                     w = partner_node.coords + v
 
-                    # create new N.Node & new Edge
+                    # create new Node
                     sub_node = N.Node.from_point(w)
-                    sub_edge = C.Edge(sub_node, partner_node, "main")
 
+                    # not creating a new Edge, because modifying the old one is really easier
                     # re-connect edge to new node & vice-versa
-                    # print(' * test\n  ->', '\n  -> '.join(map(str, partner_node.edge_list)))
                     edge.update_node(current_node, sub_node)
                     sub_node.edge_list = [edge]
                     sub_node.num_edges = 1
@@ -202,10 +214,8 @@ class Polyhedron:
                     # print(' - sub_node:', sub_node)
                     # print(' - sub_node edge:', ' ; '.join(map(str, sub_node.edge_list)))
 
-                    # add to list & increment num_new_edges
-                    # print(' - adding', sub_node)
+                    # add new Node to (virtual) set
                     group_set.add(sub_node)
-                    num_new_edges += 1
                 elif edge.type_ == "graphical":
                     continue
                 else:
@@ -223,8 +233,6 @@ class Polyhedron:
             sub_node_count += group_set.size
             # add new node to new nodes list
             new_node_list.extend(group.group)
-
-        return Polyhedron(new_node_list, final_group_set)
 
         # Now, the variable 'final_group_set' holds 'total_nodes' group objects.
         # Every node of the given Polyhedron has exactly one corresponding group
@@ -339,12 +347,12 @@ class Polyhedron:
         num_new_groups = len(new_group_set)
         vprint(f"Connecting the surface groups ({num_new_groups})")
         for i, group in enumerate(new_group_set):
-            if verbose and i % VERBOSE_STEP == 0:
+            if verbosity != 0 and i % VERBOSE_STEP == 0:
                 print(f"[{i}/{num_new_groups}] connected ({100*i/num_new_groups:.2f}%)")
             group.inter_connect("graphical")
 
         # Merge groups together
-        final_group_set.merge_with(new_group_set)
+        final_group_set |= new_group_set
 
         # return the final polyhedron
         vprint(
@@ -358,7 +366,7 @@ class Polyhedron:
         num_elements = group.size
         for i in range(num_elements):
             for j in range(i + 1, num_elements):
-                if not C.Edge.are_connected(group[i], group[j], "main"):
+                if not E.Edge.are_connected(group[i], group[j], "main"):
                     return False
         return True
 
@@ -420,7 +428,7 @@ class Polyhedron:
         """
 		else:
 			for i in range(len(current_group) - 1):
-				if not C.Edge.are_connected(current_group[i], current_group[i + 1], 'main'):
+				if not E.Edge.are_connected(current_group[i], current_group[i + 1], 'main'):
 					raise Exception('hm')
 				if i > 2:
 					if current_group[i].coords in map(lambda n: n.coords, list(current_group[:i]) + list(current_group[i+1:])):
