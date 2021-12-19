@@ -147,7 +147,7 @@ class Renderer:
         vertex_index_list = []
         for triangle in polyhedron._iter_triangles(type_):
             index_list = []
-            for vertex in triangle:
+            for vertex in triangle.iter_coords:
                 if vertex not in vertex_list:
                     vertex_list.append(vertex)
                     index_list.append(len(vertex_list) - 1)

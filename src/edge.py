@@ -20,6 +20,9 @@ class Edge:
             (other.B, other.A),
         ]
 
+    def __iter__(self):
+        return iter((self.A, self.B))
+
     def __str__(self) -> str:
         return f"A: {self.A} -> B: {self.B} type: {self.type_}"
 

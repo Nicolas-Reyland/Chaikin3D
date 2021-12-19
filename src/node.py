@@ -19,7 +19,18 @@ class Node:
         self.edge_list: list[E.Edge] = list()
 
     def __eq__(self, other: Node) -> bool:
-        return self.x == other.x and self.y == other.y and self.z == other.z
+        T = type(other)
+        if T is Node:
+            return self.x == other.x and self.y == other.y and self.z == other.z
+            # return self is other
+        elif T is list:
+            return self.coords_list == other
+        elif T is tuple:
+            return (self.x, self.y, self.z) == other
+        elif T is np.array:
+            return np.array_equal(self.coords, other)
+        else:
+            raise NotImplementedError(f"Type {T} is not supported for Node equality")
 
     def __str__(self) -> str:
         return (
@@ -98,9 +109,7 @@ class Node:
             ):
                 sub_edge_node = sub_edge.get_partner_node(edge_node)
                 if E.Edge.are_connected(sub_edge_node, self, type_):
-                    triangles.add(
-                        Triangle(self, edge_node, sub_edge_node)
-                    )
+                    triangles.add(Triangle(self, edge_node, sub_edge_node))
         return triangles
 
     def _own_edges_in_triangle(self, triangle: Triangle) -> tuple[E.Edge]:
@@ -129,8 +138,8 @@ class Node:
         first_edge = None
         count: int = 0
         for edge in self.edge_list:
-            other_node_coords = edge.get_partner_node(self).coords_list
-            if other_node_coords in triangle:
+            other_node = edge.get_partner_node(self)
+            if other_node in triangle:
                 if first_edge is None:
                     first_edge = edge
                     continue
@@ -199,7 +208,7 @@ class Node:
             )
 
         triangles, duplicate_triangles = Triangle.reduce_triangle_set(
-            raw_triangles, self.edge_list, participations
+            self, raw_triangles, participations
         )
         triangles = list(triangles)
 
@@ -281,7 +290,7 @@ class Triangle:
     """
 
     def __init__(self, A: Node, B: Node, C: Node):
-        self.data = [A.coords_list, B.coords_list, C.coords_list]
+        self.nodes = [A, B, C]
 
     def __str__(self) -> str:
         return (
@@ -289,7 +298,10 @@ class Triangle:
             + ", ".join(
                 map(
                     str,
-                    sorted(self.data, key=lambda tr: tr[0] * 3 + tr[1] * 5 + tr[2] * 7),
+                    sorted(
+                        self.iter_coords,
+                        key=lambda tr: tr[0] * 3 + tr[1] * 5 + tr[2] * 7,
+                    ),
                 )
             )
             + "}"
@@ -300,29 +312,33 @@ class Triangle:
 
     def __eq__(self, other: Triangle) -> bool:
         return (
-            self.data[0] in other
-            and self.data[1] in other
-            and self.data[2] in other
+            self.nodes[0] in other and self.nodes[1] in other and self.nodes[2] in other
         )
 
     def __getitem__(self, index: int) -> list[float]:
-        return self.data[
-            index
-        ]  # order should not be important. One should always read the whole data
+        # order ('absolute' numerical value of index) should not be important.
+        return self.nodes[index]
 
     def __iter__(self):
-        return iter(self.data)
+        return iter(self.nodes)
+
+    @property
+    def iter_coords(self):
+        return iter(map(lambda node: node.coords_list, self))
 
     @staticmethod
     def reduce_triangle_set(
+        node: Node,
         triangle_set: VirtualSet[Triangle],
-        edge_list: list[E.Edge],
         participations: list[int],
     ) -> tuple[VirtualSet[Triangle]]:
         """
         See doc in 'Node.order_edges' mehod
 
         Args:
+            node           (Node)                :
+                Node which is connected to all the triangles in the
+                triangle set.
             triangle_set   (VirtualSet[Triangle]): Set of triangles to reduce.
             edge_list      (list[E.Edge])        :
                 List of edges corresponding to the given triangle set.
@@ -336,34 +352,96 @@ class Triangle:
 
         """
 
+        # A---------B---------C
+        # |\\__     |     __// \
+        # | \  \__  |  __/  /  \
+        # |  \    \_|_/    /   \
+        # |   \     E     /    F
+        # |    \    |    /    /
+        # |     \   |   /   _/
+        # |      \  |  /  _/
+        # |       \ | / _/
+        # |        \|//
+        # G---------D
+        #
+        # current node is D
+
         reduced_triangle_set = triangle_set.copy()
+        duplicate_triangles = VirtualSet()
 
-        triangles_per_edge = list()
         for n in range(3, max(participations) + 1):
-            high_part_edges = (edge for m, edge in enumerate(edge_list) if participations[m] == n)
+            high_part_edges = (
+                edge for m, edge in enumerate(node.edge_list) if participations[m] == n
+            )
             for edge in high_part_edges:
-                c1, c2 = edge.A.coords_list, edge.B.coords_list
-                triangles_per_edge.append(
-                    VirtualSet(
-                        filter(
-                            lambda triangle: c1 in triangle and c2 in triangle,
-                            reduced_triangle_set,
-                        )
-                    )
-                )
-        print(f"{triangles_per_edge = }")
-        # if a triangle finds itself in two different sets, it should be removed
-        vset_intersections = VirtualSet()
-        for i,edge_triangle_set in enumerate(triangles_per_edge):
-            for j,other_edge_triangle_set in enumerate(triangles_per_edge):
-                if i == j:
+                # node            : P0 (D)
+                # partner_node    : P1 (C)
+                partner_node = edge.get_partner_node(node)
+                # triplet_nodes : [P2, P3, P5] ([E, A, F])
+                triplet_nodes = list()
+                p_triangles = list()
+                for triangle in reduced_triangle_set:
+                    if partner_node in triangle:
+                        p_triangles.append(triangle)
+                        for triangle_node in triangle:
+                            if triangle_node not in [node, partner_node]:
+                                triplet_nodes.append(triangle_node)
+                                break
+                        else:
+                            raise Exception(f"Corrupt triangle: {triangle}")
+                # Make sure that we have P2, P3 and P5
+                if len(triplet_nodes) != n:
                     continue
-                print(f"{edge_triangle_set = }")
-                print(f"{other_edge_triangle_set}")
-                vset_intersection = edge_triangle_set & other_edge_triangle_set
-                if vset_intersection:
-                    print(f"YES {vset_intersection = }")
-                reduced_triangle_set -= vset_intersection
-                vset_intersections &= vset_intersection
+                # Ignore P5 (F)
+                p5_node = None
+                for i in range(n):
+                    j, k = (i + 1) % n, (i + 2) % n
+                    node1 = triplet_nodes[i]
+                    node2 = triplet_nodes[j]
+                    node3 = triplet_nodes[k]
+                    # P5 (F) is not connected to P3, nor to P2, but
+                    # P2 and P3 are connected !
+                    if not (
+                        E.Edge.are_connected(node1, node2)
+                        or E.Edge.are_connected(node1, node3)
+                    ):
+                        p5_node = triplet_nodes.pop(i)  # pop P5
+                        break
+                else:
+                    raise Exception("All nodes of 'triplet_nodes' are inter-connected!")
 
-        return reduced_triangle_set, vset_intersections
+                # Make sure we found P5
+                assert p5_node is not None
+                # now that P5 has been removed from the 'triplet_nodes', it
+                # is no longer a triplet.
+                # We loose a bit of efficiency, while having clearer code.
+                p_nodes = triplet_nodes.copy()
+                del triplet_nodes
+                # We have P2 and P3 left
+                # The goal is to distinguish P2 and P3. P3 is connected to
+                # P4 (G) and possibly other nodes, while P2 is only connected
+                # to P0, P1 and P3. The P0-P1-P2 triangle must be kept, as well
+                # as the P0-P2-P3 triangle.
+                # But the P0-P1-P3 triangle must be removed from the
+                # triangle set !
+                p2_node = p3_node = None
+                for p_node, alter_node in (p_nodes, reversed(p_nodes)):
+                    # looking for P3
+                    if len(p_node.edge_list) >= 3 and any(
+                        edge.get_partner_node(p_node)
+                        not in (node, partner_node, alter_node) # (P0, P1, P(2?3))
+                        for edge in p_node.edge_list
+                    ):
+                        p3_node = p_node
+                        p2_node = alter_node
+                        break
+                else:
+                    raise Exception(f"P2 and P3 could not be distinguished: {p_nodes}")
+                # As a last step, remove the P0-P1-P3 triangle from
+                # the triangle set.
+                p0_p1_p3 = next(triangle for triangle in p_triangles if p3_node in triangle)
+                p0_p1_p3_set = VirtualSet([p0_p1_p3])
+                reduced_triangle_set -= p0_p1_p3_set
+                duplicate_triangles &= p0_p1_p3_set
+
+        return reduced_triangle_set, duplicate_triangles
