@@ -213,7 +213,7 @@ You can use the [CSS color code](https://www.w3.org/wiki/CSS/Properties/color/ke
 Here are some more examples of what can be done:
 
 
-### Dogs
+### A Dog
 
 ```
 python chaikin3d.py -i example-meshes/dog.obj -rm -sgc
