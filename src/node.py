@@ -198,8 +198,6 @@ class Node:
         #
         # 'Reducing' the corresponding triangle set means to remove DAC from it
 
-        print(f"{self = }")
-
         participations = list()
         for i, edge in enumerate(self.edge_list):
             partner_node_coords = edge.get_partner_node(self).coords_list
@@ -429,7 +427,7 @@ class Triangle:
                     # looking for P3
                     if len(p_node.edge_list) >= 3 and any(
                         edge.get_partner_node(p_node)
-                        not in (node, partner_node, alter_node) # (P0, P1, P(2?3))
+                        not in (node, partner_node, alter_node)  # (P0, P1, P(2?3))
                         for edge in p_node.edge_list
                     ):
                         p3_node = p_node
@@ -439,7 +437,9 @@ class Triangle:
                     raise Exception(f"P2 and P3 could not be distinguished: {p_nodes}")
                 # As a last step, remove the P0-P1-P3 triangle from
                 # the triangle set.
-                p0_p1_p3 = next(triangle for triangle in p_triangles if p3_node in triangle)
+                p0_p1_p3 = next(
+                    triangle for triangle in p_triangles if p3_node in triangle
+                )
                 p0_p1_p3_set = VirtualSet([p0_p1_p3])
                 reduced_triangle_set -= p0_p1_p3_set
                 duplicate_triangles &= p0_p1_p3_set

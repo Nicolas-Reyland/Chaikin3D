@@ -50,6 +50,13 @@ def gen_arg_parser() -> ArgumentParser:
     parser.add_argument(
         "-cc", "--chaikin-coef", type=float, default=4.0, help="Chaikin coefficient"
     )
+    parser.add_argument(
+        "-oe",
+        "--order-edges",
+        type=str,
+        default="none",
+        help='Order edges ["none", "first", "all"]',
+    )
     parser.add_argument("-v", "--verbose", help="verbose mode", action="store_true")
     parser.add_argument("-vv", "--vverbose", help="very-verbose", action="store_true")
     # what to plot
@@ -137,6 +144,11 @@ def read_args(arg_parser: ArgumentParser) -> dict[str, str | bool]:
             lambda kvpair: (kvpair[0].replace("_", " ").replace("-", " "), kvpair[1]),
             args.items(),
         )
+    )
+
+    # order-edges
+    assert args["order edges"] in ("none", "first", "all"), ArgumentError(
+        f'Invalid value for "order-edges" option: {args["order edges"]}'
     )
 
     # verbosity level

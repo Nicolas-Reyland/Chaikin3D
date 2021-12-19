@@ -31,7 +31,7 @@ def main():
         ), f"Number of generations must be positive ({a.chaikin_generations} >= 0)"
         for _ in range(a.chaikin_generations):
             print(" - 3D Chaikin -")
-            poly = poly.Chaikin3D(a.chaikin_coef, a.verbosity)
+            poly = poly.Chaikin3D(a)
             print("Chaikin done")
 
     # switch the plot type
