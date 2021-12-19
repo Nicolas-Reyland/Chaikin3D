@@ -44,14 +44,54 @@ Loading a polyhedron is the only thing you must do. You will get an error if you
 ### Related Options:
 
  * ```-i```/```--input```
+ * ```-rm```/```--rotate-mesh```
+ * ```-oe```/```--order-edges```
 
-### Input option
+### Input file
 
 You will first have to select a polyhedron/mesh to render or use. You can load a *.obj* (only supported extension, for now) file using the ```-i``` (```--input```) option like this: ```python chaikin3d.py -i example-meshes/dog.obj``` (if you try this and the mesh is somehow rotated, please add this to your command line: ```-rm true```).
 
 [Here](https://people.sc.fsu.edu/~jburkardt/example-meshes/obj/obj.html) is a link to lots of *.obj* files which you can download and test. You only need the *.obj* file. Only vertices and faces are read by the program.
 
 **Note**: A `-e` argument was previously available, but was removed because of python compilations issues ([see python compilation docs](https://docs.python.org/3/library/functions.html#compile)).
+
+### Mesh transformations
+
+There are two mesh transformations that can be applied : `-rm` and `-oe`.
+
+Use the ```-rm```/```--rotate-mesh``` to rotate meshes that look ... rotated **on load** (therefore, you can only use this option with the ```-i```/```--input``` option).
+
+The `-oe`/`--order-edges` option applies the edge-ordering algorithm on the mesh when applying the Chaikin3D algorithm. There are three possible values for this option: `none`, for never applying the edge-orering algorithm, `first`, for only applying the edge-ordering before the first run of the Chaikin3D algorithm, and `all`, which will run the edge-ordering algorithm before any Chaikin3D run.
+
+The edge-ordering algorithm comes in handy when your mesh data is not properly setup for the Chaikin3D algorithm (see [this section](#some-explanations)). For example, if you load the diamond mesh and simply render it, you will see nothing wrong :
+
+```python chaikin3d.py -i example-meshes/diamond.obj```
+
+But when applying the Chaikin3D algorithm once (adding `-cg 1`), you will find the strange mesh from the second picture, when you would want the mesh fom the thrid picutre (adding `-cg 1 -oe first`) !
+
+<img src="pics/order-edges-diamond-1.png"
+alt="Diamond mesh rendering"
+style="float: left; margin-left: 10px;" width="30%;" />
+<img src="pics/order-edges-diamond-2.png"
+alt="Diamond mesh rendering no edge-ordering"
+style="float: left; margn-left: 10px" width="30%;" />
+<img src="pics/order-edges-diamond-2-bis.png"
+alt="Diamond mesh rendering do edge-ordering"
+style="float: left; margin-left: 10px" width="30%;" />
+
+This error occured because the vertex-indices in the diamond mesh file were not ordered in such a way that they formed clock-wise or counter-clock-wise rotations around the vertices. There is no way this sentence makes sense, so just think about it that way: we are thinking of vertex-indices as a sorted array, when in fact they are an un-ordered, partially shuffled one. The edge-ordering algorithm sorts the edges in an arbitrary way, so that the Chaikin3D algorithm works.
+
+Here is an example of error-propagation due to a single unordered vertex-index line in the diamond.obj file (`python chaikin3d.py -i example-meshes/diamond.obj -cg 5 -p evolution`) :
+
+<img src="pics/order-edges-diamond-evolution-none.png"
+alt="Diamond mesh rendering evolution no edge-ordering"
+style="float: left; margin-left: 5%" width="90%;" />
+
+When ordering the edges during the first Chaikin3D run only, all the errors are fixed, including those from future generations (`python chaikin3d.py -i example-meshes/diamond.obj -cg 5 -p evolution -oe first`) :
+
+<img src="pics/order-edges-diamond-evolution-first.png"
+alt="Diamond mesh rendering evolution no edge-ordering"
+style="float: left; margin-left: 5%" width="90%;" />
 
 
 ## Chaikin3D Algorithm
@@ -111,7 +151,6 @@ Graphical options let you choose how you want to plot your mesh. You can customi
  * ```-sn```/```--show-nodes```
  * ```-hme```/```--hide-main-edges```
  * ```-sge```/```--show-graphical-edges```
- * ```-rm```/```--rotate-mesh```
  * ```-nc```/```--node-color```
  * ```-pc```/```-polygon-color```
  * ```-mec```/```--main-edge-color```
@@ -137,8 +176,6 @@ You can dis/en-able the rendering of nodes with the ```-sn```/```--show-nodes```
 The ```-hme``` disables the rendering of the main edges for the "simple", "evolution" and "animation" plots.
 
 The ```-sge``` enables the rendering of the graphical edges for the "simple", "evolution" and "animation" plots.
-
-Use the ```-rm```/```--rotate-mesh``` to rotate meshes that look ... rotated **on load** (therefore, you can only use this option with the ```-i```/```--input``` option).
 
 The ```-nc```, ```-pc```, ```-mec``` and ```-gec``` options let you customize the colors for the nodes (df. green), polygons (df. lightblue), main edges (df. darkred) and graphical edges (df. black). You can give color-names or colors with this format: *#12ab34*. The value *random* is valid and will generate a new random color for each node/polygon/main edge/graphical edge.
 
