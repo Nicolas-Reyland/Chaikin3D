@@ -321,7 +321,7 @@ style="float: left; margin-left: 10px;" width="48%;" /> <img src="pics/simple-de
 alt="2 simple deer no main edges alpha 1"
 style="float: right; margin-right: 10px;" width="48%;" />
 
-*Verbose switch (`-v`) not mandatory. There are 25486 nodes in the last deer mesh. Loading thoses meshes should take at least a few minutes.*
+*Verbose switch (`-v`) not mandatory.*
 
 
 # Some explanations
