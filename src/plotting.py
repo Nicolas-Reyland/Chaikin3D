@@ -128,6 +128,8 @@ def draw_chaikin_evolution(renderer: Renderer, poly: Polyhedron, a: A) -> None:
 
     """
 
+    vprint = print if a.verbose else lambda *args, **kwargs: None
+
     # find best row-col combination
     assert (
         a.chaikin_generations > 0
@@ -135,7 +137,7 @@ def draw_chaikin_evolution(renderer: Renderer, poly: Polyhedron, a: A) -> None:
     near = sqrt(a.chaikin_generations + 1)
     cols = int(near) + (0 if near == int(near) else 1)
     rows = cols if cols ** (cols - 1) <= a.chaikin_generations else cols - 1
-    print("cols", cols, "rows", rows)
+    vprint("cols", cols, "rows", rows)
     renderer.init_subplots(
         rows,
         cols,
@@ -187,11 +189,12 @@ def chaikin_animation(
     Not working yet.
 
     """
+    vprint = print if a.verbose else lambda *args, **kwargs: None
 
     frames: list[go.Frame] = []
     old_poly = poly.copy()
     for gen in range(n):
-        print("Generation: {}".format(gen))
+        vprint("Generation: {}".format(gen))
         alpha_poly_dd = renderer.get_polyhedron_draw_data(
             poly, alpha=alpha, color=polygon_color
         )

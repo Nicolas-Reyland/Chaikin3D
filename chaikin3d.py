@@ -16,9 +16,11 @@ def main():
     # a : command-line arguments
     a = read_args(arg_parser)
 
+    vprint = print if a.verbose else lambda *args, **kwargs: None
+
     # create a renderer
     Renderer = a.renderer_class
-    renderer = Renderer()
+    renderer = Renderer(verbose=a.verbose)
 
     # input file
     reader = WaveFrontReader(a.input, True, a.rotate_mesh, a.verbosity)
@@ -30,9 +32,9 @@ def main():
             a["chaikin generations"] >= 0
         ), f"Number of generations must be positive ({a.chaikin_generations} >= 0)"
         for _ in range(a.chaikin_generations):
-            print(" - 3D Chaikin -")
+            vprint(" - 3D Chaikin -")
             poly = poly.Chaikin3D(a)
-            print("Chaikin done")
+            vprint("Chaikin done")
 
     # switch the plot type
     if a.plot == "simple":

@@ -21,11 +21,17 @@ class Polyhedron:
     """
 
     def __init__(
-        self, nodes: list[N.Node], groups: VirtualSet = None, initial_mesh: bool = True
+        self,
+        nodes: list[N.Node],
+        groups: VirtualSet = None,
+        initial_mesh: bool = True,
+        verbose=False,
     ):
         self.nodes = nodes
         self.groups = groups
         self.initial_mesh = initial_mesh
+        self.verbose = verbose
+        self.vprint = print if verbose else lambda *args, **kwargs: None
 
     def __str__(self):
         return "\n* ".join(map(str, self.nodes))
@@ -45,7 +51,7 @@ class Polyhedron:
             for triangle in node.get_triangles(type_):
                 # add the triangle. if there is alreadw this triangle in the set, it will not be added
                 triangle_set.add(triangle)
-        print("num triangles (" + str(type_) + ")", triangle_set.size)
+        self.vprint("num triangles (" + str(type_) + ")", triangle_set.size)
         return triangle_set
 
     def _set_recursion_limit(self):
@@ -68,12 +74,14 @@ class Polyhedron:
             for edge in node.get_edges_by_type(type_):
                 if edge not in edge_list:
                     edge_list.append(edge)
-        print("num edges (" + type_ + ")", len(edge_list))
+        self.vprint("num edges (" + type_ + ")", len(edge_list))
         return edge_list
 
     @staticmethod
     def from_standard_vertex_lists(
-        vertex_list: list[np.array], vertex_index_list: list[np.array]
+        vertex_list: list[np.array],
+        vertex_index_list: list[np.array],
+        verbose: bool = False,
     ) -> Polyhedron:
         """
         Returns a Polyhedron instance based on a list of vertices and a list
@@ -82,6 +90,7 @@ class Polyhedron:
         Args:
             vertex_list       (list[np.array]): Vertices.
             vertex_index_list (list[np.array]): Vertex-indices.
+            verbose           (bool)          : Verbose.
 
         Returns:
             Polyhedron: Generated polyhedron object.
@@ -115,7 +124,7 @@ class Polyhedron:
             ogroup.inter_connect("graphical", order_first=True)
 
         # return polyhedron
-        return Polyhedron(nodes, groups, initial_mesh=True)
+        return Polyhedron(nodes, groups, initial_mesh=True, verbose=verbose)
 
     def Chaikin3D(self, a: A) -> Polyhedron:
         """
@@ -131,11 +140,6 @@ class Polyhedron:
 
         """
 
-        vprint = (
-            (lambda *a, **k: print(*a, **k))
-            if 1 <= a.verbosity <= 2
-            else (lambda *a, **k: None)
-        )
         vvprint = (
             (lambda *a, **k: print(*a, **k))
             if a.verbosity == 2
@@ -153,7 +157,7 @@ class Polyhedron:
         new_node_list: list[N.Node] = list()
         new_edges: list[E.Edge] = []
 
-        vprint("Copying polyhedron data...")
+        self.vprint("Copying polyhedron data...")
         # old_polyhedron = deepcopy(self)
         old_nodes = self.nodes  # .copy()#old_polyhedron.nodes
         old_groups = (
@@ -166,7 +170,7 @@ class Polyhedron:
 
         # First, order all the edge-lists in the nodes
         if a.order_edges == "all" or (a.order_edges == "first" and self.initial_mesh):
-            vprint("Ordering the edge-lists")
+            self.vprint("Ordering the edge-lists")
             duplicate_triangles = VirtualSet()
             for node in self.nodes:
                 # order edges
@@ -175,10 +179,10 @@ class Polyhedron:
         # count of the nodes
         total_nodes = len(self.nodes)
         # new nodes & groups
-        vprint(f"Calculating new node positions for {total_nodes} verticies")
+        self.vprint(f"Calculating new node positions for {total_nodes} verticies")
         for node_index, current_node in enumerate(self.nodes):
             if a.verbosity != 0 and node_index % VERBOSE_STEP == 0:
-                vprint(
+                self.vprint(
                     f"[{node_index}/{total_nodes}] calculated ({100 * node_index / total_nodes:.2f}%)"
                 )
             vvprint(f"{current_node = }")
@@ -213,9 +217,6 @@ class Polyhedron:
                     edge.update_node(current_node, sub_node)
                     sub_node.edge_list = [edge]
                     sub_node.num_edges = 1
-                    # print(' * test\n  ->', '\n  -> '.join(map(str, partner_node.edge_list)))
-                    # print(' - sub_node:', sub_node)
-                    # print(' - sub_node edge:', ' ; '.join(map(str, sub_node.edge_list)))
 
                     # add new Node to (virtual) set
                     group_set.add(sub_node)
@@ -348,20 +349,24 @@ class Polyhedron:
             new_group_set.add(new_group)
 
         num_new_groups = len(new_group_set)
-        vprint(f"Connecting the surface groups ({num_new_groups})")
+        self.vprint(f"Connecting the surface groups ({num_new_groups})")
         for i, group in enumerate(new_group_set):
             if a.verbosity != 0 and i % VERBOSE_STEP == 0:
-                print(f"[{i}/{num_new_groups}] connected ({100*i/num_new_groups:.2f}%)")
+                self.vprint(
+                    f"[{i}/{num_new_groups}] connected ({100*i/num_new_groups:.2f}%)"
+                )
             group.inter_connect("graphical")
 
         # Merge groups together
         final_group_set |= new_group_set
 
         # return the final polyhedron
-        vprint(
+        self.vprint(
             f"Chaikin 3D iteration finished {num_new_groups} nodes in {time.perf_counter() - t1:.3} sec"
         )
-        return Polyhedron(new_node_list, final_group_set, initial_mesh=False)
+        return Polyhedron(
+            new_node_list, final_group_set, initial_mesh=False, verbose=self.verbose
+        )
 
     @staticmethod
     def _nec_group_cond(group):
@@ -428,18 +433,6 @@ class Polyhedron:
             current_node.coords
         ):
             return []
-        """
-		else:
-			for i in range(len(current_group) - 1):
-				if not E.Edge.are_connected(current_group[i], current_group[i + 1], 'main'):
-					raise Exception('hm')
-				if i > 2:
-					if current_group[i].coords in map(lambda n: n.coords, list(current_group[:i]) + list(current_group[i+1:])):
-						raise Exception('hm2')
-			if not all([plane.point_on_plane(node.coords) for node in current_group]):
-				print('yes')
-			print(len(current_group))
-		"""
 
         # add to group
         current_group.add(current_node)

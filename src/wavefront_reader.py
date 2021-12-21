@@ -16,24 +16,25 @@ class WaveFrontReader:
         path: str,
         parse_on_load: bool = True,
         rotate: bool = False,
-        verbose_on_load: bool = False,
+        verbose: bool = False,
     ):
         # attributes
         self.path: str = os.path.abspath(path)
         assert os.path.isfile(self.path)
         self.vertices: list[np.array] = []
         self.vertex_indices: list[np.array] = []
+        # verbosity
+        self.verbose = verbose
         # parse
         if parse_on_load:
             self.parse(rotate)
 
-    def parse(self, rotate: bool = False, verbosity: int = 0):
+    def parse(self, rotate: bool = False):
         """
         Parse the input file.
 
         Args:
-            rotate    (bool): Invert the y and z axes.
-            verbosity (bool): Verbosity level (0-2).
+            rotate  (bool): Invert the y and z axes.
 
         Raises:
             AssertionError: Invalid number of vertices in a face.
@@ -50,7 +51,7 @@ class WaveFrontReader:
             elif line.startswith("f "):
                 vertex_indices_str.append(line[2:])
 
-        if verbosity:
+        if self.verbose:
             print("obj file -> num vertices:", len(vertices_str))
             print("obj file -> num groups:", len(vertex_indices_str))
 
@@ -87,4 +88,6 @@ class WaveFrontReader:
 
         """
 
-        return Polyhedron.from_standard_vertex_lists(self.vertices, self.vertex_indices)
+        return Polyhedron.from_standard_vertex_lists(
+            self.vertices, self.vertex_indices, self.verbose
+        )

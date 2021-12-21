@@ -149,7 +149,6 @@ class Group:
         #
         for x in range(num_iter):
             step = 2 ** (x + 1)
-            # print('step:', step)
             prev_node = self.ogroup[0]
             for i in range(step, self.size, step):
                 current_node = self.ogroup[i]
@@ -157,25 +156,3 @@ class Group:
                 prev_node = current_node
             # connect last one to first one
             self.ogroup[0].connect(prev_node, edge_type)
-
-
-def _debug_print_full_node(node, num_tabs=0):
-    prefix = "\t" * num_tabs
-    print(f"{prefix}{str(node)}:")
-    print(f"{prefix} main :")
-    for conn in node.get_edges_by_type("main"):
-        print(f"{prefix}\t - {str(conn)}")
-    print(f"{prefix} graphical :")
-    for conn in node.get_edges_by_type("graphical"):
-        print(f"{prefix}\t - {str(conn)}")
-
-
-def _debug_print_full_nodes(nodes, num_tabs=0):
-    prefix = "\t" * num_tabs
-    print(f"{prefix}Num nodes: {len(nodes)}")
-    for node in nodes:
-        _debug_print_full_node(node, num_tabs + 1)
-        print()
-
-
-#

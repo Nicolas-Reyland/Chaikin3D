@@ -5,6 +5,7 @@ import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 from polyhedron import Polyhedron
 import numpy as np
+import time
 
 DO_CHAIKIN = True
 
@@ -33,7 +34,10 @@ class Renderer:
 
     """
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, verbose: bool = False, *args, **kwargs):
+        self.verbose = verbose
+        self.vprint = print if verbose else lambda *args, **kwargs: None
+
         self.args = args
         self.kwargs = kwargs
 
@@ -56,7 +60,7 @@ class Renderer:
         fig = go.Figure(
             data, *self.args, **self.kwargs
         )  # , layout = go.Layout(scene=dict(aspectratio=dict(x=1,y=1,z=1))), *self.args, **self.kwargs)
-        print(" - drawing plot -")
+        self.vprint(" - drawing -")
         fig.show()
 
     def init_subplots(self, rows: int, cols: int, *args, **kwargs) -> None:
@@ -120,7 +124,7 @@ class Renderer:
             self.subplot_row_index += 1
             if self.subplot_row_index > self.subplot_row_limit:
                 self.active_subplot = False
-                print("subplot filled")
+                self.vprint("subplot filled")
             return
         # no limit reached
         self.subplot_col_index += 1
@@ -143,20 +147,27 @@ class Renderer:
         draw_text: bool = False,
         color: str = "lightblue",
     ) -> list[go.Mesh3d]:
+        self.vprint("Reading polyhedron data for rendering")
+        t1 = time.perf_counter()
         vertex_list = []
+        vertex_list_length = 0
         vertex_index_list = []
         for triangle in polyhedron._iter_triangles(type_):
             index_list = []
             for vertex in triangle.iter_coords:
                 if vertex not in vertex_list:
                     vertex_list.append(vertex)
-                    index_list.append(len(vertex_list) - 1)
+                    vertex_list_length += 1
+                    index_list.append(vertex_list_length - 1)
+                    if self.verbose and vertex_list_length % 100 == 0:
+                        self.vprint(f"Processed {vertex_list_length} vertices for drawing. Elapsed: {time.perf_counter() - t1:.3}s")
                 else:
                     index_list.append(vertex_list.index(vertex))
             vertex_index_list.append(index_list)
+        self.vprint(f"Total time for processing: {time.perf_counter() - t1:.3}s")
 
         if not vertex_list and not vertex_index_list:
-            print("No polyhedron data")
+            self.vprint("No polyhedron data")
             return []
 
         X, Y, Z = list(zip(*vertex_list))
