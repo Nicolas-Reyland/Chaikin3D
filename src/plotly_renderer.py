@@ -206,30 +206,44 @@ class Renderer:
         node_color: str = "green",
         width: int = 2,
     ) -> list[go.Scatter3d]:
-        figure_data: list[go.Scatter3d] = []
-        for edge in polyhedron.get_edges(type_):
-            A, B = edge.A.coords, edge.B.coords
-            figure_data.append(
-                go.Scatter3d(
-                    x=[A[0], B[0]],
-                    y=[A[1], B[1]],
-                    z=[A[2], B[2]],
-                    marker={
-                        "size": 2,
-                        "color": gen_random_color()
-                        if node_color == "random"
-                        else node_color,
-                    },
-                    line={
-                        "color": gen_random_color()
-                        if line_color == "random"
-                        else line_color,
-                        "width": 2,
-                        "dash": "solid",
-                    },
+        # flatten a list of lists into a list
+        flatten = lambda l: list(y for x in l for y in x)
+        # iterative code below
+        xs, ys, zs = map(
+            flatten,
+            zip(
+                *(
+                    [[edge.A.coords[i], edge.B.coords[i], None] for i in range(3)]
+                    for edge in polyhedron.get_edges(type_)
                 )
+            ),
+        )
+        # xs, ys, zs = [], [], []
+        # for edge in polyhedron.get_edges(type_):
+        #     A, B = edge.A.coords, edge.B.coords
+        #     xs.extend([A[0], B[0], None])
+        #     ys.extend([A[1], B[1], None])
+        #     zs.extend([A[2], B[2], None])
+        return [
+            go.Scatter3d(
+                x=xs,
+                y=ys,
+                z=zs,
+                marker={
+                    "size": 2,
+                    "color": gen_random_color()
+                    if node_color == "random"
+                    else node_color,
+                },
+                line={
+                    "color": gen_random_color()
+                    if line_color == "random"
+                    else line_color,
+                    "width": 2,
+                    "dash": "solid",
+                },
             )
-        return figure_data
+        ]
 
     def draw_edges(
         self,
