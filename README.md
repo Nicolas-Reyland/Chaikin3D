@@ -24,7 +24,7 @@ Basically, it looks like this :
 
 You need to have python (version 3+) and pip installed.
 
-Then, clone the repo:
+Then, clone the repo :
 ```
 git clone https://github.com/Nicolas-Reyland/Chaikin3D
 ```
@@ -36,10 +36,10 @@ pip install -r requirements
 
 # Usage
 
-To get full help, use the ```./chaikin3d.py -h``` command.
+To get full help, run `python3 chaikin3d.py -h`.
 
 ### Steps
-There are three simple steps to this program :
+There are three simple steps :
  - loading a mesh
  - modifying the mesh
  - rendering the results
@@ -48,7 +48,7 @@ There are three simple steps to this program :
 
 Loading a polyhedron is the only thing you must do when using this program. You will get an error if you do not. The default action is to render the mesh you load.
 
-### Related Options:
+### Related Options
 
  * ```-i```/```--input```
  * ```-rm```/```--rotate-mesh```
@@ -103,7 +103,7 @@ style="float: left; margin-left: 5%" width="90%;" />
 
 ## Chaikin3D Algorithm
 
-### Related Options:
+### Related Options
 
  * ```-cg```/```--chaikin-generations```
  * ```-cc```/```--chaikin-coef```
@@ -206,6 +206,48 @@ style="float: left; margin-left: 10px;" width="20%;" />
 The `-v` *verbose* shows info about the algorithm progress in the terminal. This might be useful for meshes with a lot of vertices or when having a lot of iterations. The `-vv` *vverbose* (very verbose) helps for debugging the algorithm.
 
 
+## Full help
+
+Here is the full help message :
+```
+usage: chaikin3d.py [-h] -i INPUT [-rm] [-cg CHAIKIN_GENERATIONS] [-cc CHAIKIN_COEF] [-oe ORDER_EDGES] [-v] [-vv]
+                    [-r RENDERER] [-p PLOT] [-hme] [-sge] [-a ALPHA] [-pc POLYGON_COLOR] [-nc NODE_COLOR]
+                    [-mec MAIN_EDGE_COLOR] [-gec GRAPHICAL_EDGE_COLOR]
+
+Apply the Chaikin algorithm, expanded to the 3D space
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -i INPUT, --input INPUT
+                        input file
+  -rm, --rotate-mesh    Rotate the mesh when loading a file
+  -cg CHAIKIN_GENERATIONS, --chaikin-generations CHAIKIN_GENERATIONS
+                        number of chaikin generations
+  -cc CHAIKIN_COEF, --chaikin-coef CHAIKIN_COEF
+                        Chaikin coefficient
+  -oe ORDER_EDGES, --order-edges ORDER_EDGES
+                        Order edges ["none", "first", "all"]
+  -v, --verbose         verbose mode
+  -vv, --vverbose       very-verbose
+  -r RENDERER, --renderer RENDERER
+                        renderer ["plotly", "mpl"]
+  -p PLOT, --plot PLOT  plot type ["simple", "full", "evolution", "animation"]
+  -hme, --hide-main-edges
+                        Hide the main edges (for plots: "simple", "full" and "evolution")
+  -sge, --show-graphical-edges
+                        Show the graphical edges (for plots: "simple", "full" and "evolution")
+  -a ALPHA, --alpha ALPHA
+                        Alpha/Opacity value for mesh rendering
+  -pc POLYGON_COLOR, --polygon-color POLYGON_COLOR
+                        Polygon color
+  -nc NODE_COLOR, --node-color NODE_COLOR
+                        Node color
+  -mec MAIN_EDGE_COLOR, --main-edge-color MAIN_EDGE_COLOR
+                        Main edge color
+  -gec GRAPHICAL_EDGE_COLOR, --graphical-edge-color GRAPHICAL_EDGE_COLOR
+                        Graphical edge
+```
+
 ### Colors
 
 You can use the [CSS color code](https://www.w3.org/wiki/CSS/Properties/color/keywords) (extended colors too) to specify a color. An rgb value can be passed through the format *#rrggbb*, or any valid VSS color value.
@@ -213,7 +255,7 @@ You can use the [CSS color code](https://www.w3.org/wiki/CSS/Properties/color/ke
 
 # Examples
 
-Here are some more examples of what can be done:
+Here are some more examples of what can be done :
 
 
 ### A Dog
@@ -345,5 +387,3 @@ If you have any issues using this project or need any help, please feel free to 
 
 Feel free to do Pull Requests !
 
-
-*Author: Nicolas Reyland*
