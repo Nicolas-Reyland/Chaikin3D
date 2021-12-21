@@ -36,14 +36,17 @@ pip install -r requirements
 
 # Usage
 
-To get help, use the ```./chaikin3d.py -h``` command.
-See the [additional info tab](#additional-info) to get info about how exactly to enter your values.
+To get full help, use the ```./chaikin3d.py -h``` command.
 
-For the rest of this README, let's consider the following words as synonyms: _polyhedron_, _mesh_, _model_. They might not mean the same thing, but repeating _polyhedron_ 10 thousand times is not cool either.
+### Steps
+There are three simple steps to this program :
+ - loading a mesh
+ - modifying the mesh
+ - rendering the results
 
 ## Loading the polyhedron
 
-Loading a polyhedron is the only thing you must do. You will get an error if you do not. If the only thing you do is loading a mesh, it will simply be drawn to the screen using the default settings.
+Loading a polyhedron is the only thing you must do when using this program. You will get an error if you do not. The default action is to render the mesh you load.
 
 ### Related Options:
 
