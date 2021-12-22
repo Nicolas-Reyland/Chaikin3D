@@ -26,17 +26,18 @@ class Group:
     """
 
     def __init__(self, iterable: Iterable, do_order: bool = False):
-        self.group: VirtualSet[N.Node] = VirtualSet(iterable)
+        self.nodes: VirtualSet[N.Node] = VirtualSet(iterable)
         self.ogroup = None
         self.ordered = False
-        self.size = self.group.size
+        self.size = self.nodes.size
+        self._triangles: list[N.Triangle] = None
         # assert self.size > 2 # >= 3
         if do_order:
             self.order()
 
     def __str__(self) -> str:
         return "[{}] o: {} s: {}".format(
-            ", ".join(map(str, self.group)), self.ordered, self.size
+            ", ".join(map(str, self.nodes)), self.ordered, self.size
         )
 
     def __repr__(self) -> str:
@@ -46,12 +47,17 @@ class Group:
         return self.size
 
     def __iter__(self):
-        return iter(self.ogroup) if self.ordered else iter(self.group)
+        return iter(self.ogroup) if self.ordered else iter(self.nodes)
 
     def __getitem__(self, index: int):
         if self.ordered:
             return self.ogroup[index]
-        return self.group[index]
+        return self.nodes[index]
+
+    @property
+    def triangles(self) -> list[N.Triangle]:
+        assert self._triangles is not None, "Group has not been interconnected"
+        return iter(self._triangles)
 
     def order(self, force: bool = False) -> None:
         """
@@ -77,11 +83,11 @@ class Group:
             return
         # trivial case
         if self.size < 3:
-            self.ogroup = self.group
+            self.ogroup = self.nodes
             self.ordered = True
             return
         # initialize variables
-        group_list: list[N.Node] = list(self.group)
+        group_list: list[N.Node] = list(self.nodes)
         current_node = group_list.pop()
         self.ogroup = [current_node]
         # connect the next ones (don't care if we go 'left' or 'right')
@@ -100,7 +106,7 @@ class Group:
                 print("ordered group")
                 _debug_print_full_nodes(self.ogroup)
                 print("group")
-                _debug_print_full_nodes(self.group)
+                _debug_print_full_nodes(self.nodes)
                 # raise Exception('broken group')
                 print(
                     f"Warning: broken group found. attaching remaning nodes: {len(group_list)}"
@@ -121,8 +127,8 @@ class Group:
         """
 
         for i in range(self.size - 1):
-            self.group[i].connect(self.group[i + 1], edge_type)
-        self.group[-1].connect(self.group[0], edge_type)
+            self.nodes[i].connect(self.nodes[i + 1], edge_type)
+        self.nodes[-1].connect(self.nodes[0], edge_type)
 
     def inter_connect(
         self, edge_type: str = "graphical", order_first: bool = False
@@ -156,3 +162,13 @@ class Group:
                 prev_node = current_node
             # connect last one to first one
             self.ogroup[0].connect(prev_node, edge_type)
+
+    def calc_triangles(self) -> None:
+        assert self._triangles is None, "Triangles already calculated"
+        self._triangles = VirtualSet()
+        treated_nodes = VirtualSet()
+        for node1 in self.nodes:
+            treated_nodes.add(node1)
+            for node2 in (n for n in node1.partners if n not in treated_nodes and n in self.nodes):
+                for node3 in (n for n in node2.partners if n not in treated_nodes and n in self.nodes):
+                    self._triangles.add(N.Triangle(node1, node2, node3))

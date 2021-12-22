@@ -146,7 +146,7 @@ def draw_chaikin_evolution(renderer: Renderer, poly: Polyhedron, a: A) -> None:
         ],
     )
     for i in range(a.chaikin_generations + 1):
-        print(f"Generation: {i}/{a.chaikin_generations}")
+        print(f"Generation: [{i}/{a.chaikin_generations}]")
         # get values
         alpha_poly_dd = renderer.get_polyhedron_draw_data(
             poly, alpha=a.alpha, color=a.polygon_color

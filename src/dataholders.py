@@ -180,6 +180,8 @@ class VirtualSet:
         if not verify or value not in self.data:
             self.data.append(value)
             self.size += 1
+            return True
+        return False
 
     def pop(self):
         """

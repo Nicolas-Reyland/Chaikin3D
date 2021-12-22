@@ -10,7 +10,7 @@ from dataholders import VirtualDict, VirtualSet
 from copy import deepcopy
 
 matrix.EPSILON = 10e-6
-VERBOSE_STEP = 10
+VERBOSE_STEP = 100
 
 
 class Polyhedron:
@@ -29,9 +29,15 @@ class Polyhedron:
     ):
         self.nodes = nodes
         self.groups = groups
+        self.size = len(groups)
         self.initial_mesh = initial_mesh
         self.verbose = verbose
         self.vprint = print if verbose else lambda *args, **kwargs: None
+
+        for i,group in enumerate(self.groups):
+            if self.verbose and i % 100 == 0:
+                self.vprint(f"pre-calculted [{i}/{self.size}] triangles")
+            group.calc_triangles()
 
     def __str__(self):
         return "\n* ".join(map(str, self.nodes))
@@ -43,21 +49,26 @@ class Polyhedron:
         return self.nodes[index]
 
     def __iter__(self):
-        return iter(self._iter_triangles())
+        return (tr for group in self.groups for tr in group.triangles)
 
     def _iter_triangles(self, type_: str = "any") -> VirtualSet:
-        triangle_set = VirtualSet()
+        triangle_list = list()
+        h_set = set()
         for node in self.nodes:
             for triangle in node.get_triangles(type_):
-                # add the triangle. if there is alreadw this triangle in the set, it will not be added
-                triangle_set.add(triangle)
-        self.vprint("num triangles (" + str(type_) + ")", triangle_set.size)
-        return triangle_set
+                h = triangle.sim_hash
+                if h in h_set and triangle in triangle_list:
+                    continue
+                h_set.add(h)
+                yield triangle
+                triangle_list.append(triangle)
+        self.vprint("num triangles (" + str(type_) + ")", len(triangle_list))
+        return triangle_list
 
     def _set_recursion_limit(self):
         sys.setrecursionlimit(10 ** 6)
 
-    def get_edges(self, type_: str = "any") -> list[E.Edge]:
+    def get_edges(self, type_: str = "any") -> Iterable[E.Edge]:
         """
         Returns the list of edges in the polyhedron.
 
@@ -69,13 +80,20 @@ class Polyhedron:
 
         """
 
-        edge_list = []
+        edge_id_set = set()
+        count = 0
         for node in self.nodes:
             for edge in node.get_edges_by_type(type_):
-                if edge not in edge_list:
-                    edge_list.append(edge)
-        self.vprint("num edges (" + type_ + ")", len(edge_list))
-        return edge_list
+                edge_id = id(edge)
+                if edge_id in edge_id_set:
+                    continue
+                if self.verbose:
+                    if count % VERBOSE_STEP == 0:
+                        self.vprint(f"Yielded {count} edges")
+                    count += 1
+                edge_id_set.add(edge_id)
+                yield edge
+        self.vprint("num edges (" + type_ + ")", count)
 
     @staticmethod
     def from_standard_vertex_lists(
@@ -120,8 +138,7 @@ class Polyhedron:
         # connect later
         for ogroup in to_connect:
             # connect the graphical edges
-            # ogroup.order() -> order_first = True
-            ogroup.inter_connect("graphical", order_first=True)
+            ogroup.inter_connect("graphical")
 
         # return polyhedron
         return Polyhedron(nodes, groups, initial_mesh=True, verbose=verbose)
@@ -183,7 +200,7 @@ class Polyhedron:
         for node_index, current_node in enumerate(self.nodes):
             if a.verbosity != 0 and node_index % VERBOSE_STEP == 0:
                 self.vprint(
-                    f"[{node_index}/{total_nodes}] calculated ({100 * node_index / total_nodes:.2f}%)"
+                    f"[{node_index}/{total_nodes}] nodes splitted ({100 * node_index / total_nodes:.2f}%)"
                 )
             vvprint(f"{current_node = }")
             # create sub-nodes
@@ -230,13 +247,14 @@ class Polyhedron:
             group.cycle_connect("main")
             # connect graphical together
             group.inter_connect("graphical", order_first=True)
+            # add it to the set
             final_group_set.add(group)
 
             # add those sub-nodes to the new nodes virtual dict
             node_virt_dict[old_nodes[node_index]] = group_set.copy()
             sub_node_count += group_set.size
             # add new node to new nodes list
-            new_node_list.extend(group.group)
+            new_node_list.extend(group.nodes)
 
         # Now, the variable 'final_group_set' holds 'total_nodes' group objects.
         # Every node of the given Polyhedron has exactly one corresponding group

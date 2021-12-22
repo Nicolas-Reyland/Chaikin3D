@@ -1,5 +1,6 @@
 #
 from __future__ import annotations
+from collections.abc import Iterable
 import edge as E
 from dataholders import VirtualSet
 import numpy as np
@@ -39,6 +40,10 @@ class Node:
 
     def __repr__(self):
         return str(self)
+
+    @property
+    def partners(self) -> Iterable[Node]:
+        return (edge.get_partner_node(self) for edge in self.edge_list)
 
     def connect(self, other: Node, type_: str) -> None:
         """

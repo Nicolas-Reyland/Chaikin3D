@@ -152,17 +152,14 @@ class Renderer:
         vertex_list = []
         vertex_list_length = 0
         vertex_index_list = []
-        for triangle in polyhedron._iter_triangles(type_):
+        triangle_iterable = polyhedron if type_ == "any" else polyhedron._iter_triangles(type_)
+        for triangle in triangle_iterable:
             index_list = []
             for vertex in triangle.iter_coords:
                 if vertex not in vertex_list:
                     vertex_list.append(vertex)
                     vertex_list_length += 1
                     index_list.append(vertex_list_length - 1)
-                    if self.verbose and vertex_list_length % 100 == 0:
-                        self.vprint(
-                            f"Processed {vertex_list_length} vertices for drawing. Elapsed: {time.perf_counter() - t1:.3}s"
-                        )
                 else:
                     index_list.append(vertex_list.index(vertex))
             vertex_index_list.append(index_list)
