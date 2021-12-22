@@ -84,7 +84,7 @@ class Renderer:
             row=self.subplot_row_index,
             col=self.subplot_col_index,
             *args,
-            **kwargs
+            **kwargs,
         )
         # go to the next row ol column
         self.next_subplot()
@@ -96,7 +96,7 @@ class Renderer:
         custom_row: int = -1,
         custom_col: int = -1,
         *args,
-        **kwargs
+        **kwargs,
     ):
         assert self.active_subplot  # make sure we are actually drawing subplots
         # default function if None
@@ -114,7 +114,7 @@ class Renderer:
             row=self.subplot_row_index if custom_row == -1 else custom_row,
             col=self.subplot_col_index if custom_col == -1 else custom_col,
             *args,
-            **kwargs
+            **kwargs,
         )
 
     def next_subplot(self) -> None:
@@ -160,7 +160,9 @@ class Renderer:
                     vertex_list_length += 1
                     index_list.append(vertex_list_length - 1)
                     if self.verbose and vertex_list_length % 100 == 0:
-                        self.vprint(f"Processed {vertex_list_length} vertices for drawing. Elapsed: {time.perf_counter() - t1:.3}s")
+                        self.vprint(
+                            f"Processed {vertex_list_length} vertices for drawing. Elapsed: {time.perf_counter() - t1:.3}s"
+                        )
                 else:
                     index_list.append(vertex_list.index(vertex))
             vertex_index_list.append(index_list)

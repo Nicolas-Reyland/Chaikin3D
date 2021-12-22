@@ -325,7 +325,7 @@ class Triangle:
         # Give a NON-UNIQUE hash for this triangle
         # The goal is to return a value that is as unique as possible
         # This is used for optimization.
-        return sum(sum(node.coords + i + 1) for i,node in enumerate(self.nodes))
+        return sum(sum(node.coords + i + 1) for i, node in enumerate(self.nodes))
 
     @property
     def iter_coords(self):
