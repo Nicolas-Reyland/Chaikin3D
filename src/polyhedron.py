@@ -120,7 +120,10 @@ class Polyhedron:
         groups: VirtualSet = VirtualSet()
         to_connect = []
         # connect using the index list
-        for i in range(len(vertex_index_list)):
+        vertex_index_list_length = len(vertex_index_list)
+        for i in range(vertex_index_list_length):
+            if verbose and i % 500 == 0:
+                print(f"Read and processed [{i}/{vertex_index_list_length}] from input file")
             # get the indices
             node_groupe_index_list = vertex_index_list[i]
             # get the corresponding (ordered) group
@@ -136,6 +139,8 @@ class Polyhedron:
             groups.add(group)
 
         # connect later
+        if verbose:
+            print(f"Inter-connecting {len(to_connect)} groups from input file")
         for ogroup in to_connect:
             # connect the graphical edges
             ogroup.inter_connect("graphical")
