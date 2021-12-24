@@ -36,7 +36,7 @@ class Polyhedron:
 
         for i,group in enumerate(self.groups):
             if self.verbose and i % 100 == 0:
-                self.vprint(f"pre-calculted [{i}/{self.size}] triangles")
+                self.vprint(f"pre-calculted triangles from [{i}/{self.size}] group")
             group.calc_triangles()
 
     def __str__(self):
