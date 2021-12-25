@@ -379,7 +379,7 @@ To better understand what I mean with _graphical_ edges, try these commands: ```
 # TODO
 
 - [x] Fix wrong mesh-approximation with un-ordered vertex-index lines in mesh file
-- [ ] Fix issue where plotly would just freeze the program (Windows only & might be a plotly issue ?)
+- [ ] Fix group corruption for higher number of iterations (e.g. 4 iterations on cube)
 - [x] Load wavefront .obj files
 - [ ] Save resulting polyhedron to .obj file (keeping original textures ?)
 - [x] Progress verbosity
