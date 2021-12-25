@@ -381,7 +381,7 @@ To better understand what I mean with _graphical_ edges, try these commands: ```
 - [x] Fix wrong mesh-approximation with un-ordered vertex-index lines in mesh file
 - [ ] Fix group corruption for higher number of iterations (e.g. 4 iterations on cube)
 - [x] Load wavefront .obj files
-- [ ] Save resulting polyhedron to .obj file (keeping original textures ?)
+- [x] Save resulting polyhedron to .obj file
 - [x] Progress verbosity
 - [x] Code documentation (majority done)
 - [x] Get rid of the matrix module (now included in project)
