@@ -152,7 +152,9 @@ class Renderer:
         vertex_list = []
         vertex_list_length = 0
         vertex_index_list = []
-        triangle_iterable = polyhedron if type_ == "any" else polyhedron._iter_triangles(type_)
+        triangle_iterable = (
+            polyhedron if type_ == "any" else polyhedron._iter_triangles(type_)
+        )
         for triangle in triangle_iterable:
             index_list = []
             for vertex in triangle.iter_coords:

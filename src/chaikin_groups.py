@@ -168,5 +168,7 @@ class Group:
         self._triangles = VirtualSet()
         for node1 in self.nodes:
             for node2 in (n for n in node1.partners if n in self.nodes):
-                for node3 in (n for n in node2.partners if n in self.nodes and n in node1.partners):
+                for node3 in (
+                    n for n in node2.partners if n in self.nodes and n in node1.partners
+                ):
                     self._triangles.add(N.Triangle(node1, node2, node3))
