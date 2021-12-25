@@ -200,11 +200,16 @@ style="float: left; margin-left: 10px;" width="20%;" />
 
 ## Output to file
 
-For saving the output mesh to a file, in a '.obj' wavefront format, you should specify the `-o`/`--output` argument. This option cannot be used with the "evolution" or "animation" plot types.
+For saving the output mesh to a file, a '.obj' wavefront or '.html' format, you should specify the `-o`/`--output` argument. When saving the mesh itself ('.obj'), this option cannot be used with the "evolution" or "animation" plot types. For saving the plotly rendering to a '.html' file, you cannot use the "none" plot type.
 
 For example, you could do this:
 ```bash
-python chaikin3d.py -i example-meshes/cube.obj -cg 3 -o new-cube.obj
+python chaikin3d.py -i example-meshes/cube.obj -cg 3 -p none -o new-cube.obj
+```
+
+Or this:
+```bash
+python chaikin3d.py -i example-meshes/cube.obj -cg 3 -p full -o render.html
 ```
 
 Then, you could re-use this 'new-cube.obj' file as input for new chaikin iterations, or render it using other rendering software ([this website](https://3dviewer.net/), for example).
