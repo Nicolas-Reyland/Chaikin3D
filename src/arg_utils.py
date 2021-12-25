@@ -72,7 +72,7 @@ def gen_arg_parser() -> ArgumentParser:
         "--plot",
         type=str,
         default="simple",
-        help='plot type ["simple", "full", "evolution", "animation"]',
+        help='plot type ["none", "simple", "full", "evolution", "animation"]',
     )
     parser.add_argument(
         "-hme",
