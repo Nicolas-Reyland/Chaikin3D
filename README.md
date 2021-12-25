@@ -202,6 +202,13 @@ style="float: left; margin-left: 10px;" width="20%;" />
 
 For saving the output mesh to a file, in a '.obj' wavefront format, you should specify the `-o`/`--output` argument. This option cannot be used with the "evolution" or "animation" plot types.
 
+For example, you could do this:
+```bash
+python chaikin3d.py -i example-meshes/cube.obj -cg 3 -o new-cube.obj
+```
+
+Then, you could re-use this 'new-cube.obj' file as input for new chaikin iterations, or render it using other rendering software ([this website](https://3dviewer.net/), for example).
+
 
 ## Other Options
 
