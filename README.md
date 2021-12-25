@@ -387,6 +387,8 @@ To better understand what I mean with _graphical_ edges, try these commands: ```
 - [x] Get rid of the matrix module (now included in project)
 - [ ] Finish animation plot
 - [ ] Optimization of the Chaikin3D algorithm
+     - [ ] do pre-calculations
+     - [x] implement calculations caching system
      - [ ] port the still native-python parts of the calculations to numpy
      - [ ] threading and parallelism
 - [ ] Fix the issues that show up when applying the algorithm on A LOT of nodes.
