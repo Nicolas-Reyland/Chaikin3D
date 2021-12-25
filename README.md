@@ -165,11 +165,12 @@ Graphical options let you choose how you want to plot your mesh. You can customi
 
 ### Plot Types
 
-There are 4 types of plots (see examples below):
- * **simple** plot : this plot only draws your polyhedron to the screen
- * **full** plot : this one draws a lot of data separately: your edges (by type, etc.), your vertices and different mesh representations. Useful for understanding how things work and debugging in general
- * **evolution** plot : the evolution plot takes into account the number of _chaikin generations_ that you want (```-cg``` option). I will render one generation after another in a grid-format (like the "full" plot)
- * **animation** plot (NOT DONE YET) : this plot should create an animation, rendering all the _chaikin generations_ from 0 to the value given in the ```-cg``` option
+There are 5 types of plots (see examples below):
+ * **none** : when set to this value, the results will not be rendered. This is useful when you only want to save the 'result' mesh to a file, then render it using your own method.
+ * **simple** : this plot only draws your polyhedron to the screen
+ * **full** : this one draws a lot of data separately: your edges (by type, etc.), your vertices and different mesh representations. Useful for understanding how things work and debugging in general
+ * **evolution** : the evolution plot takes into account the number of _chaikin generations_ that you want (```-cg``` option). I will render one generation after another in a grid-format (like the "full" plot)
+ * **animation** (do not use) : this plot should create an animation, rendering all the _chaikin generations_ from 0 to the value given in the ```-cg``` option
 The default value is "simple"
 
 ### How to plot (colors, etc.)
@@ -197,6 +198,10 @@ alt="special colors chaikin cube cg 3 cc 5"
 style="float: left; margin-left: 10px;" width="20%;" />
 
 
+## Output to file
+
+For saving the output mesh to a file, in a '.obj' wavefront format, you should specify the `-o`/`--output` argument. This option cannot be used with the "evolution" or "animation" plot types.
+
 
 ## Other Options
 
@@ -209,14 +214,14 @@ The `-v` *verbose* shows info about the algorithm progress in the terminal. This
 ## Full help
 
 Here is the full help message :
+
 ```
-usage: chaikin3d.py [-h] -i INPUT [-rm] [-cg CHAIKIN_GENERATIONS] [-cc CHAIKIN_COEF] [-oe ORDER_EDGES] [-v] [-vv]
-                    [-r RENDERER] [-p PLOT] [-hme] [-sge] [-a ALPHA] [-pc POLYGON_COLOR] [-nc NODE_COLOR]
-                    [-mec MAIN_EDGE_COLOR] [-gec GRAPHICAL_EDGE_COLOR]
+usage: chaikin3d.py [-h] -i INPUT [-rm] [-cg CHAIKIN_GENERATIONS] [-cc CHAIKIN_COEF] [-oe ORDER_EDGES] [-v] [-vv] [-r RENDERER] [-p PLOT] [-hme] [-sge] [-a ALPHA] [-pc POLYGON_COLOR] [-nc NODE_COLOR] [-mec MAIN_EDGE_COLOR]
+                    [-gec GRAPHICAL_EDGE_COLOR] [-o OUTPUT]
 
 Apply the Chaikin algorithm, expanded to the 3D space
 
-optional arguments:
+options:
   -h, --help            show this help message and exit
   -i INPUT, --input INPUT
                         input file
@@ -231,7 +236,7 @@ optional arguments:
   -vv, --vverbose       very-verbose
   -r RENDERER, --renderer RENDERER
                         renderer ["plotly", "mpl"]
-  -p PLOT, --plot PLOT  plot type ["simple", "full", "evolution", "animation"]
+  -p PLOT, --plot PLOT  plot type ["none", "simple", "full", "evolution", "animation"]
   -hme, --hide-main-edges
                         Hide the main edges (for plots: "simple", "full" and "evolution")
   -sge, --show-graphical-edges
@@ -246,6 +251,8 @@ optional arguments:
                         Main edge color
   -gec GRAPHICAL_EDGE_COLOR, --graphical-edge-color GRAPHICAL_EDGE_COLOR
                         Graphical edge
+  -o OUTPUT, --output OUTPUT
+                        Output file path (wavefront format)
 ```
 
 ### Colors
