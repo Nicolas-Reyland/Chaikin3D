@@ -35,8 +35,14 @@ def main():
             vprint(" - 3D Chaikin -")
             poly = poly.Chaikin3D(a)
             vprint("Chaikin done")
+        if a.output:
+            vprint(f"Saving file to {a.output!s}")
+            with open(a.output, "w") as f:
+                poly.save(f)
 
     # switch the plot type
+    if a.plot == "none":
+        exit(0)
     if a.plot == "simple":
         poly_dd = renderer.get_polyhedron_draw_data(
             poly, type_="any", alpha=a.alpha, color=a.polygon_color
@@ -64,7 +70,7 @@ def main():
         plotting.draw_full(renderer, poly, a)
     elif a.plot == "evolution":
         plotting.draw_chaikin_evolution(renderer, poly, a)
-    elif plot == "animation":
+    elif a.plot == "animation":
         plotting.chaikin_animation(renderer, poly, a)
     else:
         raise ValueError(f'Unrecognized plot type "{a.plot}"')

@@ -114,6 +114,14 @@ def gen_arg_parser() -> ArgumentParser:
         default="black",
         help="Graphical edge",
     )
+    # output
+    parser.add_argument(
+        "-o",
+        "--output",
+        type=str,
+        default=None,
+        help="Output file path (wavefront format)",
+    )
 
     return parser
 
