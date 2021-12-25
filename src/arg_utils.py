@@ -120,7 +120,7 @@ def gen_arg_parser() -> ArgumentParser:
         "--output",
         type=str,
         default=None,
-        help="Output file path (wavefront format)",
+        help="Output file path (wavefront '.obj' or '.html' format)",
     )
 
     return parser
