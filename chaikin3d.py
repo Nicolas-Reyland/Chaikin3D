@@ -8,6 +8,21 @@ from arg_utils import gen_arg_parser, read_args
 import plotting
 
 
+def save_poly(poly, figure, output):
+    # writing to file
+    if not output:
+        return
+    print(f"Saving file to {output!r}")
+    if output.endswith(".obj"):
+        with open(output, "w") as f:
+            poly.save(f)
+    elif output.endswith(".html"):
+        assert figure is not None, "Must plot the mesh when saving to html"
+        figure.write_html(output)
+    else:
+        raise ValueError(f'Invalid output: "{output}"')
+
+
 # Main function
 def main():
     """Main function"""
@@ -35,14 +50,8 @@ def main():
             vprint(" - 3D Chaikin -")
             poly = poly.Chaikin3D(a)
             vprint("Chaikin done")
-        if a.output:
-            vprint(f"Saving file to {a.output!s}")
-            with open(a.output, "w") as f:
-                poly.save(f)
 
     # switch the plot type
-    if a.plot == "none":
-        exit(0)
     if a.plot == "simple":
         poly_dd = renderer.get_polyhedron_draw_data(
             poly, type_="any", alpha=a.alpha, color=a.polygon_color
@@ -65,13 +74,19 @@ def main():
             )
         else:
             graphical_conn_dd = list()
-        renderer.draw(poly_dd + graphical_conn_dd + main_conn_dd)
+        fig = renderer.figure(poly_dd + graphical_conn_dd + main_conn_dd)
+        save_poly(poly, fig, a.output)
+        fig.show()
     elif a.plot == "full":
-        plotting.draw_full(renderer, poly, a)
+        fig = plotting.draw_full(renderer, poly, a)
+        save_poly(poly, fig, a.output)
     elif a.plot == "evolution":
-        plotting.draw_chaikin_evolution(renderer, poly, a)
+        fig = plotting.draw_chaikin_evolution(renderer, poly, a)
+        save_poly(poly, fig, a.output)
     elif a.plot == "animation":
         plotting.chaikin_animation(renderer, poly, a)
+    elif a.plot == "none":
+        save_poly(poly, None, a.output)
     else:
         raise ValueError(f'Unrecognized plot type "{a.plot}"')
 

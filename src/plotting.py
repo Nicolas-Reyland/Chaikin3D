@@ -107,7 +107,7 @@ def draw_full(renderer: Renderer, poly: Polyhedron, a: A) -> None:
         renderer.add_to_subplot(mconn_dd, custom_row=3, custom_col=3)
         renderer.add_to_subplot(mconn_dd, custom_row=2, custom_col=1)
 
-    renderer.draw_subplots()
+    return renderer.draw_subplots()
 
 
 def draw_chaikin_evolution(renderer: Renderer, poly: Polyhedron, a: A) -> None:
@@ -179,7 +179,7 @@ def draw_chaikin_evolution(renderer: Renderer, poly: Polyhedron, a: A) -> None:
         # Chaikin
         poly = poly.Chaikin3D(a)
 
-    renderer.draw_subplots()
+    return renderer.draw_subplots()
 
 
 def chaikin_animation(
@@ -294,3 +294,4 @@ def chaikin_animation(
     )
 
     fig.show()
+    return fig

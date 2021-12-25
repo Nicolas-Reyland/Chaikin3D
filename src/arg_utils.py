@@ -159,6 +159,12 @@ def read_args(arg_parser: ArgumentParser) -> dict[str, str | bool]:
         f'Invalid value for "order-edges" option: {args["order edges"]}'
     )
 
+    # output file
+    if args["output"] is not None:
+        assert args["output"].endswith(".obj") or args["output"].endswith(
+            ".html"
+        ), f"Invalid file extension: '{args['output']}'. Must end with '.obj' or '.html'"
+
     # verbosity level
     if args["vverbose"]:
         args["verbosity"] = 2

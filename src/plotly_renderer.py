@@ -48,7 +48,7 @@ class Renderer:
         self.subplot_col_index = 0
         self.subplot_col_limit = 0
 
-    def draw(self, data: list) -> None:
+    def figure(self, data: list) -> _figure.Figure:
         """
         Draw the data.
 
@@ -57,11 +57,7 @@ class Renderer:
 
         """
 
-        fig = go.Figure(
-            data, *self.args, **self.kwargs
-        )  # , layout = go.Layout(scene=dict(aspectratio=dict(x=1,y=1,z=1))), *self.args, **self.kwargs)
-        self.vprint(" - drawing -")
-        fig.show()
+        return go.Figure(data, *self.args, **self.kwargs)
 
     def init_subplots(self, rows: int, cols: int, *args, **kwargs) -> None:
         assert not self.active_subplot  # cannot have two subplots at a time
@@ -130,7 +126,7 @@ class Renderer:
         self.subplot_col_index += 1
 
     def draw_subplots(self):
-        print(" - drawing subplots -")
+        self.vprint(" - drawing subplots -")
         self.subplot_fig.show()
         # don't reset figure on purpose (why do it ? could be used later by user)
         self.active_subplot = False
@@ -138,6 +134,7 @@ class Renderer:
         self.subplot_row_limit = 0
         self.subplot_col_index = 0
         self.subplot_col_limit = 0
+        return self.subplot_fig
 
     def get_polyhedron_draw_data(
         self,
@@ -208,7 +205,11 @@ class Renderer:
     def draw_polyhedron(
         self, polyhedron: Polyhedron, alpha: float = 0.8, draw_text: bool = True
     ) -> None:
-        self.draw(data=self.get_polyhedron_draw_data(polyhedron, alpha, draw_text))
+        fig = self.figure(
+            data=self.get_polyhedron_draw_data(polyhedron, alpha, draw_text)
+        )
+        fig.show()
+        return fig
 
     def get_edges_draw_data(
         self,
@@ -264,4 +265,8 @@ class Renderer:
         color: str = "lightblue",
         width: int = 2,
     ) -> None:
-        self.draw(data=self.get_edges_draw_data(polyhedron, type_, color, width))
+        fig = self.figure(
+            data=self.get_edges_draw_data(polyhedron, type_, color, width)
+        )
+        fig.show()
+        return fig
