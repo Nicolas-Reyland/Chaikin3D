@@ -52,7 +52,7 @@ def main():
             vprint("Chaikin done")
 
     # switch the plot type
-    if a.plot == "simple":
+    if a.plot == "simple" or a.plot == "none":
         poly_dd = renderer.get_polyhedron_draw_data(
             poly, type_="any", alpha=a.alpha, color=a.polygon_color
         )
@@ -76,7 +76,8 @@ def main():
             graphical_conn_dd = list()
         fig = renderer.figure(poly_dd + graphical_conn_dd + main_conn_dd)
         save_poly(poly, fig, a.output)
-        fig.show()
+        if a.plot == "simple":
+            fig.show()
     elif a.plot == "full":
         fig = plotting.draw_full(renderer, poly, a)
         save_poly(poly, fig, a.output)
@@ -84,9 +85,8 @@ def main():
         fig = plotting.draw_chaikin_evolution(renderer, poly, a)
         save_poly(poly, fig, a.output)
     elif a.plot == "animation":
+        raise NotImplementedError("Animation plot not implemetned yet")
         plotting.chaikin_animation(renderer, poly, a)
-    elif a.plot == "none":
-        save_poly(poly, None, a.output)
     else:
         raise ValueError(f'Unrecognized plot type "{a.plot}"')
 
