@@ -392,9 +392,9 @@ To better understand what I mean with _graphical_ edges, try these commands: ```
 - [x] Get rid of the matrix module (now included in project)
 - [ ] Finish animation plot
 - [ ] Optimization of the Chaikin3D algorithm
-     - [ ] do pre-calculations
-     - [x] implement calculations caching system
-     - [ ] port the still native-python parts of the calculations to numpy
+     - [ ] do pre-computations
+     - [x] implement 3d-compute caching system
+     - [ ] port the still native-python parts of the computations to numpy
      - [ ] threading and parallelism
 - [x] Fix the issues that show up when applying the algorithm on A LOT of nodes.
 - [x] Ability to rotate y/z axes when loading a .obj file
