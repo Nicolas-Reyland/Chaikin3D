@@ -110,7 +110,7 @@ style="float: left; margin-left: 5%" width="90%;" />
 
 ### Chaikin Generations
 
-To choose the number of Chaikin generations (or iterations) you want to run on the given polyhedron, you should be using the ```-cg```/```--chaikin-generations``` option. The default value is 0. To run one iteration, you could use ```-cg 1``` (for 2 iterations : ```-cg 2```, you got it).
+To choose the number of Chaikin generations (or iterations) you want to run on the given polyhedron, you should be using the ```-cg```/```--chaikin-generations``` option. The default value is 0. To run one iteration, you could use ```-cg 1``` (for 2 iterations : ```-cg 2```, etc.).
 
 ### Chaikin Coeffiecient
 
@@ -118,7 +118,7 @@ You might also want to control the *Chaikin coefficient*. This is done using the
 
 ### Examples
 
-One iteration on a deer (yes, a deer)
+One iteration on a deer
 ```
 python chaikin3d.py -i example-meshes/deer.obj -cg 1
 ```
@@ -169,9 +169,10 @@ There are 5 types of plots (see examples below):
  * **none** : when set to this value, the results will not be rendered. This is useful when you only want to save the 'result' mesh to a file, then render it using your own method.
  * **simple** : this plot only draws your polyhedron to the screen
  * **full** : this one draws a lot of data separately: your edges (by type, etc.), your vertices and different mesh representations. Useful for understanding how things work and debugging in general
- * **evolution** : the evolution plot takes into account the number of _chaikin generations_ that you want (```-cg``` option). I will render one generation after another in a grid-format (like the "full" plot)
+ * **evolution** : the evolution plot takes into account the number of _chaikin generations_ that you want (```-cg``` option). Each generation will be rendered in a grid-format (like the "full" plot)
  * **animation** (do not use) : this plot should create an animation, rendering all the _chaikin generations_ from 0 to the value given in the ```-cg``` option
-The default value is "simple"
+
+The default value is **simple**.
 
 ### How to plot (colors, etc.)
 
@@ -212,7 +213,7 @@ Or this:
 python chaikin3d.py -i example-meshes/cube.obj -cg 3 -p full -o render.html
 ```
 
-Then, you could re-use this 'new-cube.obj' file as input for new chaikin iterations, or render it using other rendering software ([this website](https://3dviewer.net/), for example).
+Then, you could re-use this 'new-cube.obj' file as input for new chaikin iterations, or render it using some other means (like your own rendering software ou [this website](https://3dviewer.net/)).
 
 
 ## Other Options
@@ -220,7 +221,7 @@ Then, you could re-use this 'new-cube.obj' file as input for new chaikin iterati
 ```-v```/```--verbose```
 ```-vv```/```--vverbose```
 
-The `-v` *verbose* shows info about the algorithm progress in the terminal. This might be useful for meshes with a lot of vertices or when having a lot of iterations. The `-vv` *vverbose* (very verbose) helps for debugging the algorithm.
+The `-v` *verbose* shows info about the algorithm progress in the terminal. This might be useful for meshes with a lot of vertices or when having a lot of iterations. The `-vv` *vverbose* (very verbose) is for debugging.
 
 
 ## Full help
@@ -269,7 +270,7 @@ options:
 
 ### Colors
 
-You can use the [CSS color code](https://www.w3.org/wiki/CSS/Properties/color/keywords) (extended colors too) to specify a color. An rgb value can be passed through the format *#rrggbb*, or any valid VSS color value.
+You can use the [CSS color code](https://www.w3.org/wiki/CSS/Properties/color/keywords) (extended colors too) to specify a color. RGB values are accepted in the format *#rrggbb*.
 
 
 # Examples
@@ -310,7 +311,7 @@ python chaikin3d.py -i example-meshes/tetrahedron.obj -p full -cg 1 -cc 3
 
 ![full triangle chaikin with coeff 3](pics/full-triangle-chaikin-cc-3.png)
 
-*The "solid" statement means that the alpha value of the triangles has been set to 1.0 (no transparency).*
+**solid** means that the alpha value of the triangles has been set to 1.0 (no transparency).
 
 
 ### Bigger meshes
